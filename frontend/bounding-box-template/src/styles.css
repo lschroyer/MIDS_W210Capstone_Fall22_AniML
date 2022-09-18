@@ -1,0 +1,20 @@
+:root {
+  --primary: #16aa65;
+  --secondary: #124e7f;
+  --dark: #555;
+  --light: #9a9a9a;
+  --white: #f7f7f7;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  /* margin: 10px 100px; */
+  background-color: lightblue;
+  font-family: "Poppins";
+}
