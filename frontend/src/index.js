@@ -19,6 +19,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Layout from "./pages/Layout";
 import Home from "./pages/Home";
 import Contact from "./pages/Contact";
+import BoundingBox from "./pages/BoundingBox";
 import NoPage from "./pages/NoPage"
 
 
@@ -29,6 +30,7 @@ export default function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="contact" element={<Contact />} />
+          <Route path="boundingbox" element={<BoundingBox />} />
           <Route path="*" element={<NoPage />} />
         </Route>
       </Routes>
