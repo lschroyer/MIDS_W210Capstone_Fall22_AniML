@@ -1,0 +1,110 @@
+{% extends "layout.html" %}
+{% block script %}
+<!-- 
+put your custom script or styling here
+
+-->
+{% endblock script %}
+
+
+{% block my_content %}
+<!-- Confirmed, Recovered, Deaths Card -->
+<div class="row">
+    <div class="col-sm">
+        <!-- small box -->
+        <div class="small-box bg-warning">
+            <div class="inner">
+                <h3>{{context.total_category_count}}</h3>
+
+                <p>Total Category Count</p>
+            </div>
+        </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-sm">
+        <!-- small box -->
+        <div class="small-box bg-success">
+            <div class="inner">
+                <h3>{{context.total_product_count}}<sup style="font-size: 20px"></sup></h3>
+
+                <p>Total Product Count</p>
+            </div>
+        </div>
+    </div>
+    <!-- ./col -->
+    <!-- ./col -->
+    <div class="col-sm">
+        <!-- small box -->
+        <div class="small-box bg-danger">
+            <div class="inner">
+                <h3>{{context.average_rank}}</h3>
+
+                <p>Average Rank</p>
+            </div>
+        </div>
+    </div>
+    <!-- ./col -->
+</div>
+<!-- Altair plot placeholder -->
+<div class="container-fluid">
+    <!-- Ivan added codes 2/3/2021 -->
+    <!-- 
+    <div class="row">
+    -->
+        <!-- Placeholder for scatterchart_player -->
+    <!-- 
+        <div id="scatterchart_player"></div>
+    </div>
+    -->
+    <!-- Ivan added codes 2/5/2021 -->
+    <div class="row">
+        <!-- Placeholder for scatterchart_product -->
+        <div id="scatterchart_product"></div>
+    </div>     
+    <!-- Ivan added codes 2/6/2021 -->
+    <div class="row">
+        <div class="column">
+            <!-- Placeholder for bar_product -->
+            <div id="bar_product"></div>
+        </div>      
+        <div class="column">
+            <!-- Placeholder for bar_product -->
+            <div id="line_product"></div>
+        </div>      
+    </div>   
+    <!-- Ivan added codes 2/7/2021 -->
+    <div class="row">
+        <div class="column">
+            <!-- Placeholder for bar_product -->
+            <div id="bar_year_product"></div>
+        </div>      
+        <div class="column">
+            <!-- Placeholder for bar_product -->
+            <div id="bar_yearqtrmonth_product"></div>
+        </div>      
+    </div>   
+    <!-- Placeholder for the tooltip -->
+    <div id="vis-tooltip" class="vg-tooltip"></div>
+</div>
+<!-- Render Charts -->
+<script type="text/javascript">
+    function parse(url, div) {
+        var opt = {
+            mode: "vega-lite",
+            renderer: "svg",
+            actions: { export: true, source: false, editor: false }
+        };
+        vegaEmbed("#" + div, url, opt, function (error, result) {
+            // result.view is the Vega View, url is the original Vega-Lite specification
+            vegaTooltip.vegaLite(result.view, url);
+        });
+    }
+    //Parse your Json variable here
+    // parse({{ context.plot_scatterchart_player | safe }},"scatterchart_player");
+    parse({{ context.plot_scatterchart_product | safe }},"scatterchart_product"); 
+    parse({{ context.plot_bar_product | safe }},"bar_product");  
+    parse({{ context.plot_line_product | safe }},"line_product");  
+    parse({{ context.plot_bar_year_product | safe }},"bar_year_product");  
+    parse({{ context.plot_bar_yearqtrmonth_product | safe }},"bar_yearqtrmonth_product");     
+</script>
+{% endblock my_content %}
