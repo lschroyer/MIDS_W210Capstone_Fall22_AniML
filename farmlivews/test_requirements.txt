@@ -1,0 +1,12 @@
+numpy==1.18.4
+matplotlib==3.2.2
+altair==4.1.0
+scipy==1.5.0
+vega_datasets==0.8.0
+regex==2020.6.8
+Flask==1.1.2
+plotly==4.9.0
+pyLDAvis==2.1.2
+python-dotenv
+jinja2<3.1.0
+itsdangerous==2.0.1

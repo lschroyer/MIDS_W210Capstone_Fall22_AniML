@@ -1,0 +1,80 @@
+{% extends "layout.html" %}
+{% block script %}
+<!-- 
+put your custom script or styling here
+-->
+{% endblock script %}
+{% block my_content %}
+<!-- Confirmed, Recovered, Deaths Card -->
+<div class="row">
+    <div class="col-sm">
+        <!-- small box -->
+        <div class="small-box bg-danger">
+            <div class="inner">
+                <h3>{{context.category_name}}</h3>
+
+                <p>Category Name</p>
+            </div>
+        </div>
+    </div>
+    <!-- ./col -->
+    <div class="col-sm">
+        <!-- small box -->
+        <div class="small-box bg-warning">
+            <div class="inner">
+                <h3>{{context.total_product_count}}<sup style="font-size: 20px"></sup></h3>
+
+                <p>Total Product Count</p>
+            </div>
+        </div>
+    </div>
+    <!-- ./col -->
+    <!-- ./col -->
+    <div class="col-sm">
+        <!-- small box -->
+        <div class="small-box bg-success">
+            <div class="inner">
+                <h3>{{context.average_rank}}</h3>
+
+                <p>Average Rank</p>
+            </div>
+        </div>
+    </div>
+    <!-- ./col -->
+</div>
+
+<div class="container-fluid">
+    <!-- Ivan modified codes 2-3-2021 -->
+    <div class="row">
+        <!-- Placeholder for the altair-->
+        <div id="altair-category-product"></div>
+        <hr>
+        <div class="row">
+            <!-- Placeholder for the chart js notice that it use canvas-->
+        </div>
+        <!-- Placeholder for the tooltip -->
+        <div id="vis-tooltip" class="vg-tooltip"></div>
+    </div>
+</div>
+
+<!-- Script to execute the Json -->
+
+<!-- Altair -->
+<script type="text/javascript">
+    function parse(url, div) {
+        var opt = {
+            mode: "vega-lite",
+            renderer: "svg",
+            actions: { export: true, source: false, editor: false }
+        };
+        vegaEmbed("#" + div, url, opt, function (error, result) {
+            // result.view is the Vega View, url is the original Vega-Lite specification
+            vegaTooltip.vegaLite(result.view, url);
+        });
+    }
+    //Parse your Json variable here
+    parse({{ context.altair_category_product_plot | safe }}, "altair-category-product")
+</script>
+
+
+{% endblock my_content %}
