@@ -1,19 +1,23 @@
-from fastapi import FastAPI, Request, Form, APIRouter
-from fastapi.responses import HTMLResponse
+from fastapi import Request, UploadFile, File, APIRouter
 from fastapi.templating import Jinja2Templates
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates/")
 
 
-@router.get("/upload", response_class=HTMLResponse)
-def get_upload(request: Request):
-    tag = "flower"
-    result = "Type a number"
-    return templates.TemplateResponse('Upload.html', context={'request': request, 'result': result, 'tag': tag})
+@router.post("/upload")
+def upload(file: UploadFile = File(...)):
+    try:
+        contents = file.file.read()
+        with open("uploaded_" + file.filename, "wb") as f:
+            f.write(contents)
+    except Exception:
+        return {"message": "There was an error uploading the file"}
+    finally:
+        file.file.close()
 
+    return {"message": f"Successfuly uploaded {file.filename}"}
 
-@router.post("/upload", response_class=HTMLResponse)
-def post_upload(request: Request, tag: str = Form(...)):
-
-    return templates.TemplateResponse('Upload.html', context={'request': request, 'tag': tag})
+@router.get("/upload")
+def main(request: Request):
+    return templates.TemplateResponse("upload.html", {"request": request})

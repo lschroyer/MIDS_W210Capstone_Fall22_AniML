@@ -1,7 +1,7 @@
 {% extends "base.html" %}
-{% set active_page = "accordion" %}
+{% set active_page = "label" %}
 
-{% block title %}Accordion{% endblock %}
+{% block title %}Label{% endblock %}
 
 {% block head %}
 {{ super() }}
@@ -10,37 +10,37 @@
 {% endblock %}
 
 {% block page_content %}
-<h1 class="cap">Accordion</h1>
+<h1 class="cap">Select</h1>
 
 {% if tag %}
 <h2>You selected {{tag}}</h2>
 {% endif %}
 
-{% set flora = ['flower','tree','fruit','garden'] %}
-{% set fauna = [ 'cat', 'dog', 'bird', 'fish'] %}
+{% set Choice_1 = ['1','2','3','4', ''] %}
+{% set Choice_2 = [ 'A', 'B', 'C', 'D', ''] %}
 
 <form method="post" id="category">
-    <div class="accordion" id="accordionExample">
+    <div class="upload" id="uploadExample">
         <div class="card">
             <div class="card-header" id="headingOne">
                 <h2 class="mb-0">
                     <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne"
                         aria-controls="collapseOne">
-                        FLORA
+                        Choice_1
                     </button>
 
                 </h2>
             </div>
 
             <div id="collapseOne" class="collapse
-            {% for  name in flora %}
+            {% for  name in Choice_1 %}
             {% if name==tag %}
             show
             {% endif %}
             {% endfor %}
-            " aria-labelledby="headingOne" data-parent="#accordionExample">
+            " aria-labelledby="headingOne" data-parent="#uploadExample">
                 <div class="card-body">
-                    {% for name in flora %}
+                    {% for name in Choice_1 %}
                     {% if tag == name %}
                     {% set checked="checked" %}
                     {% endif %}
@@ -57,23 +57,23 @@
         </div>
 
         <div class="card">
-            <div class="card-header" id="headingTwo">
+            <div class="card-header" id="analytics">
                 <h2 class="mb-0">
                     <button class="btn btn-link collapsed" type="button" data-toggle="collapse"
                         data-target="#collapseTwo" aria-controls="collapseTwo">
-                        FAUNA
+                        Choice_2
                     </button>
                 </h2>
             </div>
             <div id="collapseTwo" class="collapse
-            {% for  name in fauna %}
+            {% for  name in Choice_1 %}
             {% if name==tag %}
             show
             {% endif %}
             {% endfor %}
-            " aria-labelledby="headingTwo" data-parent="#accordionExample">
+            " aria-labelledby="headingTwo" data-parent="#uploadExample">
                 <div class="card-body">
-                    {% for name in fauna %}
+                    {% for name in Choice_2 %}
                     {% if tag == name %}
                     {% set checked="checked" %}
                     {% endif %}
