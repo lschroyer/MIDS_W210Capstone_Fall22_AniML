@@ -20,6 +20,7 @@ import Layout from "./pages/Layout";
 import Home from "./pages/Home";
 import Contact from "./pages/Contact";
 import BoundingBox from "./pages/BoundingBox";
+import UploadAndDisplayImage from "./pages/ImagesUpload";
 import NoPage from "./pages/NoPage"
 
 
@@ -31,6 +32,7 @@ export default function App() {
           <Route index element={<Home />} />
           <Route path="contact" element={<Contact />} />
           <Route path="boundingbox" element={<BoundingBox />} />
+          <Route path="uploadimages" element={<UploadAndDisplayImage />} />
           <Route path="*" element={<NoPage />} />
         </Route>
       </Routes>

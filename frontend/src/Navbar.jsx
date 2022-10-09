@@ -14,6 +14,9 @@ function Navbar() {
         <li>
           <Link to="/boundingbox">BoundingBox</Link>
         </li>
+        <li>
+          <Link to="/uploadimages">UploadImages</Link>
+        </li>
       </ul>
     </nav>
   );
