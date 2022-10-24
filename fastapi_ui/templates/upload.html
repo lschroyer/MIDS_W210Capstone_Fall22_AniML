@@ -26,19 +26,6 @@
         var file_list = inputs[0].files
         console.log(file_list)
         console.log(inputs_array)
-        // inputs.forEach(input=>{
-        //     //deal with each input
-        //     let file = input.files[0];
-        //     //use file
-        //     const reader = new FileReader();
-        //     reader.addEventListener("load", function() {
-        //         // preview.src = reader.result; // show image in <img> tag
-        //         uploadFile(file)
-        //     }, false);
-        //     if (file) {
-        //         reader.readAsDataURL(file);
-        //     }
-        //     });
         for(let i=0; i<file_list.length; i++){
             // let file = inputs[i].files[0];
             let file = file_list[i];
@@ -56,30 +43,6 @@
         }
     }
 
-
-        // for (let i = 0; numFiles = myfiles.length; i < numFiles) {
-        // // for (let i = 0; numFiles = fileList.length; i < numFiles) {
-        //     const file = document.querySelector('input[type=file]').files[0];
-        //     const reader = new FileReader();
-        //     reader.addEventListener("load", function() {
-        //         // preview.src = reader.result; // show image in <img> tag
-        //         uploadFile(file)
-        //     }, false);
-        //     if (file) {
-        //         reader.readAsDataURL(file);
-        //     }
-        // }
-        // const file = document.querySelector('input[type=file]').files[0];
-        // const reader = new FileReader();
-        // reader.addEventListener("load", function() {
-        //     // preview.src = reader.result; // show image in <img> tag
-        //     uploadFile(file)
-        // }, false);
-        // if (file) {
-        //     reader.readAsDataURL(file);
-        // }
-    // }
-
     function uploadFile(file) {
         var formData = new FormData();
         formData.append('file', file);
@@ -95,15 +58,11 @@
             });
     }
 </script>
-<!--<input type="file" onchange="previewFile()"><br>-->
-<!--<input id="myfiles" name = "myfiles" multiple type="file" onchange="previewFile()"><br>-->
 <form action="/action_page.php">
-<!--  <label for="files">Select files:</label>-->
   <input type="file" id="files"
          name="files[]" multiple
          onchange="previewFile()"
-         accept="image/jpeg, image/png, image/jpg"><br><br>
-<!--  <label id="files-upload-label" for="files"><i class="fas fa-plus plus fa-4x"></i></label>-->
+         accept="image/*, zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed"><br><br>
   <label id="files-upload-label" for="files"><i previewFile()></i></label>
 
 </form>
