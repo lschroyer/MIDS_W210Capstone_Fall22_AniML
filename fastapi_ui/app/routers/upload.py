@@ -42,9 +42,6 @@ def upload(file: UploadFile = File(...)):
         response = s3.upload_file(local_file_path, bucket_name, '%s/%s' % (bucket_folder,object_name ))
 
 
-
-
-
     except Exception:
         raise HTTPException(status_code=400, detail="There was an error uploading the file to S3")
         
