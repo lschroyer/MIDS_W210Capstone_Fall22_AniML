@@ -20,8 +20,8 @@ logging.info("end of logging configs")
 
 @router.post("/upload")
 def upload(file: UploadFile = File(...)):
-    destination_file_path = "images_uploads/"+file.filename #output file path
     file_name = file.filename
+    destination_file_path = "images_uploads/" + file_name #output file path
     logging.debug("Logging Test")
     try:
         contents = file.file.read()
