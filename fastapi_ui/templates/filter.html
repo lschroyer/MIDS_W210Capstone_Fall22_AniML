@@ -1,7 +1,7 @@
 {% extends "base.html" %}
-{% set active_page = "upload" %}
+{% set active_page = "filter" %}
 
-{% block title %}Upload{% endblock %}
+{% block title %}Filter{% endblock %}
 
 {% block head %}
 {{ super() }}
@@ -9,11 +9,17 @@
 
 {% endblock %}
 
-{% block page_content %}
-<h1 class="cap">Drag, Drop & Train!</h1>
-<p>Drag and drop your Labeled Dataset & we’ll train a custom model that you can use to automatically monitor your camera<br>
-    <br>
+<div>Hello World</div>
 
+
+{% block page_content %}
+<h1 class="cap">Filter</h1>
+
+    <p>No more combing through thousands of false triggers! <br>
+    Simply add all your images below or a zip file of your images and we’ll cluster them into similar groups based on likeness.
+    <br>
+    <br>
+</p>
 
 <script type="text/javascript">
     function previewFile() {
@@ -26,18 +32,8 @@
         var file_list = inputs[0].files
         console.log(file_list)
         console.log(inputs_array)
-        
-        loopProgress(file_list);
-        $(window).resize(function() {
-            loopProgress(file_list);
-        });
-    }
-
-    function loopProgress(file_list) {
-        var list = $('.progress-wrap');        
-
         for(let i=0; i<file_list.length; i++){
-            
+            // let file = inputs[i].files[0];
             let file = file_list[i];
             console.log("filename:")
             console.log(file)
@@ -49,18 +45,8 @@
             if (file) {
                 reader.readAsDataURL(file);
             }
-            
-            var percent = (list[i].getAttribute('data-progress-percent'))/ 100;
-            var getProgressWrapWidth = list.width();
-            var progressTotal = percent * getProgressWrapWidth;
-            var animationLength = 2500;   
-                // on page load, animate percentage bar to data percentage length
-                // .stop() used to prevent animation queueing
-                $('.progress-bar').stop().animate({
-                    left: progressTotal 
-                }, animationLength);
-            }
         }
+    }
 
     function uploadFile(file) {
         var formData = new FormData();
@@ -76,9 +62,7 @@
                 console.error(error);
             });
     }
-
 </script>
-
 <form action="/action_page.php">
   <input type="file" id="files"
          name="files[]" multiple
@@ -87,9 +71,6 @@
   <label id="files-upload-label" for="files"><i previewFile()></i></label>
 
 </form>
-
-<button onclick="myFunction()">Train Model</button>
-
 
 {% endblock %}
 

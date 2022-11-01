@@ -1,9 +1,9 @@
-# MIDS_W210Capstone_Fall22_FarMLife
-W210 - Section 7 - FarMLife Group
+# MIDS_W210Capstone_Fall22_AniML
+W210 - Section 7 - AniML Group
 
-Lucas Harvey-Schroyer, 
 Ivan Wong,
 Lana Elauria,
+Lucas Harvey-Schroyer, 
 Whit Blodgett
 
 GitHub Repository For Hosting Code for the Web Application - Computer Vision AI Model

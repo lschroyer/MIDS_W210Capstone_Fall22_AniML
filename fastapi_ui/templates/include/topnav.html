@@ -3,7 +3,7 @@
 
         <button type="button" id="sidebarCollapse" class="btn btn-info">
             <i class="fas fa-align-left"></i>
-            <span>Toggle Sidebar</span>
+            <span>Menu</span>
         </button>
         <button class="btn btn-dark d-inline-block d-lg-none ml-auto" type="button" data-toggle="collapse"
             data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false"
@@ -13,15 +13,25 @@
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="nav navbar-nav ml-auto">
+                <li class="nav-item {{'active' if active_page == 'filter' }}">
+                    <a class="nav-link" href="/filter">Filter Images</a>
+                </li>
+                <li class="nav-item {{'active' if active_page == 'review' }}">
+                    <a class="nav-link" href="/review">Review Filtered Images</a>
+                </li>
                 <li class="nav-item {{'active' if active_page == 'label' }}">
-                    <a class="nav-link" href="/label">Label</a>
+                    <a class="nav-link" href="/label">Label Images</a>
+                </li>
+                <li class="nav-item {{'active' if active_page == 'upload' }}">
+                    <a class="nav-link" href="/upload">Model Training</a>
+                </li>
+                <li class="nav-item {{'active' if active_page == 'inference' }}">
+                    <a class="nav-link" href="/inference">Automatic Image Detection</a>
                 </li>
                 <li class="nav-item {{'active' if active_page == 'analytics' }}">
                     <a class="nav-link" href="/analytics">Analytics</a>
                 </li>
-                <li class="nav-item {{'active' if active_page == 'upload' }}">
-                    <a class="nav-link" href="/upload">Upload</a>
-                </li>
+                
             </ul>
         </div>
     </div>
