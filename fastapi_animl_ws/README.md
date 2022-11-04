@@ -1,18 +1,19 @@
-# About
-<br>
-<h1 style="display:inline;color:gold;">Ani</h1><h1 style="display:inline;color:green;">ML</h1>
-<h2 style="color:green;">No Code ML Vision for Specialists with no CV experience</h2>
+**Ivan Wong**
 
-<br>
-<p style="display:inline;color:green;">As a</p> 
-<p style="display:inline;color:blue;">Specialist with no computer vision experience</p> 
-<p style="display:inline;color:green;">, I need a way to rapidly create a CV system to (1)automatically</p>
-<p style="display:inline;color:blue;">filter </p>
-<p style="display:inline;color:green;">a large set of images, (2) </p>
-<p style="display:inline;color:blue;">identify </p>
-<p style="display:inline;color:green;">objects of interest and (3) provide analytical 
-<p style="display:inline;color:blue;">insights. </p>
+**11/3/22**
 
-<br>
-<br>
-<p style="color:green;">Reducing the amount of time needed for non-technical tasks enables these groups to spend more time where it counts.</p>
+**FastAPI Web Server for AniML**
+
+*Environment*
+
+* Login to EC2 Farmlive2 instance
+* Create conda environment
+   * conda create -c conda-forge --name anymlws_p39 python=3.9
+
+*Run application*
+* conda env list
+* conda activate anymlws_p39 
+* cd /data/fastapi_animl_ws
+* Start Unicorn
+	 * uvicorn app.main:app --reload --host 0.0.0.0 --port 8080
+	 * http://52.52.143.50:8080/
