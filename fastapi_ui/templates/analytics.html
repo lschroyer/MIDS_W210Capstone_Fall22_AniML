@@ -13,6 +13,9 @@
 <h1 class="cap">Analytics</h1>
 {% if yournum %}
 <h2>Your number is {{yournum}} and the result is {{result}}.</h2>
+{% else %}
+<h2>Image ID's are:</h2>
+{{result}}
 {% endif %}
 <h3>Form 1: Add 2</h3>
 <form action="/form1" method="post">
@@ -23,6 +26,11 @@
 <h3>Form 2: Add 100</h3>
 <form action="/form2" method="post">
     <input type="number" name="number" value="" required />
+    <input type="submit">
+</form>
+
+<h3>Form 3: Show Image IDS</h3>
+<form action="/form3" method="get">
     <input type="submit">
 </form>
 

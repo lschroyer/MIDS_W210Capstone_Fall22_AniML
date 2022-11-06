@@ -1,7 +1,7 @@
 {% extends "base.html" %}
-{% set active_page = "inference" %}
+{% set active_page = "training" %}
 
-{% block title %}Inference{% endblock %}
+{% block title %}Training{% endblock %}
 
 {% block head %}
 {{ super() }}
@@ -9,66 +9,10 @@
 
 {% endblock %}
 
-
 {% block page_content %}
-<h1 class="cap">Auotmatic Image Detection</h1>
-
-    <p>No more combing through thousands of false triggers! <br>
-    Simply add all your images below or a zip file of your images and we’ll cluster them into similar groups based on likeness.
+<h1 class="cap">Drag, Drop & Train!</h1>
+<p>Drag and drop your Labeled Dataset (i.e. Roboflow zip file) & we’ll train a custom model that you can use to automatically monitor your camera<br>
     <br>
-    <br>
-</p>
-
-<!-- <script type="text/javascript">
-    function previewFile() {
-        console.log("document:")
-        console.log(document)
-        var inputs = document.querySelectorAll('input[type=file]');
-        console.log("inputs:")
-        console.log(inputs)
-        var inputs_array = [...inputs];
-        var file_list = inputs[0].files
-        console.log(file_list)
-        console.log(inputs_array)
-        for(let i=0; i<file_list.length; i++){
-            // let file = inputs[i].files[0];
-            let file = file_list[i];
-            console.log("filename:")
-            console.log(file)
-            //use file
-            const reader = new FileReader();
-            reader.addEventListener("load", function() {
-                uploadFile(file)
-            }, false);
-            if (file) {
-                reader.readAsDataURL(file);
-            }
-        }
-    }
-
-    function uploadFile(file) {
-        var formData = new FormData();
-        formData.append('file', file);
-        fetch('/upload', {
-                method: 'POST',
-                body: formData,
-            })
-            .then(response => {
-                console.log(response);
-            })
-            .catch(error => {
-                console.error(error);
-            });
-    }
-</script>
-<form action="/action_page.php">
-  <input type="file" id="files"
-         name="files[]" multiple
-         onchange="previewFile()"
-         accept="image/*, zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed"><br><br>
-  <label id="files-upload-label" for="files"><i previewFile()></i></label>
-
-</form> -->
 
 <html>
 
@@ -77,7 +21,7 @@
     <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <!-- <script src="{{ url_for('static', path='app.js') }}"></script> -->
-    <script src="../static/js/app.js"></script>
+    <script src="../static/js/training.js"></script>
     <!-- <link href="{{ url_for('static', path='css/styles.css') }}" rel="stylesheet"> -->
     <link rel="stylesheet" href="../static/css/styles.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
@@ -85,8 +29,8 @@
 </head>
 
 <body>
-    <h2> AniML - Object Detection</h2>
-    <p style="text-align: center;">Upload images and perform YOLOv5 object detection</p>
+    <h2> AniML - Model Training</h2>
+    <p style="text-align: center;">Upload labeled images to perform custom YOLOv5 model training</p>
     <div class="container">
         <div class="col-sm-12">
             <div class="form-row">
@@ -96,7 +40,7 @@
                 </div>
                 <div class="form-group col-md-4">
                     <label>&nbsp;</label>
-                    <button type="button" class="btn btn-primary btn-block" id="btn-process">Upload and Process</button>
+                    <button type="button" class="btn btn-primary btn-block" id="btn-training">Training</button>
                 </div>
             </div>
             <div class="form-row" id="row_results">
@@ -124,7 +68,6 @@
 </body>
 
 </html>
-
 
 {% endblock %}
 

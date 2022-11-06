@@ -7,7 +7,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from .library.helpers import *
-from .routers import analytics, label, upload, filter, review, inference
+from .routers import analytics, label, upload, filter, review, inference, training
 
 
 from datetime import datetime
@@ -23,7 +23,8 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 app.include_router(filter.router)
 app.include_router(review.router)
 app.include_router(label.router)
-app.include_router(upload.router)
+# app.include_router(upload.router)
+app.include_router(training.router)
 app.include_router(inference.router)
 app.include_router(analytics.router)
 

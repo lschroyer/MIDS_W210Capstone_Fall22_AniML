@@ -96,6 +96,104 @@
     <button type="submit" class="submit btn btn-primary btn-xl">Submit</button>
 </form>
 
+
+
+<body>
+    <div>
+        <h1>This is a heading</h1>
+        <p>This is a paragraph.</p>
+        <button id="jsstyle" 
+        onclick="display_random_image();">Show Image</button> 
+    </div>
+
+
+<script type="text/javascript">
+    function display_random_image() 
+    {
+        var theImages = [{
+            src: "http://farm4.staticflickr.com/3691/11268502654_f28f05966c_m.jpg",
+            width: "240",
+            height: "160",
+            position: "fixed",
+            x: "200",
+            y: "200"
+
+        }, {
+            src: "http://farm1.staticflickr.com/33/45336904_1aef569b30_n.jpg",
+            width: "320",
+            height: "195",
+            position: "fixed",
+            x: "200",
+            y: "200"
+        }, {
+            src: "http://farm6.staticflickr.com/5211/5384592886_80a512e2c9.jpg",
+            width: "500",
+            height: "343",
+            position: "fixed",
+            x: "200",
+            y: "200"
+        }];
+        
+        var preBuffer = [];
+        for (var i = 0, j = theImages.length; i < j; i++) {
+            preBuffer[i] = new Image();
+            preBuffer[i].src = theImages[i].src;
+            preBuffer[i].width = theImages[i].width;
+            preBuffer[i].height = theImages[i].height;
+            preBuffer[i].position = theImages[i].position;
+            preBuffer[i].x = theImages[i].x;
+            preBuffer[i].y = theImages[i].y;
+        }
+    
+    // create random image number
+        function getRandomInt(min,max) 
+            {
+            //  return Math.floor(Math.random() * (max - min + 1)) + min;
+            
+        imn = Math.floor(Math.random() * (max - min + 1)) + min;
+            return preBuffer[imn];
+            }  
+
+        // 0 is first image,   preBuffer.length - 1) is  last image
+        
+        var newImage = getRandomInt(0, preBuffer.length - 1);
+        
+        // remove the previous images
+        var images = document.getElementsByTagName('img');
+        var l = images.length;
+        for (var p = 0; p < l; p++) {
+            images[0].parentNode.removeChild(images[0]);
+        }
+        // display the image  
+        // document.body.appendChild(newImage);
+
+        
+        
+
+
+        var newDivElement = document.createElement("div");
+
+        // Add the image element to the div:
+        newDivElement.append(newImage);
+
+        // Append the div
+
+        document.body.append(newDivElement);
+
+        document.body.insertBefore
+
+        }
+    </script>
+
+<div style="position:relative; height:60px;">
+    <img src="//www.willmaster.com/images/20000710w80h80.jpg"
+       style="position:absolute; top:-10px; left:-30px; width:80px; height:80px; border:none;"
+       alt="photo of Will Bontrager"
+       title="Photo of Will Bontrager" />
+    </div>
+    
+
+
 {% endblock %}
 
 {% block scripts %}
