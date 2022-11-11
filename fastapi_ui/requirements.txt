@@ -9,3 +9,4 @@ Markdown==3.3.4
 pytest==6.2.5
 boto3==1.24.95
 pandas==1.4.4
+dataframe_image==0.1.3

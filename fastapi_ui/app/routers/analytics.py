@@ -1,10 +1,14 @@
 from fastapi import FastAPI, Request, Form, APIRouter
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.templating import Jinja2Templates
 import json
 
 import pandas as pd
 import logging
+import matplotlib.pyplot as plt
+from pandas.plotting import table 
+import dataframe_image as dfi
+
 
 # setup loggers
 # logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
@@ -74,11 +78,6 @@ def form_post1(request: Request, number: int = Form(...)):
     return templates.TemplateResponse('analytics.html', context={'request': request, 'result': result, 'yournum': number})
 
 
-@router.post("/form2", response_class=HTMLResponse)
-def form_post2(request: Request, number: int = Form(...)):
-    result = number + 100
-    return templates.TemplateResponse('analytics.html', context={'request': request, 'result': result, 'yournum': number})
-
 @router.post("/form3", response_class=HTMLResponse)
 def form_post3(request: Request, conf_lev: float = Form(...)):
     pred_classes_new = filter_low_conf_images(conf_lev)
@@ -90,13 +89,23 @@ def form_post3(request: Request, conf_lev: float = Form(...)):
     model_predictions_df = pd.DataFrame.from_dict(model_predictions)
 
 
-    #render dataframe as html
-    html = model_predictions_df.to_html()
+    # #render dataframe as html
+    # html = model_predictions_df.to_html()
 
-    #write html to file
-    text_file = open("templates/classification_table.html", "w")
-    text_file.write(html)
-    text_file.close()
+    # #write html to file
+    # text_file = open("templates/classification_table.html", "w")
+    # text_file.write(html)
+    # text_file.close()
 
-    return templates.TemplateResponse('analytics.html', context={'request': request, 'model_predictions': model_predictions_df})
+    # ax.xaxis.set_visible(False)  # hide the x axis
+    # ax.yaxis.set_visible(False)  # hide the y axis
+
+    # table(ax, df)  # where df is your data frame
+
+    # plt.savefig('mytable.png')
+
+    dfi.export(model_predictions_df,"analytics/conf_table.png")
+    show_model_table = True
+
+    return templates.TemplateResponse('analytics.html', context={'request': request, 'model_predictions': show_model_table})
 
