@@ -10,6 +10,7 @@ from pandas.plotting import table
 import dataframe_image as dfi
 
 
+
 # setup loggers
 # logging.config.fileConfig('logging.conf', disable_existing_loggers=False)
 
@@ -66,46 +67,36 @@ def filter_low_conf_images(conf_level):
 
 @router.get("/analytics", response_class=HTMLResponse)
 def form_get(request: Request):
-    logger.info("log test")
+    # logger.info("log test")
     logger.info(test_yolo_image_ids)
-    result = "Type a number"
-    return templates.TemplateResponse('analytics.html', context={'request': request, 'result': result})
+    model_predictions = {"image ids": test_yolo_image_ids, 
+            "confidence scores": test_yolo_confs, 
+            "predicted classes original": test_yolo_pred_classes}
+
+    model_predictions_df = pd.DataFrame.from_dict(model_predictions)
+    dfi.export(model_predictions_df,"static/images/analytics/conf_table_initial.png")
 
 
-@router.post("/form1", response_class=HTMLResponse)
-def form_post1(request: Request, number: int = Form(...)):
-    result = number + 2
-    return templates.TemplateResponse('analytics.html', context={'request': request, 'result': result, 'yournum': number})
+    show_model_table_initial = False
+    return templates.TemplateResponse('analytics.html', context={'request': request, 'model_predictions': show_model_table_initial})
 
 
-@router.post("/form3", response_class=HTMLResponse)
+@router.post("/reclassify_predictions", response_class=HTMLResponse)
 def form_post3(request: Request, conf_lev: float = Form(...)):
     pred_classes_new = filter_low_conf_images(conf_lev)
-    model_predictions = {"image_ids": test_yolo_image_ids, 
-            "confidence_scores": test_yolo_confs, 
-            "predicted_classes_old": test_yolo_pred_classes, 
-            "predicted_classes_new": pred_classes_new}
+    model_predictions = {"image ids": test_yolo_image_ids, 
+            "confidence scores": test_yolo_confs, 
+            "predicted classes original": test_yolo_pred_classes, 
+            "predicted classes new": pred_classes_new}
 
     model_predictions_df = pd.DataFrame.from_dict(model_predictions)
 
+    dfi.export(model_predictions_df,"static/images/analytics/conf_table_reclassified.png")
+    show_model_table_reclassified = True
+    model_cutoff = float(conf_lev)
 
-    # #render dataframe as html
-    # html = model_predictions_df.to_html()
-
-    # #write html to file
-    # text_file = open("templates/classification_table.html", "w")
-    # text_file.write(html)
-    # text_file.close()
-
-    # ax.xaxis.set_visible(False)  # hide the x axis
-    # ax.yaxis.set_visible(False)  # hide the y axis
-
-    # table(ax, df)  # where df is your data frame
-
-    # plt.savefig('mytable.png')
-
-    dfi.export(model_predictions_df,"analytics/conf_table.png")
-    show_model_table = True
-
-    return templates.TemplateResponse('analytics.html', context={'request': request, 'model_predictions': show_model_table})
+    return templates.TemplateResponse('analytics.html', 
+        context={'request': request, 
+                'model_predictions': show_model_table_reclassified, 
+                'reclass_conf_lev_cutoff': model_cutoff})
 
