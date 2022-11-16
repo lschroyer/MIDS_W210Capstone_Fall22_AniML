@@ -1,12 +1,11 @@
-from fastapi import FastAPI, Request, Form, APIRouter
-from fastapi.responses import HTMLResponse, FileResponse
+from fastapi import Request, Form, APIRouter
+from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 import json
 
 import pandas as pd
 import logging
 import matplotlib.pyplot as plt
-from pandas.plotting import table 
 import dataframe_image as dfi
 
 

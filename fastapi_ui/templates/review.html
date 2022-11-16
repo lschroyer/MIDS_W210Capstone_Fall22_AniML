@@ -16,182 +16,48 @@
     If it contains an object of interest you’d like to automatically detect, select it for labeling.<br>
     <br>
 
-{% if tag %}
-<h2>You selected {{tag}}</h2>
-{% endif %}
-
-{% set Choice_1 = ['1','2','3','4', ''] %}
-{% set Choice_2 = [ 'A', 'B', 'C', 'D', ''] %}
-
-<form method="post" id="category">
-    <div class="upload" id="uploadExample">
-        <div class="card">
-            <div class="card-header" id="headingOne">
-                <h2 class="mb-0">
-                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne"
-                        aria-controls="collapseOne">
-                        Choice_1
-                    </button>
-
-                </h2>
-            </div>
-
-            <div id="collapseOne" class="collapse
-            {% for  name in Choice_1 %}
-            {% if name==tag %}
-            show
-            {% endif %}
-            {% endfor %}
-            " aria-labelledby="headingOne" data-parent="#uploadExample">
-                <div class="card-body">
-                    {% for name in Choice_1 %}
-                    {% if tag == name %}
-                    {% set checked="checked" %}
-                    {% endif %}
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="tag" id="radio-{{name}}" value="{{name}}"
-                            {{ checked }}>
-                        <label class="form-check-label" for="radio-{{name}}">
-                            {{ name | capitalize}}
-                        </label>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header" id="analytics">
-                <h2 class="mb-0">
-                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse"
-                        data-target="#collapseTwo" aria-controls="collapseTwo">
-                        Choice_2
-                    </button>
-                </h2>
-            </div>
-            <div id="collapseTwo" class="collapse
-            {% for  name in Choice_1 %}
-            {% if name==tag %}
-            show
-            {% endif %}
-            {% endfor %}
-            " aria-labelledby="headingTwo" data-parent="#uploadExample">
-                <div class="card-body">
-                    {% for name in Choice_2 %}
-                    {% if tag == name %}
-                    {% set checked="checked" %}
-                    {% endif %}
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="tag" id="radio-{{name}}" value="{{name}}"
-                            {{ checked }}>
-                        <label class="form-check-label" for="radio-{{name}}">
-                            {{ name | capitalize}}
-                        </label>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-    </div>
-    <button type="submit" class="submit btn btn-primary btn-xl">Submit</button>
-</form>
-
-
+    {% if model_predictions %}
+    <h2>Model Predictions with new cutoff of {{reclass_conf_lev_cutoff}}</h2>
+    <img src="static/images/analytics/conf_table_reclassified.png" alt="Model Classification Table" width=”500″ height=”600″>
+    {% else %}
+    <h2>Model Predictions</h2>
+    <img src="static/images/analytics/conf_table_initial.png" alt="Model Classification Table" width=”500″ height=”600″>
+    {% endif %}
+    
+    
+    <h3>Reclassify with new confidence level</h3>
+    <form action="/reclassify_predictions" method="post">
+        <input type="number" name="conf_lev" id="conf_lev"
+        max="1.0000000000000000" min="0.0000000000000000" 
+        placeholder="e.g. 0.50" step="0.01" 
+        value="" required />
+        <input type="submit">
+    </form>
+    
 
 <body>
     <div>
-        <h1>This is a heading</h1>
-        <p>This is a paragraph.</p>
-        <button id="jsstyle" 
-        onclick="display_random_image();">Show Image</button> 
+        <h3>Click this submit button below to randomly view images from each class at 
+            current cuttoff level </h3>
+        <form action="/review_random_file" method="get">
+            <input type="submit">
+        </form>
+        {% if random_files_names %}
+        <h3>Random Sample Images Per Class at Current Cutoff: </h3>
+        <h4>Predicted Does Not Contains Animal</h4>
+        <figure>
+            <img src="{{'static/images/inference_images/' + random_files_names[0]}}" alt="Random Class 0" style="width:300px;height:auto;">
+            <figcaption>{{random_files_names[0]}}</figcaption>
+        </figure>
+        <h4>Predicted Does Contains Animal</h4>
+        <figure>
+            <img src="{{'static/images/inference_images/' + random_files_names[1]}}" alt="Random Class 1" style="width:300px;height:auto;">
+            <figcaption>{{random_files_names[1]}}</figcaption>
+        </figure>
+        {% endif %}
     </div>
 
 
-<script type="text/javascript">
-    function display_random_image() 
-    {
-        var theImages = [{
-            src: "http://farm4.staticflickr.com/3691/11268502654_f28f05966c_m.jpg",
-            width: "240",
-            height: "160",
-            position: "fixed",
-            x: "200",
-            y: "200"
-
-        }, {
-            src: "http://farm1.staticflickr.com/33/45336904_1aef569b30_n.jpg",
-            width: "320",
-            height: "195",
-            position: "fixed",
-            x: "200",
-            y: "200"
-        }, {
-            src: "http://farm6.staticflickr.com/5211/5384592886_80a512e2c9.jpg",
-            width: "500",
-            height: "343",
-            position: "fixed",
-            x: "200",
-            y: "200"
-        }];
-        
-        var preBuffer = [];
-        for (var i = 0, j = theImages.length; i < j; i++) {
-            preBuffer[i] = new Image();
-            preBuffer[i].src = theImages[i].src;
-            preBuffer[i].width = theImages[i].width;
-            preBuffer[i].height = theImages[i].height;
-            preBuffer[i].position = theImages[i].position;
-            preBuffer[i].x = theImages[i].x;
-            preBuffer[i].y = theImages[i].y;
-        }
-    
-    // create random image number
-        function getRandomInt(min,max) 
-            {
-            //  return Math.floor(Math.random() * (max - min + 1)) + min;
-            
-        imn = Math.floor(Math.random() * (max - min + 1)) + min;
-            return preBuffer[imn];
-            }  
-
-        // 0 is first image,   preBuffer.length - 1) is  last image
-        
-        var newImage = getRandomInt(0, preBuffer.length - 1);
-        
-        // remove the previous images
-        var images = document.getElementsByTagName('img');
-        var l = images.length;
-        for (var p = 0; p < l; p++) {
-            images[0].parentNode.removeChild(images[0]);
-        }
-        // display the image  
-        // document.body.appendChild(newImage);
-
-        
-        
-
-
-        var newDivElement = document.createElement("div");
-
-        // Add the image element to the div:
-        newDivElement.append(newImage);
-
-        // Append the div
-
-        document.body.append(newDivElement);
-
-        document.body.insertBefore
-
-        }
-    </script>
-
-<div style="position:relative; height:60px;">
-    <img src="//www.willmaster.com/images/20000710w80h80.jpg"
-       style="position:absolute; top:-10px; left:-30px; width:80px; height:80px; border:none;"
-       alt="photo of Will Bontrager"
-       title="Photo of Will Bontrager" />
-    </div>
-    
 
 
 {% endblock %}

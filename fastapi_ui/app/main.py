@@ -48,3 +48,4 @@ def sumbit_message(request: Request):
     print(data)
     return "successfully received your message!"
 
+
