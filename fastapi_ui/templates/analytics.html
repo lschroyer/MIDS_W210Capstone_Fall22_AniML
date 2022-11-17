@@ -18,6 +18,10 @@
 <img src="static/images/analytics/conf_table_reclassified.png" alt="Model Classification Table" width=”500″ height=”600″>
 {% else %}
 <h2>Model Predictions</h2>
+<div id="vis1" class="vis">
+    <div id="hist" class="vis-inner"/>
+</div>
+
 <img src="static/images/analytics/conf_table_initial.png" alt="Model Classification Table" width=”500″ height=”600″>
 {% endif %}
 
@@ -42,6 +46,13 @@
     <img src="static/images/inference_images/09290155_JPG.rf.31d35cd944998b1dbd0fa0358fcb0093.jpg" alt="Model Classification Table" width=”100″ height=”120″>
     <figcaption>09290155_JPG.rf.31d35cd944998b1dbd0fa0358fcb0093.jpg</figcaption>
 </figure>
+
+
+<!-- scripts to fill histogram/analytics viz divs -->
+<script>
+  var concat_chart = JSON.parse({{concat_chart|tojson|safe}});
+  vegaEmbed("#hist", concat_chart, {mode: "vega-lite"}).then(console.log).catch(console.warn);
+</script>
 
 {% endblock %}
 
