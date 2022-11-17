@@ -15,11 +15,26 @@
 
 {% if model_predictions %}
 <h2>Model Predictions with new cutoff of {{reclass_conf_lev_cutoff}}</h2>
-<img src="static/images/analytics/conf_table_reclassified.png" alt="Model Classification Table" width=”500″ height=”600″>
-{% else %}
-<h2>Model Predictions</h2>
+
 <div id="vis1" class="vis">
     <div id="hist" class="vis-inner"/>
+</div>
+
+<div id="space" class="space">
+<!--     this is just for some spacing so the image doesn't show up in a weird place -->
+</div>
+
+<img src="static/images/analytics/conf_table_reclassified.png" alt="Model Classification Table" width=”500″ height=”600″>
+
+{% else %}
+<h2>Model Predictions</h2>
+
+<div id="vis1" class="vis">
+    <div id="hist" class="vis-inner"/>
+</div>
+
+<div id="space" class="space">
+<!--     this is just for some spacing so the image doesn't show up in a weird place -->
 </div>
 
 <img src="static/images/analytics/conf_table_initial.png" alt="Model Classification Table" width=”500″ height=”600″>
