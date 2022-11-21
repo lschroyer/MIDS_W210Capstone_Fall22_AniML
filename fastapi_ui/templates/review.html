@@ -10,53 +10,162 @@
 {% endblock %}
 
 {% block page_content %}
-<h1 class="cap">Review Images</h1>
+<h1 class="cap">Review Image Classifications</h1>
 
-<p>Click into each cluster to review it’s contents.<br>
-    If it contains an object of interest you’d like to automatically detect, select it for labeling.<br>
-    <br>
 
-    {% if model_predictions %}
-    <h2>Model Predictions with new cutoff of {{reclass_conf_lev_cutoff}}</h2>
-    <img src="static/images/analytics/conf_table_reclassified.png" alt="Model Classification Table" width=”500″ height=”600″>
-    {% else %}
-    <h2>Model Predictions</h2>
-    <img src="static/images/analytics/conf_table_initial.png" alt="Model Classification Table" width=”500″ height=”600″>
-    {% endif %}
+<h2>Model Predictions with cutoff of: </h2>
+<h4>Confidence score cutoff = {{reclass_conf_lev_cutoff}}</h4>
+{% if model_predictions %}
+<img src="static/images/analytics/conf_table_reclassified.png" alt="Model Classification Table" width=”500″ height=”600″>
+{% else %}
+<img src="static/images/analytics/conf_table_initial.png" alt="Model Classification Table" width=”500″ height=”600″>
+{% endif %}
+
+<br><br>
+<h3>Reclassify with new confidence level</h3>
+<form action="/reclassify_predictions" method="post">
+    <input type="number" name="conf_lev" id="conf_lev"
+    max="1.0000000000000000" min="0.0000000000000000" 
+    placeholder="e.g. 0.50" step="0.01" 
+    value="" required />
+    <input type="submit">
+</form>
+
+<br><br>
+<h3>Reset classification to default model outputs</h3>
+<form action="/review" method="get">
+    <input type="submit" value="Reset classifications">
+</form>
+
     
-    
-    <h3>Reclassify with new confidence level</h3>
-    <form action="/reclassify_predictions" method="post">
-        <input type="number" name="conf_lev" id="conf_lev"
-        max="1.0000000000000000" min="0.0000000000000000" 
-        placeholder="e.g. 0.50" step="0.01" 
-        value="" required />
-        <input type="submit">
-    </form>
-    
+<br><br>
 
 <body>
-    <div>
-        <h3>Click this submit button below to randomly view images from each class at 
-            current cuttoff level </h3>
-        <form action="/review_random_file" method="get">
-            <input type="submit">
-        </form>
-        {% if random_files_names %}
-        <h3>Random Sample Images Per Class at Current Cutoff: </h3>
-        <h4>Predicted Does Not Contains Animal</h4>
-        <figure>
-            <img src="{{'static/images/inference_images/' + random_files_names[0]}}" alt="Random Class 0" style="width:300px;height:auto;">
-            <figcaption>{{random_files_names[0]}}</figcaption>
-        </figure>
-        <h4>Predicted Does Contains Animal</h4>
-        <figure>
-            <img src="{{'static/images/inference_images/' + random_files_names[1]}}" alt="Random Class 1" style="width:300px;height:auto;">
-            <figcaption>{{random_files_names[1]}}</figcaption>
-        </figure>
-        {% endif %}
-    </div>
+<center>
+    <h1>Image Classification Results</h1>
+</center>
 
+<style type="text/css">
+    table {
+        border-collapse: collapse;
+    }
+    #one th {
+        border: 1px solid white; 
+    }
+    #one td {
+        border: 1px solid white; 
+    }
+</style>
+
+
+<table border="5" align="center"> 
+    <tr>
+        <th colspan="3">
+            <h3>
+                <center>Random Sample Images Per Class at Current Cutoff</center>
+            </h3>
+        </th> 
+    </tr>
+    <tr id="one">
+        <th><center><h3>Predicted Does Not Contain Animal</h3></center></th>
+        <th><font color="white">------y</font></th>
+        <th><center><h3>Predicted Does Contain Animal</h3></center></th>
+    </tr>
+    <tr id="one">
+        <th>
+            <center>
+                <a href="static/images/outputs/predicted_0.zip" download="class_0">
+                <button type="button">Download class 0</button>
+                </a>
+            </center>
+        </th>
+        <th></th>
+        <th>
+            <center>
+                <a href="static/images/outputs/predicted_1.zip" download="class_1">
+                <button type="button">Download class 1</button>
+                </a>
+            </center>
+        </th>
+    </tr>
+    <tr id="one">
+        <td>
+            <figure>
+                <img src="{{'static/images/predicted_0/' + random_files_names[0][0]}}" alt="Class No Animal - Random Image 1" style="width:600px;height:auto;">
+                <figcaption>{{random_files_names[0][0]}}</figcaption>
+            </figure>
+        </td>
+        <td></td>
+        <td>
+            <figure>
+                <img src="{{'static/images/predicted_1/' + random_files_names[1][0]}}" alt="Class Animal - Random Image 1" style="width:600px;height:auto;">
+                <figcaption>{{random_files_names[1][0]}}</figcaption>
+            </figure>
+        </td>
+    </tr>
+    <tr id="one">
+        <td>
+            <figure>
+                <img src="{{'static/images/predicted_0/' + random_files_names[0][1]}}" alt="Class No Animal - Random Image 2" style="width:600px;height:auto;">
+                <figcaption>{{random_files_names[0][1]}}</figcaption>
+            </figure>
+        </td>
+        <td></td>
+        <td>
+            <figure>
+                <img src="{{'static/images/predicted_1/' + random_files_names[1][1]}}" alt="Class Animal - Random Image 2" style="width:600px;height:auto;">
+                <figcaption>{{random_files_names[1][1]}}</figcaption>
+            </figure>
+        </td>
+    </tr>
+    <tr id="one">
+        <td>
+            <figure>
+                <img src="{{'static/images/predicted_0/' + random_files_names[0][2]}}" alt="Class No Animal - Random Image 3" style="width:600px;height:auto;">
+                <figcaption>{{random_files_names[0][2]}}</figcaption>
+            </figure>
+        </td>        
+        <td></td>
+        <td>
+            <figure>
+                <img src="{{'static/images/predicted_1/' + random_files_names[1][2]}}" alt="Class Animal - Random Image 3" style="width:600px;height:auto;">
+                <figcaption>{{random_files_names[1][2]}}</figcaption>
+            </figure>
+        </td>
+    </tr>
+    <tr id="one">
+        <td>
+            <figure>
+                <img src="{{'static/images/predicted_0/' + random_files_names[0][3]}}" alt="Class No Animal - Random Image 4" style="width:600px;height:auto;">
+                <figcaption>{{random_files_names[0][3]}}</figcaption>
+            </figure>
+        </td>        
+        <td></td>
+        <td>
+            <figure>
+                <img src="{{'static/images/predicted_1/' + random_files_names[1][3]}}" alt="Class Animal - Random Image 4" style="width:600px;height:auto;">
+                <figcaption>{{random_files_names[1][3]}}</figcaption>
+            </figure>
+        </td>
+    </tr>
+    <tr id="one">
+        <td>
+            <figure>
+                <img src="{{'static/images/predicted_0/' + random_files_names[0][4]}}" alt="Class No Animal - Random Image 5" style="width:600px;height:auto;">
+                <figcaption>{{random_files_names[0][4]}}</figcaption>
+            </figure>
+        </td>        
+        <td></td>
+        <td>
+            <figure>
+                <img src="{{'static/images/predicted_1/' + random_files_names[1][4]}}" alt="Class Animal - Random Image 5" style="width:600px;height:auto;">
+                <figcaption>{{random_files_names[1][4]}}</figcaption>
+            </figure>
+        </td>
+    </tr>
+</table>
+
+</body>
 
 
 

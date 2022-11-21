@@ -23,3 +23,14 @@ footer {
     margin-left: auto;
     margin-right: auto;
 }
+
+table {
+    border: 5px solid black;
+    table-layout: fixed;
+    width: 600px;
+  }
+th td {
+	border: 1px solid white;
+	width: 300px;
+	overflow: hidden;
+}

@@ -55,11 +55,11 @@ span.class-name {
 	text-align: center !important;
 }
 
-th,
+/* th,
 td {
 	border: 1px solid;
 	padding: 10px;
-}
+} */
 
 textarea {
 	border: 0px;
@@ -67,4 +67,21 @@ textarea {
 
 #row_detail {
 	margin-top: 20px;
+}
+
+
+
+table {
+    border: 5px solid black;
+    table-layout: fixed;
+    width: 600px;
+  }
+  
+th  {
+	border: 5px solid white;
+  }
+td {
+	border: 1px solid white;
+	width: 300px;
+	overflow: hidden;
 }
