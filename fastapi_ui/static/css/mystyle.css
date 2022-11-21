@@ -26,11 +26,11 @@ footer {
 
 table {
     border: 5px solid black;
-    table-layout: fixed;
-    width: 600px;
+    /* table-layout: fixed; */
+    width: 1200px;
   }
-th td {
+th, td {
 	border: 1px solid white;
-	width: 300px;
+	/* width: 300px; */
 	overflow: hidden;
 }
