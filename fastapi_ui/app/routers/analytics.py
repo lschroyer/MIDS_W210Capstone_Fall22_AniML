@@ -131,7 +131,7 @@ def form_get(request: Request):
     class_chart = make_class_chart(model_predictions_df)
     
     # concatenating charts horizontally and saving as a JSON object to easily parse with JavaScript on the frontend
-    concat_chart = class_chart | conf_chart
+    concat_chart = (class_chart | conf_chart).resolve_scale(y="shared")
     concat_chart_json = concat_chart.to_json()
     
     show_model_table_initial = False
