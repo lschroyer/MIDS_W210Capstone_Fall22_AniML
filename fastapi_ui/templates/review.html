@@ -14,12 +14,15 @@
 
 
 <h2>Model Predictions with cutoff of: </h2>
-<h4>Confidence score cutoff = {{reclass_conf_lev_cutoff}}</h4>
-{% if model_predictions %}
-<img src="static/images/analytics/conf_table_reclassified.png" alt="Model Classification Table" width=”500″ height=”600″>
-{% else %}
-<img src="static/images/analytics/conf_table_initial.png" alt="Model Classification Table" width=”500″ height=”600″>
-{% endif %}
+<center>
+    <h4>Confidence score cutoff = {{reclass_conf_lev_cutoff}}</h4>
+    {% if model_predictions %}
+    <img src="static/images/analytics/conf_table_reclassified.png" alt="Model Classification Table" width=”500″ height=”600″>
+    {% else %}
+    <img src="static/images/analytics/conf_table_initial.png" alt="Model Classification Table" width=”500″ height=”600″>
+    {% endif %}
+</center>
+
 
 <br><br>
 <h3>Reclassify with new confidence level</h3>
