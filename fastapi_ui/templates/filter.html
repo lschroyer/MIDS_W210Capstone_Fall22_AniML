@@ -73,17 +73,6 @@
 </form>
 
 
-<div id="vis1" class="vis">
-    <div id="vis_lana" class="vis-inner"/>
-</div>
-
-<!-- scripts to fill divs -->
-<script>
-  var dash_lana = JSON.parse({{dash_lana|tojson|safe}});
-  vegaEmbed("#vis_lana", dash_lana, {mode: "vega-lite"}).then(console.log).catch(console.warn);
-</script>
-
-
 {% endblock %}
 
 

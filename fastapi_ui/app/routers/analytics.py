@@ -36,6 +36,7 @@ def parse_yolo_json(yolo_json_path):
     # reading in json file
     with open(yolo_json_path, 'r') as pred_json:
         yolo_preds = json.load(pred_json)
+        # print(yolo_preds)
     
     # parsing information from json files:
     # image id's (list of strings)
