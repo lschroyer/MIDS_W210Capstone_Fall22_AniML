@@ -20,6 +20,14 @@
     <div id="hist" class="vis-inner"/>
 </div>
 
+<div id="vis2" class="vis">
+    <div id="timeseries-total" class="vis-inner"/>
+</div>
+
+<div id="vis3" class="vis">
+    <div id="timeseries-class" class="vis-inner"/>
+</div>
+
 <div id="space" class="space">
 <!--     this is just for some spacing so the image doesn't show up in a weird place -->
 </div>
@@ -31,6 +39,14 @@
 
 <div id="vis1" class="vis">
     <div id="hist" class="vis-inner"/>
+</div>
+
+<div id="vis2" class="vis">
+    <div id="timeseries-total" class="vis-inner"/>
+</div>
+
+<div id="vis3" class="vis">
+    <div id="timeseries-class" class="vis-inner"/>
 </div>
 
 <div id="space" class="space">
@@ -66,7 +82,11 @@
 <!-- scripts to fill histogram/analytics viz divs -->
 <script>
   var concat_chart = JSON.parse({{concat_chart|tojson|safe}});
+  var time_series_total = JSON.parse({{time_series_total|tojson|safe}});
+  var time_series_class = JSON.parse({{time_series_class|tojson|safe}});
   vegaEmbed("#hist", concat_chart, {mode: "vega-lite"}).then(console.log).catch(console.warn);
+  vegaEmbed("#timeseries-total", time_series_total, {mode: "vega-lite"}).then(console.log).catch(console.warn);
+  vegaEmbed("#timeseries-class", time_series_class, {mode: "vega-lite"}).then(console.log).catch(console.warn);
 </script>
 
 {% endblock %}
