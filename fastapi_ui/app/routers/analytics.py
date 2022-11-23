@@ -219,6 +219,9 @@ def form_post3(request: Request, conf_lev: float = Form(...)):
     # creating Altair charts from model predictions
     conf_chart = make_conf_chart(model_predictions_df)
     class_chart = make_class_chart(model_predictions_df)
+    time_series_total, time_series_class = time_series(model_predictions_df)
+    time_series_total_json = time_series_total.to_json()
+    time_series_class_json = time_series_class.to_json()
     
     # concatenating charts horizontally and saving as a JSON object to easily parse with JavaScript on the frontend
     concat_chart = (class_chart | conf_chart).resolve_scale(y="shared")
@@ -232,5 +235,7 @@ def form_post3(request: Request, conf_lev: float = Form(...)):
         context={'request': request, 
                 'model_predictions': show_model_table_reclassified, 
                 'reclass_conf_lev_cutoff': model_cutoff,
-                'concat_chart': concat_chart_json})
+                'concat_chart': concat_chart_json,
+                'time_series_total': time_series_total_json,
+                'time_series_class': time_series_class_json})
 
