@@ -179,7 +179,6 @@ def filter_low_conf_images(conf_level):
 @router.get("/analytics", response_class=HTMLResponse)
 def form_get(request: Request):
     # logger.info("log test")
-    logger.info(test_yolo_image_ids)
     model_predictions = {"image ids": test_yolo_image_ids, 
             "confidence scores": test_yolo_confs, 
             "predicted classes original": test_yolo_pred_classes}

@@ -1,7 +1,7 @@
 {% extends "base.html" %}
-{% set active_page = "inference" %}
+{% set active_page = "filter" %}
 
-{% block title %}Inference{% endblock %}
+{% block title %}Filter{% endblock %}
 
 {% block head %}
 {{ super() }}
@@ -11,10 +11,10 @@
 
 
 {% block page_content %}
-<h1 class="cap">Automatic Image Detection</h1>
+<h1 class="cap">Automatic Image Filtering</h1>
 
     <p>No more combing through thousands of false triggers! <br>
-    Simply add all your images below or a zip file of your images and we’ll cluster them into similar groups based on likeness.
+    Simply add all your images below or a zip file of your images and we’ll automatially detect images that contain animals.
     <br>
     <br>
 </p>
@@ -35,7 +35,7 @@
 
 <body>
     <h2> AniML - Object Detection</h2>
-    <p style="text-align: center;">Upload images and perform YOLOv5 object detection</p>
+    <p style="text-align: center;">Upload images and perform filtering with YOLOv5 object detection</p>
     <div class="container">
         <div class="col-sm-12">
             <div class="form-row">

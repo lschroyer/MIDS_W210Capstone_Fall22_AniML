@@ -1,24 +1,14 @@
 
-// var URL = 'http://localhost:8000'
-// var URL_STATUS = 'http://localhost:8000/api/status/'
-
 // Change URL from localhost to AWS Server http://52.52.143.50:8000/
-var URL = 'http://52.52.143.50:8000'
-var URL_STATUS = 'http://52.52.143.50:8000/api/status/'
+// var URL = 'http://52.52.143.50:8000'
+// var URL_STATUS = 'http://52.52.143.50:8000/api/status/'
+// Change URL AWS server from farmlive2 to farmliv3 http://50.18.155.254:8000/
+var URL = 'http://50.18.155.254:8000'
+var URL_STATUS = 'http://50.18.155.254:8000/api/status/'
 
 var results = []
 var status_list = []
 var res = ''
-
-// Lucas code:
-// function download(content, fileName, contentType) {
-//     var a = document.createElement("a");
-//     var file = new Blob([content], {type: contentType});
-//     a.href = URL.createObjectURL(file);
-//     a.download = fileName;
-//     a.click();
-// }
-// end Lucas code
 
 
 jQuery(document).ready(function () {
@@ -29,7 +19,6 @@ jQuery(document).ready(function () {
         files = $('#input_file').prop('files')
         for (i = 0; i < files.length; i++)
             form_data.append('files', $('#input_file').prop('files')[i]);
-            // save($('#input_file').prop('files')[i], "../output_" + String(i) + ".jpg") // Lucas line
 
         $.ajax({
             url: URL + '/api/process',
@@ -48,11 +37,9 @@ jQuery(document).ready(function () {
             },
         }).done(function (jsondata, textStatus, jqXHR) {
             for (i = 0; i < jsondata.length; i++) {
-                // console.log(jsondata)
                 task_id = jsondata[i]['task_id']
                 status = jsondata[i]['status']
                 results.push(URL + jsondata[i]['url_result'])
-                // download(jsonData, jsondata[i] + '_json.txt', 'text/plain'); //Lucas code
                 status_list.push(task_id)
                 result_button = `<button class="btn btn-small btn-success" style="display: none" id="btn-view" data=${i}>View</a>`
                 $("#table_result > tbody").append(`<tr><td>${task_id}</td><td id=${task_id}>${status}</td><td>${result_button}</td></tr>`);
