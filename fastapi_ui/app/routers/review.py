@@ -54,7 +54,7 @@ def parse_yolo_json(yolo_json_path):
 
     return image_ids, pred_classes, bboxes, confs
 
-test_yolo_image_ids, test_yolo_pred_classes, test_yolo_bboxes, test_yolo_confs = parse_yolo_json("../data/yolo_v5_prediction.json")
+test_yolo_image_ids, test_yolo_pred_classes, test_yolo_bboxes, test_yolo_confs = parse_yolo_json("../data/filter_prediction/yolo_v5_prediction.json")
 test_yolo_pred_classes_new = test_yolo_pred_classes.copy()
 
 def filter_low_conf_images(conf_level):
@@ -77,7 +77,7 @@ def form_get(request: Request):
     df_export = df.copy()
     df_export.loc[df_export["predicted_classes_original"] == 1, "predicted_classes_original"] = "animal detected"
     df_export.loc[df_export["predicted_classes_original"] == 0, "predicted_classes_original"] = "animal not detected"
-    dfi.export(df_export,"static/images/analytics/conf_table_initial.png")
+    dfi.export(df_export,"static/images/review/data_frame/conf_table_initial.png")
     
 
     ## Class 0 ##
@@ -87,11 +87,11 @@ def form_get(request: Request):
     # logger.info(file_names_class_0)
 
     # Clear files in classification folders
-    destination_folder = "static/images/predicted_0/"
+    destination_folder = "static/images/review/predicted_0/"
     _clear_files(destination_folder)
 
     # Copy paste classified images:
-    list_of_files_to_copy = ["static/images/inference_images/" + str(i[0] + ".jpg") for i in file_names_class_0]
+    list_of_files_to_copy = ["static/images/review/inference_images/" + str(i[0] + ".jpg") for i in file_names_class_0]
     # logger.info(list_of_files_to_copy)
     _copy_paste_files(list_of_files_to_copy, destination_folder)
 
@@ -99,11 +99,11 @@ def form_get(request: Request):
     file_names_class_1 = df[df.predicted_classes_original == 1][["image_ids"]].values.tolist()
 
     # Clear files in classification folders
-    destination_folder = "static/images/predicted_1/"
+    destination_folder = "static/images/review/predicted_1/"
     _clear_files(destination_folder)
 
     # Copy paste classified images:
-    list_of_files_to_copy = ["static/images/inference_images/" + str(i[0] + ".jpg") for i in file_names_class_1]
+    list_of_files_to_copy = ["static/images/review/inference_images/" + str(i[0] + ".jpg") for i in file_names_class_1]
     # logger.info(list_of_files_to_copy)
     _copy_paste_files(list_of_files_to_copy, destination_folder)
 
@@ -123,7 +123,7 @@ def form_get(request: Request):
                     })
 
 
-@router.post("/reclassify_predictions", response_class=HTMLResponse)
+@router.post("/review_reclassify_predictions", response_class=HTMLResponse)
 def form_post3(request: Request, conf_lev: float = Form(...)):
     pred_classes_new = filter_low_conf_images(conf_lev)
     model_predictions = {"image_ids": test_yolo_image_ids, 
@@ -137,18 +137,18 @@ def form_post3(request: Request, conf_lev: float = Form(...)):
     df_export.loc[df_export["predicted_classes_original"] == 0, "predicted_classes_original"] = "animal not detected"
     df_export.loc[df_export["predicted_classes_new"] == 1, "predicted_classes_new"] = "animal detected"
     df_export.loc[df_export["predicted_classes_new"] == 0, "predicted_classes_new"] = "animal not detected"
-    dfi.export(df_export,"static/images/analytics/conf_table_reclassified.png")
+    dfi.export(df_export,"static/images/review/data_frame/conf_table_reclassified.png")
 
 
     ## Class 0 ##
     file_names_class_0 = df[df.predicted_classes_new == 0][["image_ids"]].values.tolist()
  
     # Clear files in classification folders
-    destination_folder = "static/images/predicted_0/"
+    destination_folder = "static/images/review/predicted_0/"
     _clear_files(destination_folder)
 
     # Copy paste classified images:
-    list_of_files_to_copy = ["static/images/inference_images/" + str(i[0] + ".jpg") for i in file_names_class_0]
+    list_of_files_to_copy = ["static/images/review/inference_images/" + str(i[0] + ".jpg") for i in file_names_class_0]
     # logger.info(list_of_files_to_copy)
     _copy_paste_files(list_of_files_to_copy, destination_folder)
 
@@ -156,11 +156,11 @@ def form_post3(request: Request, conf_lev: float = Form(...)):
     file_names_class_1 = df[df.predicted_classes_new == 1][["image_ids"]].values.tolist()
 
     # Clear files in classification folders
-    destination_folder = "static/images/predicted_1/"
+    destination_folder = "static/images/review/predicted_1/"
     _clear_files(destination_folder)
 
     # Copy paste classified images:
-    list_of_files_to_copy = ["static/images/inference_images/" + str(i[0] + ".jpg") for i in file_names_class_1]
+    list_of_files_to_copy = ["static/images/review/inference_images/" + str(i[0] + ".jpg") for i in file_names_class_1]
     # logger.info(list_of_files_to_copy)
     _copy_paste_files(list_of_files_to_copy, destination_folder)
 
@@ -186,7 +186,7 @@ def random_files():
     i = 0
     while i < 15 :
         try:
-            file_name = random_script.list_random_files('predicted_0/')
+            file_name = random_script.list_random_files('review/predicted_0/')
             if file_name not in random_file_0:
                 random_file_0.append(file_name)
         except:
@@ -201,7 +201,7 @@ def random_files():
     i = 0
     while i < 15 :
         try:
-            file_name = random_script.list_random_files('predicted_1/')
+            file_name = random_script.list_random_files('review/predicted_1/')
             if file_name not in random_file_1:
                 random_file_1.append(file_name)
         except:
@@ -232,8 +232,8 @@ def _copy_paste_files(list_of_file_paths_to_copy, destination_folder):
 
 
 def _zip_files():
-    _clear_files("static/images/outputs/")
+    _clear_files("static/images/review/outputs/")
     for _class in ["predicted_0", "predicted_1"]:
-        dst = "static/images/outputs/" + _class # where to save
-        src = "static/images/" + _class + "/" # directory to be zipped
+        dst = "static/images/review/outputs/" + _class # where to save
+        src = "static/images/review/" + _class + "/" # directory to be zipped
         shutil.make_archive(dst,'zip',src)

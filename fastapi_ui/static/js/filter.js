@@ -41,8 +41,15 @@ jQuery(document).ready(function () {
                 status = jsondata[i]['status']
                 results.push(URL + jsondata[i]['url_result'])
                 status_list.push(task_id)
+                contains_animal = JSON.stringify(jsondata[i])
                 result_button = `<button class="btn btn-small btn-success" style="display: none" id="btn-view" data=${i}>View</a>`
-                $("#table_result > tbody").append(`<tr><td>${task_id}</td><td id=${task_id}>${status}</td><td>${result_button}</td></tr>`);
+                $("#table_result > tbody").append(
+                    `<tr>
+                        <td>${task_id}</td>
+                        <td id=${task_id}>${status}</td>
+                        <td>${result_button}</td>
+                        <td id=${task_id}>${contains_animal}</td>
+                    </tr>`);
                 $("#row_results").show();
             }
 
