@@ -11,7 +11,11 @@
 
 {% block page_content %}
 <h1 class="cap">Analytics</h1>
-<p> text text text</p>
+<p> Here we have our predictions of what animals (i.e. "model classes" or "classes" for short) were 
+    identified based on the model built from the custom labels you provided. On this webpage, we show
+    some charts around what and when different classes were identified as well as allow you to change
+    how sensitive the model predictions are before saving your final outputs. 
+</p>
 
 <html>
 <head>
@@ -25,6 +29,14 @@
 <h2>AniML - Classified Images Analytics and Review</h2>
 <br>
 
+<h3>Histograms of Model Class Predictions</h3>
+<p>
+    Here are two histograms displaying the number of different classes identified (left) 
+    as well as the distribution of how confident the model was when classifying each image per 
+    class (i.e. the confidence scores per class). If a class has a low confidence score, more images 
+    during the training phase may be needed so that the model is better at recognizing the different
+    angles, lighting exposures, etc. of that animal when trying to classify it.
+</p>
 <div id="vis1" class="vis">
     <div id="hist" class="vis-inner"/>
 </div>
@@ -160,7 +172,7 @@
         <tr id="one">
             <th><center><h3>Model Prediction:</h3></center></th>
             <th><font color="white">------</font></th>
-            <th><center><h3>Model Predict:</h3></center></th>
+            <th><center><h3>Model Prediction:</h3></center></th>
         </tr>
         <tr id="one">
             <th><center><font color="black">Does Not Contain {{class_name}}</font></center></th>
@@ -265,7 +277,6 @@
     {% endif %}
 </center>
 
-
 <!-- scripts to fill histogram/analytics viz divs -->
 <script>
     var concat_chart = JSON.parse({{concat_chart|tojson|safe}});
@@ -275,7 +286,6 @@
     vegaEmbed("#timeseries-total", time_series_total, {mode: "vega-lite"}).then(console.log).catch(console.warn);
     vegaEmbed("#timeseries-class", time_series_class, {mode: "vega-lite"}).then(console.log).catch(console.warn);
 </script>
-
 
 
 

@@ -69,6 +69,21 @@ def filter_low_conf_images(conf_level):
 def form_get(request: Request):
     # logger.info(cwd)
     # logger.info(test_yolo_image_ids)
+    
+    # Clear legacy outputs and create folders
+    destination_folder = [
+        "static/images/review/predicted_0/",
+        "static/images/review/predicted_1/",
+        "static/images/review/data_frame/",
+        "static/images/review/outputs/"
+    ]
+    
+    for folder in destination_folder:
+        _clear_files(folder)
+        if not os.path.exists(folder):
+            os.mkdir(folder)
+    
+    
     model_predictions = {"image_ids": test_yolo_image_ids, 
             "confidence_scores": test_yolo_confs, 
             "predicted_classes_original": test_yolo_pred_classes}
@@ -77,8 +92,10 @@ def form_get(request: Request):
     df_export = df.copy()
     df_export.loc[df_export["predicted_classes_original"] == 1, "predicted_classes_original"] = "animal detected"
     df_export.loc[df_export["predicted_classes_original"] == 0, "predicted_classes_original"] = "animal not detected"
-    dfi.export(df_export,"static/images/review/data_frame/conf_table_initial.png")
     
+    # Save model results dataframe
+    dfi.export(df_export,"static/images/review/data_frame/conf_table_initial.png")
+
 
     ## Class 0 ##
     file_names_class_0 = df[df.predicted_classes_original == 0][["image_ids"]].values.tolist()
@@ -88,7 +105,6 @@ def form_get(request: Request):
 
     # Clear files in classification folders
     destination_folder = "static/images/review/predicted_0/"
-    _clear_files(destination_folder)
 
     # Copy paste classified images:
     list_of_files_to_copy = ["static/images/review/inference_images/" + str(i[0] + ".jpg") for i in file_names_class_0]
@@ -100,7 +116,6 @@ def form_get(request: Request):
 
     # Clear files in classification folders
     destination_folder = "static/images/review/predicted_1/"
-    _clear_files(destination_folder)
 
     # Copy paste classified images:
     list_of_files_to_copy = ["static/images/review/inference_images/" + str(i[0] + ".jpg") for i in file_names_class_1]

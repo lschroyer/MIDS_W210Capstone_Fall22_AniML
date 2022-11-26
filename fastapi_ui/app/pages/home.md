@@ -15,10 +15,10 @@
 </head>
 </html>
 
-1. <span style="color:black"> **Filter**</span>
+1. <span style="color:black"> **Filter & Review**</span>
 
 
-    Upload your unfiltered images and we'll auto sort them into similarity groups!
+    Upload your unfiltered images and we'll auto sort them by if the image contains an object or is empty! You can then review and adjust the filtering model results before saving the images that contain the animals or objects of interest. 
 
 2. <span style="color:black"> **Label**</span>
 
@@ -29,6 +29,10 @@
     Using your mannualy labeled dataset, we train a custom Artificial Intelligence (AI) model that will accurately hone in on your objects of interest.
 
 4. <span style="color:black"> **Relax**</span>
+
+    With your model hosted on an API endpoint, simple add images as you need and we’ll do the rest. Relax as your huge datasets are filtered down to items of interest and beautiful analytics are shared.
+
+5. <span style="color:black"> **Relax**</span>
 
     With your model hosted on an API endpoint, simple add images as you need and we’ll do the rest. Relax as your huge datasets are filtered down to items of interest and beautiful analytics are shared.
 
@@ -47,4 +51,6 @@ Ivan Wong,
 Lana Elauria,
 Lucas Harvey-Schroyer,
 Whit Blodgett
+
+UC Berkeley, School of Information 2022 - Masters of Information and Data Science
 

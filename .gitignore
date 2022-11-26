@@ -6,6 +6,16 @@ __pycache__/
 # C extensions
 *.so
 
+# Custom filepaths
+fastapi_ui/static/images/review/data_frame/
+fastapi_ui/static/images/review/predicted_0/
+fastapi_ui/static/images/review/predicted_1/
+fastapi_ui/static/images/review/outputs/
+fastapi_ui/static/images/analytics/data_frame/
+fastapi_ui/static/images/analytics/outputs/
+fastapi_ui/static/images/analytics/predicted_classes/
+
+
 # Distribution / packaging
 .Python
 build/
@@ -127,6 +137,19 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.Python
+[Bb]in
+[Ii]nclude
+[Ll]ib
+[Ll]ib64
+[Ll]ocal
+[Ss]cripts
+pyvenv.cfg
+fastapi_ui/.venv
+fastapi_ui/venv
+fastapi_ui/.venv/
+fastapi_ui/venv/
+pip-selfcheck.json
 
 # Spyder project settings
 .spyderproject

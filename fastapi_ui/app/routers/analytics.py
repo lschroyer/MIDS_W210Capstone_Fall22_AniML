@@ -55,7 +55,7 @@ def parse_yolo_json(yolo_json_path):
 
     return image_ids, pred_classes, bboxes, confs
 
-def make_class_chart(pred_df, width=300, height=600):
+def make_class_chart(pred_df, width=700, height=400):
     '''
     Function to parse DataFrame of model predictions and create an Altair/Vega-Lite histogram of confidence levels.
     Input:
@@ -86,7 +86,7 @@ def make_class_chart(pred_df, width=300, height=600):
     return class_chart
 
 
-def make_conf_chart(pred_df, width=600, height=600):
+def make_conf_chart(pred_df, width=1000, height=400):
     '''
     Function to parse DataFrame of model predictions and create an Altair/Vega-Lite histogram of confidence levels.
     Input:
@@ -107,7 +107,7 @@ def make_conf_chart(pred_df, width=600, height=600):
         color = alt.Color("predicted_classes_original:N", scale=alt.Scale(scheme="category10"), title = "Predicted Class"),
         tooltip = [alt.Tooltip("confidence_scores:Q", bin=alt.Bin(maxbins=10), title="Confidence Interval"),
                    alt.Tooltip("predicted_classes_original:N", title="Predicted Class"),
-                   alt.Tooltip("count()", title="Count")]
+                   alt.Tooltip("count()", title="Count")],
     ).properties(
         width = width,
         height = height,
@@ -157,7 +157,7 @@ def time_series(pred_df):
     ).configure_point(
         size = 100
     ).properties(
-        width = 1000,
+        width = 2000,
         height = 300,
         title = "Total Detected Animals Time Series"
     )
@@ -232,15 +232,24 @@ def form_get(request: Request):
     # Initialize data
     df_global, already_reclassified, global_class_list = get_model_data()
 
-    # Clear legacy outputs
-    _clear_files("static/images/analytics/predicted_classes/")
-    _clear_files("static/images/analytics/data_frame/")
-    _clear_files("static/images/analytics/outputs/")
+    # Clear legacy outputs and create folders
+    destination_folder = [
+        "static/images/analytics/predicted_classes/",
+        "static/images/analytics/data_frame/",
+        "static/images/analytics/outputs/"
+    ]
+    
+    for folder in destination_folder:
+        _clear_files(folder)
+        if not os.path.exists(folder):
+            os.mkdir(folder)
 
     df_global['predicted_classes_original'] = df_global.predicted_classes_original.replace(' ', '_', regex=True)
-
     dfi.export(df_global,"static/images/analytics/data_frame/conf_table_initial.png")
-    
+
+    # ToDo - if time allows, change pandas table to html
+    # with open('static/images/analytics/data_frame/conf_table_initial.html', 'w') as fo:
+    #     df_global.to_html(fo)
 
     # Zip all classes and get random files for all classes
     _zip_files(class_name = "all_classes", specific_class = False)

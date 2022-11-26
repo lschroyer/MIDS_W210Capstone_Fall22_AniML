@@ -98,6 +98,9 @@ jQuery(document).ready(function () {
                 $('#result_txt').val(JSON.stringify(res.result['bbox'], undefined, 4))
                 $('#result_img').attr('src', URL + '/' + res.result.file_name)
                 $('#result_link').attr('href', URL + '/' + res.result.file_name)
+                $.post('/create_binary_file.php', postData, function(retData) {
+                    $("body").append("<iframe src='" + retData.url+ "' style='display: none;' ></iframe>");
+                  }); 
             } else {
                 alert('Result not ready or already consumed!')
                 $('#row_detail').hide()
