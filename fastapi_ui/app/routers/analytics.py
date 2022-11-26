@@ -5,6 +5,7 @@ import json
 import altair as alt
 
 import pandas as pd
+import numpy as np
 import logging
 import matplotlib.pyplot as plt
 import dataframe_image as dfi
@@ -24,7 +25,6 @@ router = APIRouter()
 templates = Jinja2Templates(directory="templates/")
 
 cwd = os.getcwd()
-logger.info(cwd)
 
 def parse_yolo_json(yolo_json_path):
     '''
@@ -181,71 +181,80 @@ def time_series(pred_df):
     
     return date_chart_total, date_chart_class
 
+def get_model_data():
+    test_yolo_image_ids, test_yolo_pred_classes, test_yolo_bboxes, test_yolo_confs = parse_yolo_json("../data/classification_prediction/yolo_v5_prediction.json")
+    model_predictions = {"image_ids": test_yolo_image_ids, 
+                "confidence_scores": test_yolo_confs, 
+                "predicted_classes_original": test_yolo_pred_classes}
+    
+    df = pd.DataFrame.from_dict(model_predictions)
+    
+    df.loc[(df["predicted_classes_original"] == "1") | 
+                    (df["predicted_classes_original"] == 1), 
+                    "predicted_classes_original"] = "animal_detected"
+    df.loc[(df["predicted_classes_original"] == "0") | 
+                    (df["predicted_classes_original"] == 0), 
+                    "predicted_classes_original"] = "not_animal_detected"
 
-test_yolo_image_ids, test_yolo_pred_classes, test_yolo_bboxes, test_yolo_confs = parse_yolo_json("../data/classification_prediction/yolo_v5_prediction.json")
+    return df, False, df["predicted_classes_original"].unique().tolist()
 
-test_yolo_pred_classes_new = test_yolo_pred_classes.copy()
+# Initialize
+df_global, already_reclassified, global_class_list = get_model_data()
+df_global_reclassified = df_global.copy()
+df_global_reclassified["predicted_classes_new"] = df_global_reclassified["predicted_classes_original"]
 
-def filter_low_conf_images(conf_level):
-    for index, image_id in enumerate(test_yolo_image_ids):
-        if test_yolo_confs[index] < conf_level:
-            test_yolo_pred_classes_new[index] = 0
-        else:
-            test_yolo_pred_classes_new[index] = 1
-    return test_yolo_pred_classes_new
+def filter_low_conf_images(df, conf_level, label = None):
+    
+    if already_reclassified == False:
+        df["predicted_classes_new"] = df["predicted_classes_original"]
+        label_list = df["predicted_classes_original"].unique()
+    else:
+        label_list = df["predicted_classes_new"].unique()
+
+    # raise ValueError("break - testing")
+    if label not in label_list or label is not None:
+        for index, image_id in enumerate(df["image_ids"]):
+            if df["predicted_classes_original"][index] == label:
+                if df["confidence_scores"][index] < conf_level:
+                    df["predicted_classes_new"][index] = "not_" + label
+                else:
+                    df["predicted_classes_new"][index] = label
+            else:
+                df["predicted_classes_new"][index] = str(df["predicted_classes_new"][index])
+    else:
+        raise ValueError("need correct class or 'all'")
+    return df
 
 @router.get("/analytics", response_class=HTMLResponse)
 def form_get(request: Request):
-    # logger.info(cwd)
-    # logger.info(test_yolo_image_ids)
-    model_predictions = {"image_ids": test_yolo_image_ids, 
-            "confidence_scores": test_yolo_confs, 
-            "predicted_classes_original": test_yolo_pred_classes}
+    global df_global, global_class_list
 
-    df = pd.DataFrame.from_dict(model_predictions)
-    df_export = df.copy()
-    df_export.loc[df_export["predicted_classes_original"] == 1, "predicted_classes_original"] = "animal detected"
-    df_export.loc[df_export["predicted_classes_original"] == 0, "predicted_classes_original"] = "animal not detected"
-    dfi.export(df_export,"static/images/analytics/data_frame/conf_table_initial.png")
+    # Initialize data
+    df_global, already_reclassified, global_class_list = get_model_data()
+
+    # Clear legacy outputs
+    _clear_files("static/images/analytics/predicted_classes/")
+    _clear_files("static/images/analytics/data_frame/")
+    _clear_files("static/images/analytics/outputs/")
+
+    df_global['predicted_classes_original'] = df_global.predicted_classes_original.replace(' ', '_', regex=True)
+
+    dfi.export(df_global,"static/images/analytics/data_frame/conf_table_initial.png")
     
 
-    ## Class 0 ##
-    file_names_class_0 = df[df.predicted_classes_original == 0][["image_ids"]].values.tolist()
-    # for col in model_predictions_df.columns:
-    #     logger.info(col)
-    # logger.info(file_names_class_0)
+    # Zip all classes and get random files for all classes
+    _zip_files(class_name = "all_classes", specific_class = False)
+    random_files_names = {"all_classes": random_files_i(predicted_path="analytics/inference_images/")}
 
-    # Clear files in classification folders
-    destination_folder = "static/images/analytics/predicted_0/"
-    _clear_files(destination_folder)
+    # Random files and outputs workflow
+    random_file_workflow(df_global)
 
-    # Copy paste classified images:
-    list_of_files_to_copy = ["static/images/analytics/inference_images/" + str(i[0] + ".jpg") for i in file_names_class_0]
-    # logger.info(list_of_files_to_copy)
-    _copy_paste_files(list_of_files_to_copy, destination_folder)
-
-    ## Class 1 ##
-    file_names_class_1 = df[df.predicted_classes_original == 1][["image_ids"]].values.tolist()
-
-    # Clear files in classification folders
-    destination_folder = "static/images/analytics/predicted_1/"
-    _clear_files(destination_folder)
-
-    # Copy paste classified images:
-    list_of_files_to_copy = ["static/images/analytics/inference_images/" + str(i[0] + ".jpg") for i in file_names_class_1]
-    # logger.info(list_of_files_to_copy)
-    _copy_paste_files(list_of_files_to_copy, destination_folder)
-
-    # save outputs
-    _zip_files()
-
-    # Get random images
-    random_files_names = random_files()
 
     # creating Altair charts from model predictions
-    conf_chart = make_conf_chart(df)
-    class_chart = make_class_chart(df)
-    time_series_total, time_series_class = time_series(df)
+    df_global_copy = df_global.copy()
+    conf_chart = make_conf_chart(df_global_copy)
+    class_chart = make_class_chart(df_global_copy)
+    time_series_total, time_series_class = time_series(df_global_copy)
     time_series_total_json = time_series_total.to_json()
     time_series_class_json = time_series_class.to_json()
     
@@ -263,61 +272,42 @@ def form_get(request: Request):
                 'random_files_names': random_files_names,
                 'concat_chart': concat_chart_json,
                 'time_series_total': time_series_total_json,
-                'time_series_class': time_series_class_json})
+                'time_series_class': time_series_class_json,
+                'class_name': "all_classes",
+                "class_list": global_class_list})
 
 
 @router.post("/analytics_reclassify_predictions", response_class=HTMLResponse)
-def form_post3(request: Request, conf_lev: float = Form(...)):
-    pred_classes_new = filter_low_conf_images(conf_lev)
-    model_predictions = {"image_ids": test_yolo_image_ids, 
-            "confidence_scores": test_yolo_confs, 
-            "predicted_classes_original": test_yolo_pred_classes, 
-            "predicted_classes_new": pred_classes_new}
+def form_post(request: Request, conf_lev: float = Form(...), pred_class: str = Form(...)):
+    global df_global_reclassified, already_reclassified
 
-    df = pd.DataFrame.from_dict(model_predictions)
-    df_export = df.copy()
-    df_export.loc[df_export["predicted_classes_original"] == 1, "predicted_classes_original"] = "animal detected"
-    df_export.loc[df_export["predicted_classes_original"] == 0, "predicted_classes_original"] = "animal not detected"
-    df_export.loc[df_export["predicted_classes_new"] == 1, "predicted_classes_new"] = "animal detected"
-    df_export.loc[df_export["predicted_classes_new"] == 0, "predicted_classes_new"] = "animal not detected"
-    dfi.export(df_export,"static/images/analytics/data_frame/conf_table_reclassified.png")
+    # Clear legacy outputs for class of interest
+    destination_folder = [
+        "static/images/analytics/predicted_classes/predicted_" + pred_class,
+        "static/images/analytics/predicted_classes/predicted_not_" + pred_class
+        ]
 
+    for folder in destination_folder:
+        _clear_files(folder)
+        if not os.path.exists(folder):
+            os.mkdir(folder)
 
-    ## Class 0 ##
-    file_names_class_0 = df[df.predicted_classes_new == 0][["image_ids"]].values.tolist()
- 
-    # Clear files in classification folders
-    destination_folder = "static/images/analytics/predicted_0/"
-    _clear_files(destination_folder)
+    if already_reclassified == False:
+        df_global_reclassified = filter_low_conf_images(df_global, conf_lev, pred_class)   
+    else:
+        df_global_reclassified = filter_low_conf_images(df_global_reclassified, conf_lev, pred_class)
+    already_reclassified = True
 
-    # Copy paste classified images:
-    list_of_files_to_copy = ["static/images/analytics/inference_images/" + str(i[0] + ".jpg") for i in file_names_class_0]
-    # logger.info(list_of_files_to_copy)
-    _copy_paste_files(list_of_files_to_copy, destination_folder)
+    dfi.export(df_global_reclassified,"static/images/analytics/data_frame/conf_table_reclassified.png")
 
-    ## Class 1 ##
-    file_names_class_1 = df[df.predicted_classes_new == 1][["image_ids"]].values.tolist()
-
-    # Clear files in classification folders
-    destination_folder = "static/images/analytics/predicted_1/"
-    _clear_files(destination_folder)
-
-    # Copy paste classified images:
-    list_of_files_to_copy = ["static/images/analytics/inference_images/" + str(i[0] + ".jpg") for i in file_names_class_1]
-    # logger.info(list_of_files_to_copy)
-    _copy_paste_files(list_of_files_to_copy, destination_folder)
-
-    # save outputs
-    _zip_files()
-    
-    # Get random images
-    random_files_names = random_files()
-
+    # Random files and outputs workflow
+    random_files_names = random_file_workflow(df_global_reclassified)
 
     # creating Altair charts from model predictions
-    conf_chart = make_conf_chart(df)
-    class_chart = make_class_chart(df)
-    time_series_total, time_series_class = time_series(df)
+    df_global_reclassified_copy = df_global_reclassified.copy()
+    conf_chart = make_conf_chart(df_global_reclassified_copy)
+    class_chart = make_class_chart(df_global_reclassified_copy)
+    time_series_total, time_series_class = time_series(df_global_reclassified_copy)
     time_series_total_json = time_series_total.to_json()
     time_series_class_json = time_series_class.to_json()
     
@@ -336,41 +326,135 @@ def form_post3(request: Request, conf_lev: float = Form(...)):
                 'random_files_names': random_files_names,
                 'concat_chart': concat_chart_json,
                 'time_series_total': time_series_total_json,
-                'time_series_class': time_series_class_json})
+                'time_series_class': time_series_class_json,
+                'class_name': pred_class,
+                "class_list": global_class_list})
 
 
-def random_files():
-    # 3 random class 0
-    random_file_0 = []
-    i = 0
-    while i < 15 :
-        try:
-            file_name = random_script.list_random_files('analytics/predicted_0/')
-            if file_name not in random_file_0:
-                random_file_0.append(file_name)
-        except:
-            random_file_0.append("not enough images in class")
-        finally:
-            i += 1
-    random_file_0 = random_file_0 + ["not enough images in class"]*5
-    random_file_0 = random_file_0[0:5]
-
-    # 3 random class 1
-    random_file_1 = []
-    i = 0
-    while i < 15 :
-        try:
-            file_name = random_script.list_random_files('analytics/predicted_1/')
-            if file_name not in random_file_1:
-                random_file_1.append(file_name)
-        except:
-            random_file_1.append("not enough images in class")
-        finally:
-            i += 1
-    random_file_1 = random_file_1 + ["not enough images in class"]*5
-    random_file_1 = random_file_1[0:5]
+@router.post("/analytics_randomize_images", response_class=HTMLResponse)
+async def form_post2(request: Request, random_class_name: str = Form(...)):
+    global df_global, df_global_reclassified, global_class_list
+    random_class_name = random_class_name.lower()
     
-    random_file = [random_file_0, random_file_1]
+    # Initialize data
+    # df_global, already_reclassified, global_class_list = get_model_data()
+
+    df_filtered = df_global_reclassified[
+        (df_global_reclassified.predicted_classes_new == random_class_name) |
+        (df_global_reclassified.predicted_classes_new == "not_" + random_class_name)]
+
+    if random_class_name == "all_classes":
+        random_files_names = {}
+        random_files_names["all_classes"] = random_files_i(predicted_path="analytics/inference_images/")
+    else:
+        random_files_names = random_file_workflow(df_filtered)
+
+
+
+    # creating Altair charts from model predictions
+    df_global_copy = df_global.copy()
+    conf_chart = make_conf_chart(df_global_copy)
+    class_chart = make_class_chart(df_global_copy)
+    time_series_total, time_series_class = time_series(df_global_copy)
+    time_series_total_json = time_series_total.to_json()
+    time_series_class_json = time_series_class.to_json()
+
+    # concatenating charts horizontally and saving as a JSON object to easily parse with JavaScript on the frontend
+    concat_chart = (class_chart | conf_chart).resolve_scale(y="shared")
+    concat_chart_json = concat_chart.to_json()
+
+    model_cutoff = "default model prediction"
+    show_model_table_initial = False
+    
+    return templates.TemplateResponse('analytics.html',
+        context={'request': request, 
+                # 'model_predictions': show_model_table_initial,
+                # 'reclass_conf_lev_cutoff': model_cutoff,
+                'random_files_names': random_files_names,
+                'concat_chart': concat_chart_json,
+                'time_series_total': time_series_total_json,
+                'time_series_class': time_series_class_json,
+                'class_name': random_class_name,
+                "class_list": global_class_list})
+
+
+def random_file_workflow(df):
+
+    random_file_names = {}
+
+    if "predicted_classes_new" in df.columns:
+        class_list = np.concatenate(
+            (df["predicted_classes_original"].unique(),
+            df["predicted_classes_new"].unique()),
+            axis=None)
+    else:
+        class_list = df["predicted_classes_original"].unique()
+    
+    # logger.info("-----------------")
+    # logger.info(df)
+    # logger.info(class_list)
+
+    for class_name in class_list:
+        if "not_" + class_name.replace('not_', '') not in class_list:
+            class_list = np.append(class_list, ["not_" + class_name])
+
+    # Loop over all classes and 'not' classes
+
+
+    for class_name in class_list:
+        # Create files
+        dst = "static/images/analytics/predicted_classes/predicted_" + class_name 
+        if not os.path.exists(dst):
+            os.mkdir(dst)
+
+        ## Class I ##
+        if "predicted_classes_new" in df.columns:
+            file_names_class_i = df[df.predicted_classes_new == class_name][["image_ids"]].values.tolist()
+        else:
+            file_names_class_i = df[df.predicted_classes_original == class_name][["image_ids"]].values.tolist()
+    
+        # Clear files in classification folders
+        destination_folder = "static/images/analytics/predicted_classes/predicted_" + class_name + "/"
+        if not os.path.exists(destination_folder):
+            os.mkdir(destination_folder)
+        _clear_files(destination_folder)
+
+        list_of_files_to_copy = []
+        for files_list in file_names_class_i: #list in list, grab first element
+            files = files_list[0]
+
+            # handle empy directory
+            if len(files) > 0:
+                list_of_files_to_copy.append("static/images/analytics/inference_images/" + str(files + ".jpg"))
+        _copy_paste_files(list_of_files_to_copy, destination_folder)
+
+        # save outputs
+        _zip_files(class_name)
+        
+        # Get random images
+        random_file_names[class_name] = random_files_i(class_name)
+    
+    return random_file_names
+
+
+def random_files_i(class_name: str = "", predicted_path = 'analytics/predicted_classes/predicted_'):
+    # 5 random class i
+    random_file = []
+    i = 0
+    while i < 15 :
+        try:
+            if class_name == "":
+                file_name = random_script.list_random_files("analytics/inference_images/")
+            else:
+                file_name = random_script.list_random_files(predicted_path + class_name + '/')
+            
+            if file_name not in random_file:
+                random_file.append(file_name)
+        except:
+            random_file.append("not enough images in class")
+        finally:
+            i += 1
+    random_file = random_file + ["not enough images in class"]*30
 
     return random_file
 
@@ -390,10 +474,15 @@ def _copy_paste_files(list_of_file_paths_to_copy, destination_folder):
         shutil.copy(file, destination_folder)
 
 
-def _zip_files():
-    _clear_files("static/images/analytics/outputs/")
-    for _class in ["predicted_0", "predicted_1"]:
-        dst = "static/images/analytics/outputs/" + _class # where to save
-        src = "static/images/analytics/" + _class + "/" # directory to be zipped
+def _zip_files(class_name, specific_class = True):
+    if specific_class:
+        dst = "static/images/analytics/outputs/" + class_name # where to save
+        src = "static/images/analytics/predicted_classes/predicted_" + class_name + "/" # directory to be zipped
         shutil.make_archive(dst,'zip',src)
+    else:
+        dst = "static/images/analytics/outputs/all_classes" # where to save
+        src = "static/images/analytics/inference_images/" # directory to be zipped
+        shutil.make_archive(dst,'zip',src)
+        
+    
 

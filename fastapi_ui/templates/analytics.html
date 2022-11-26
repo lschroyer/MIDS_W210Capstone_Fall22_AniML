@@ -41,14 +41,211 @@
 <!--     this is just for some spacing so the image doesn't show up in a weird place -->
 </div>
 
+
+<body>
+    <br><br>
+    
+    <center>
+        <h1>Image Classification Results</h1>
+    </center>
+    <br><br>
+
+    <h3>Randomize Images in table</h3>
+    <form action="/analytics_randomize_images" method="post">
+        <input type="text" name="random_class_name" id="random_class_name" placeholder="e.g. fox or 'all_classes'" required>
+        <input type="submit" value="Randomize class images">
+    </form>
+
+    <style type="text/css">
+        table {
+            border-collapse: collapse;
+        }
+        #one th {
+            border: 1px solid white; 
+        }
+        #one td {
+            border: 1px solid white; 
+        }
+    </style>
+    
+    
+    {% if class_name == "all_classes" %}
+    <table border="5" align="center"> 
+        <tr>
+            <th colspan="1">
+                <h3>
+                    <center>Random Sample Images</center>
+                </h3>
+            </th> 
+        </tr>
+        <tr id="one">
+            <th>
+                <center>
+                    <a href={{"static/images/analytics/outputs/not_" + class_name + ".zip"}} download={{"class_" + class_name}}>
+                    <button type="button">Download zip of all images</button>
+                    </a>
+                </center>
+            </th>
+        </tr>
+        <tr id="one">
+            <td>
+                <center><figure>
+                    <img src="{{'static/images/analytics/inference_images/' + random_files_names[class_name][0]}}" alt="Any Class - Random Image 1" style="width:300px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][0]}}</figcaption>
+                </figure></center>
+            </td>
+            <td>
+                <center><figure>
+                    <img src="{{'static/images/analytics/inference_images/' + random_files_names[class_name][1]}}" alt="Any Class - Random Image 2" style="width:300px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][1]}}</figcaption>
+                </figure></center>
+            </td>
+            <td>
+                <center><figure>
+                    <img src="{{'static/images/analytics/inference_images/' + random_files_names[class_name][2]}}" alt="Any Class - Random Image 3" style="width:300px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][2]}}</figcaption>
+                </figure></center>
+            </td>
+        </tr>
+        <tr id="one">
+            <td>
+                <center><figure>
+                    <img src="{{'static/images/analytics/inference_images/' + random_files_names[class_name][3]}}" alt="Any Class - Random Image 4" style="width:300px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][3]}}</figcaption>
+                </figure></center>
+            </td>
+            <td>
+                <center><figure>
+                    <img src="{{'static/images/analytics/inference_images/' + random_files_names[class_name][4]}}" alt="Any Class - Random Image 5" style="width:300px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][4]}}</figcaption>
+                </figure></center>
+            </td>
+            <td>
+                <center><figure>
+                    <img src="{{'static/images/analytics/inference_images/' + random_files_names[class_name][5]}}" alt="Any Class - Random Image 6" style="width:300px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][5]}}</figcaption>
+                </figure></center>
+            </td>
+        </tr>
+        <tr id="one">
+            <td>
+                <center><figure>
+                    <img src="{{'static/images/analytics/inference_images/' + random_files_names[class_name][6]}}" alt="Any Class - Random Image 7" style="width:300px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][6]}}</figcaption>
+                </figure></center>
+            </td>
+            <td>
+                <center><figure>
+                    <img src="{{'static/images/analytics/inference_images/' + random_files_names[class_name][7]}}" alt="Any Class - Random Image 8" style="width:300px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][7]}}</figcaption>
+                </figure></center>
+            </td>
+            <td>
+                <center><figure>
+                    <img src="{{'static/images/analytics/inference_images/' + random_files_names[class_name][8]}}" alt="Any Class - Random Image 9" style="width:300px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][8]}}</figcaption>
+                </figure></center>
+            </td>
+        </tr>
+    </table>
+    {% else %}
+    <table border="5" align="center"> 
+        <tr>
+            <th colspan="3">
+                <h3>
+                    <center>Random Sample Images Per Class at Current Cutoff</center>
+                </h3>
+            </th> 
+        </tr>
+        <tr id="one">
+            <th><center><h3>Model Prediction:</h3></center></th>
+            <th><font color="white">------</font></th>
+            <th><center><h3>Model Predict:</h3></center></th>
+        </tr>
+        <tr id="one">
+            <th><center><font color="black">Does Not Contain {{class_name}}</font></center></th>
+            <th><font color="white">------</font></th>
+            <th><center><font color="black">Does Contain {{class_name}}</font></center></th>
+        </tr>
+        <tr id="one">
+            <th>
+                <center>
+                    <a href={{"static/images/analytics/outputs/not_" + class_name + ".zip"}} download={{"class_not_" + class_name}}>
+                    <button type="button">Download zip of prediction of not_{{class_name}} images</button>
+                    </a>
+                </center>
+            </th>
+            <th></th>
+            <th>
+                <center>
+                    <a href={{"static/images/analytics/outputs/" + class_name + ".zip"}} download={{"class_" + class_name}}>
+                    <button type="button">Download zip of prediction of {{class_name}} images</button>
+                    </a>
+                </center>
+            </th>
+        </tr>
+        <tr id="one">
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_not_" + class_name + "/" + random_files_names["not_"+class_name][0]}} alt={{"Class_not_" + class_name + " - Random Image 1"}} style="width:300px;height:auto;">
+                    <figcaption>{{random_files_names["not_"+class_name][0]}}</figcaption>
+                </figure></center>
+            </th>
+            <th></th>
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_" + class_name + "/" + random_files_names[class_name][0]}} alt={{"Class_" + class_name + " - Random Image 1"}} style="width:300px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][0]}}</figcaption>
+                </figure></center>
+            </th>
+        </tr>
+        <tr id="one">
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_not_" + class_name + "/" + random_files_names["not_"+class_name][1]}} alt={{"Class_not_" + class_name + " - Random Image 2"}} style="width:300px;height:auto;">
+                    <figcaption>{{random_files_names["not_"+class_name][1]}}</figcaption>
+                </figure></center>
+            </th>
+            <th></th>
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_" + class_name + "/" + random_files_names[class_name][1]}} alt={{"Class_" + class_name + " - Random Image 2"}} style="width:300px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][1]}}</figcaption>
+                </figure></center>
+            </th>
+        </tr>
+        <tr id="one">
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_not_" + class_name + "/" + random_files_names["not_"+class_name][2]}} alt={{"Class_not_" + class_name + " - Random Image 3"}} style="width:300px;height:auto;">
+                    <figcaption>{{random_files_names["not_"+class_name][2]}}</figcaption>
+                </figure></center>
+            </th>
+            <th></th>
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_" + class_name + "/" + random_files_names[class_name][2]}} alt={{"Class_" + class_name + " - Random Image 3"}} style="width:300px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][2]}}</figcaption>
+                </figure></center>
+            </th>
+        </tr>
+    </table>
+    {% endif %}
+
+<body>
+
+
+
 <br><br>
-<h3>Reclassify with new confidence level</h3>
+<h3>Reclassify class with new confidence level</h3>
 <form action="/analytics_reclassify_predictions" method="post">
     <input type="number" name="conf_lev" id="conf_lev"
     max="1.0000000000000000" min="0.0000000000000000" 
     placeholder="e.g. 0.50" step="0.01" 
     value="" required />
+    <input type="text" name="pred_class" id="pred_class" placeholder="e.g. fox" required>
     <input type="submit">
+
 </form>
 
 <br>
@@ -78,6 +275,9 @@
     vegaEmbed("#timeseries-total", time_series_total, {mode: "vega-lite"}).then(console.log).catch(console.warn);
     vegaEmbed("#timeseries-class", time_series_class, {mode: "vega-lite"}).then(console.log).catch(console.warn);
 </script>
+
+
+
 
 {% endblock %}
 

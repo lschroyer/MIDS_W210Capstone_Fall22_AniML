@@ -122,7 +122,7 @@
     },
     {
        "image_id":"09090019_JPG.rf.b8def9071a90f5525f050cb0e0d892f9",
-       "category_id":1,
+       "category_id":"fox",
        "bbox":[
           454.492,
           305.396,
@@ -133,7 +133,7 @@
     },
     {
        "image_id":"09090022_JPG.rf.ac8543bc7813616d7b3598404f6e3470",
-       "category_id":0,
+       "category_id":"bob cat",
        "bbox":[
           333.578,
           397.631,
@@ -221,7 +221,7 @@
     },
     {
        "image_id":"09180070_JPG.rf.da6b6b60b375f7e9a71fba931932cebd",
-       "category_id":0,
+       "category_id":"coyote",
        "bbox":[
           147.285,
           326.808,
@@ -232,7 +232,7 @@
     },
     {
        "image_id":"09180073_JPG.rf.7448f1e657b45ef54b66b72703577fa4",
-       "category_id":0,
+       "category_id":"coyote",
        "bbox":[
           1.442,
           256.554,
