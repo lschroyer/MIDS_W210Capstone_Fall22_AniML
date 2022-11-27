@@ -12,14 +12,13 @@
 
 {% block page_content %}
 <h1 class="cap">Automatic Image Filtering</h1>
-    <p>No more combing through thousands of false triggers! <br>
-    Simply add all your images below or a zip file of your images and we’ll automatially detect images that contain animals.
+<p>No more combing through thousands of false triggers! </p>
     <br>
+<p>Add all your images below or a zip file of your images and we’ll 
+    cluster them into similar groups based on likeness. </p>
     <br>
-</p>
 
 <html>
-
 <head>
     <title>AniML Filtering Empty Images</title>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
@@ -71,6 +70,57 @@
         </div>
 
     </body>
+
+    <!-- <input type="button" value="Download PDF File" onclick="DownloadFile('Sample.pdf')" />
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.0.0/jquery.min.js"></script>
+    <script type="text/javascript">
+        function DownloadFile(fileName) {
+            //Set the File URL.
+            // var url = "Files/" + fileName;
+            var url = "../../data/filter_prediction" + fileName;
+            // var url = result_link;
+ 
+            $.ajax({
+                url: url,
+                cache: false,
+                xhr: function () {
+                    var xhr = new XMLHttpRequest();
+                    xhr.onreadystatechange = function () {
+                        if (xhr.readyState == 2) {
+                            if (xhr.status == 200) {
+                                xhr.responseType = "blob";
+                            } else {
+                                xhr.responseType = "text";
+                            }
+                        }
+                    };
+                    return xhr;
+                },
+                success: function (data) {
+                    //Convert the Byte Data to BLOB object.
+                    var blob = new Blob([data], { type: "application/octetstream" });
+
+                    //Check the Browser type and download the File.
+                    var isIE = false || !!document.documentMode;
+                    if (isIE) {
+                        window.navigator.msSaveBlob(blob, fileName);
+                    } else {
+                        // var url = window.URL || window.webkitURL;
+                        var url = result_link;
+
+                        link = url.createObjectURL(blob);
+                        var a = $("<a />");
+                        a.attr("download", fileName);
+                        a.attr("href", link);
+                        $("body").append(a);
+                        a[0].click();
+                        $("body").remove(a);
+                    }
+                }
+            });
+        };
+    </script> -->
+
 
 </html>
 
