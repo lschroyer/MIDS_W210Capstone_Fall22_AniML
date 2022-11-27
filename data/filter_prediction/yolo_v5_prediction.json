@@ -1,38 +1,24 @@
 [
    {
-      "image_id":"09250142_JPG.rf.79abmab7835abalilb3147fafrb1kfaof",
-      "category_id":0,
-      "bbox":[
-      ],
-      "score":0.75012
-   },
-   {
-      "image_id":"09240173_JPG.rf.23abc6723cadc41684176f238fafccd78",
-      "category_id":0,
-      "bbox":[
-      ],
-      "score":0.75012
-   },
-   {
       "image_id":"09220174_JPG.rf.d67daflj41bncei1814cdlwofuda023147cfw",
       "category_id":0,
       "bbox":[
       ],
-      "score":0.75012
+      "score":0.7812
    },
    {
       "image_id":"10020175_JPG.rf.78dbaf78afdlkjcacd04f4789dfcdd34d",
       "category_id":0,
       "bbox":[
       ],
-      "score":0.75012
+      "score":0.6939
    },
    {
       "image_id":"10020177_JPG.rf.89dfd98fdfef898421cd3983cfe238adf",
       "category_id":0,
       "bbox":[
       ],
-      "score":0.75012
+      "score":0.8813
    },
    {
       "image_id":"09080004_JPG.rf.867d658be6573c5b18f3a26467744e7b",
@@ -71,6 +57,17 @@
        "score":0.7115
     },
     {
+      "image_id":"09180073_JPG.rf.7448f1e657b45ef54b66b72703577fa4",
+      "category_id":0,
+      "bbox":[
+         1.442,
+         256.554,
+         511.792,
+         373.46
+      ],
+      "score":0.2191
+   },
+    {
        "image_id":"09220113_JPG.rf.67904d0764563fd6d921e907e034ab23",
        "category_id":1,
        "bbox":[
@@ -102,17 +99,6 @@
           147.325
        ],
        "score":0.62989
-    },
-    {
-       "image_id":"09200088_JPG.rf.f087b7a8a23bf745b932d1da2e4b2a93",
-       "category_id":1,
-       "bbox":[
-          157.283,
-          472.828,
-          351.526,
-          130.104
-       ],
-       "score":0.31266
     },
     {
        "image_id":"09260140_JPG.rf.92ae3de09b0a1e9f9353d7b07c814641",
@@ -148,17 +134,6 @@
        "score":0.44693
     },
     {
-       "image_id":"09230121_JPG.rf.be314214a792202918e4028ec5ec71e7",
-       "category_id":1,
-       "bbox":[
-          138.192,
-          353.29,
-          491.185,
-          286.71
-       ],
-       "score":0.22561
-    },
-    {
        "image_id":"09180079_JPG.rf.b655f8164e6875d1c2479aa844f757e8",
        "category_id":1,
        "bbox":[
@@ -182,7 +157,7 @@
     },
     {
        "image_id":"09090022_JPG.rf.ac8543bc7813616d7b3598404f6e3470",
-       "category_id":1,
+       "category_id":0,
        "bbox":[
           333.578,
           397.631,
@@ -212,6 +187,20 @@
           134.924
        ],
        "score":0.80001
+    },
+    {
+      "image_id":"09250142_JPG.rf.79abmab7835abalilb3147fafrb1kfaof",
+      "category_id":0,
+      "bbox":[
+      ],
+      "score":0.6239
+    },
+    {
+      "image_id":"09240173_JPG.rf.23abc6723cadc41684176f238fafccd78",
+      "category_id":0,
+      "bbox":[
+      ],
+      "score":0.8123
     },
     {
        "image_id":"09110028_JPG.rf.b89b5415b9eacf9342ecca992529923a",
@@ -278,16 +267,5 @@
           288.334
        ],
        "score":0.3535
-    },
-    {
-       "image_id":"09180073_JPG.rf.7448f1e657b45ef54b66b72703577fa4",
-       "category_id":1,
-       "bbox":[
-          1.442,
-          256.554,
-          511.792,
-          373.46
-       ],
-       "score":0.2191
     }
  ]

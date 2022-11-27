@@ -54,22 +54,54 @@ def parse_yolo_json(yolo_json_path):
 
     return image_ids, pred_classes, bboxes, confs
 
-test_yolo_image_ids, test_yolo_pred_classes, test_yolo_bboxes, test_yolo_confs = parse_yolo_json("../data/filter_prediction/yolo_v5_prediction.json")
-test_yolo_pred_classes_new = test_yolo_pred_classes.copy()
 
-def filter_low_conf_images(conf_level):
-    for index, image_id in enumerate(test_yolo_image_ids):
-        if test_yolo_confs[index] < conf_level:
-            test_yolo_pred_classes_new[index] = 0
+def get_model_data():
+    test_yolo_image_ids, test_yolo_pred_classes, test_yolo_bboxes, test_yolo_confs = parse_yolo_json("../data/filter_prediction/yolo_v5_prediction.json")
+    model_predictions = {"image_ids": test_yolo_image_ids, 
+                "confidence_scores": test_yolo_confs, 
+                "predicted_classes_original": test_yolo_pred_classes}
+    
+    df = pd.DataFrame.from_dict(model_predictions)
+    
+    df.loc[(df["predicted_classes_original"] == "1") | 
+                    (df["predicted_classes_original"] == 1), 
+                    "predicted_classes_original"] = "animal_detected"
+    df.loc[(df["predicted_classes_original"] == "0") | 
+                    (df["predicted_classes_original"] == 0), 
+                    "predicted_classes_original"] = "not_animal_detected"
+
+    # shuffle data
+    df = df.sample(frac=1)
+    return df, False, df["predicted_classes_original"].unique().tolist()
+
+# Initialize
+df_global, already_reclassified, global_class_list = get_model_data()
+df_global_reclassified = df_global.copy()
+df_global_reclassified["predicted_classes_new"] = df_global_reclassified["predicted_classes_original"]
+
+
+def filter_low_conf_images(df, conf_level):
+
+    label = "animal_detected"
+
+    # raise ValueError("break - testing")
+    for index, image_id in enumerate(df["image_ids"]):
+        if df["predicted_classes_original"][index] == label:
+            if df["confidence_scores"][index] < conf_level:
+                df["predicted_classes_new"][index] = "not_" + label
+            else:
+                df["predicted_classes_new"][index] = label
         else:
-            test_yolo_pred_classes_new[index] = 1
-    return test_yolo_pred_classes_new
+            df["predicted_classes_new"][index] = str(df["predicted_classes_new"][index])
+
+    return df
+
+
+
 
 @router.get("/review", response_class=HTMLResponse)
 def form_get(request: Request):
-    # logger.info(cwd)
-    # logger.info(test_yolo_image_ids)
-    
+
     # Clear legacy outputs and create folders
     destination_folder = [
         "static/images/review/predicted_0/",
@@ -83,44 +115,30 @@ def form_get(request: Request):
         if not os.path.exists(folder):
             os.mkdir(folder)
     
+    global df_global, global_class_list
+
+    # Initialize data
+    df_global, already_reclassified, global_class_list = get_model_data()
+
+    df_global['predicted_classes_original'] = df_global.predicted_classes_original.replace(' ', '_', regex=True)
+    dfi.export(df_global,"static/images/review/data_frame/conf_table_initial.png")
+
+
+
+    ## Class 0 & 1 ##
+    label_list = ["not_animal_detected", "animal_detected"]
+    for j in [0, 1]:
+        label_j = label_list[j]
+
+        file_names_class_i = df_global[df_global.predicted_classes_original == label_j][["image_ids"]].values.tolist()
     
-    model_predictions = {"image_ids": test_yolo_image_ids, 
-            "confidence_scores": test_yolo_confs, 
-            "predicted_classes_original": test_yolo_pred_classes}
+        # Clear files in classification folders
+        destination_folder = "static/images/review/predicted_" + str(j) + "/"
 
-    df = pd.DataFrame.from_dict(model_predictions)
-    df_export = df.copy()
-    df_export.loc[df_export["predicted_classes_original"] == 1, "predicted_classes_original"] = "animal detected"
-    df_export.loc[df_export["predicted_classes_original"] == 0, "predicted_classes_original"] = "animal not detected"
-    
-    # Save model results dataframe
-    dfi.export(df_export,"static/images/review/data_frame/conf_table_initial.png")
+        # Copy paste classified images:
+        list_of_files_to_copy = ["static/images/review/inference_images/" + str(i[0] + ".jpg") for i in file_names_class_i]
 
-
-    ## Class 0 ##
-    file_names_class_0 = df[df.predicted_classes_original == 0][["image_ids"]].values.tolist()
-    # for col in model_predictions_df.columns:
-    #     logger.info(col)
-    # logger.info(file_names_class_0)
-
-    # Clear files in classification folders
-    destination_folder = "static/images/review/predicted_0/"
-
-    # Copy paste classified images:
-    list_of_files_to_copy = ["static/images/review/inference_images/" + str(i[0] + ".jpg") for i in file_names_class_0]
-    # logger.info(list_of_files_to_copy)
-    _copy_paste_files(list_of_files_to_copy, destination_folder)
-
-    ## Class 1 ##
-    file_names_class_1 = df[df.predicted_classes_original == 1][["image_ids"]].values.tolist()
-
-    # Clear files in classification folders
-    destination_folder = "static/images/review/predicted_1/"
-
-    # Copy paste classified images:
-    list_of_files_to_copy = ["static/images/review/inference_images/" + str(i[0] + ".jpg") for i in file_names_class_1]
-    # logger.info(list_of_files_to_copy)
-    _copy_paste_files(list_of_files_to_copy, destination_folder)
+        _copy_paste_files(list_of_files_to_copy, destination_folder)
 
     # save outputs
     _zip_files()
@@ -140,46 +158,44 @@ def form_get(request: Request):
 
 @router.post("/review_reclassify_predictions", response_class=HTMLResponse)
 def form_post3(request: Request, conf_lev: float = Form(...)):
-    pred_classes_new = filter_low_conf_images(conf_lev)
-    model_predictions = {"image_ids": test_yolo_image_ids, 
-            "confidence_scores": test_yolo_confs, 
-            "predicted_classes_original": test_yolo_pred_classes, 
-            "predicted_classes_new": pred_classes_new}
+    global df_global_reclassified, already_reclassified
 
-    df = pd.DataFrame.from_dict(model_predictions)
-    df_export = df.copy()
-    df_export.loc[df_export["predicted_classes_original"] == 1, "predicted_classes_original"] = "animal detected"
-    df_export.loc[df_export["predicted_classes_original"] == 0, "predicted_classes_original"] = "animal not detected"
-    df_export.loc[df_export["predicted_classes_new"] == 1, "predicted_classes_new"] = "animal detected"
-    df_export.loc[df_export["predicted_classes_new"] == 0, "predicted_classes_new"] = "animal not detected"
-    dfi.export(df_export,"static/images/review/data_frame/conf_table_reclassified.png")
+    # Clear legacy outputs for class of interest
+    destination_folder = [
+        "static/images/review/predicted_0",
+        "static/images/review/predicted_1"
+        ]
+
+    for folder in destination_folder:
+        _clear_files(folder)
+        if not os.path.exists(folder):
+            os.mkdir(folder)
+
+   
+    df_global_reclassified = filter_low_conf_images(df_global_reclassified, conf_lev)
+    
+    already_reclassified = True
+
+    dfi.export(df_global_reclassified, "static/images/review/data_frame/conf_table_reclassified.png")
 
 
-    ## Class 0 ##
-    file_names_class_0 = df[df.predicted_classes_new == 0][["image_ids"]].values.tolist()
- 
-    # Clear files in classification folders
-    destination_folder = "static/images/review/predicted_0/"
-    _clear_files(destination_folder)
+    # Class 0 & 1#
+    label_list = ["not_animal_detected", "animal_detected"]
 
-    # Copy paste classified images:
-    list_of_files_to_copy = ["static/images/review/inference_images/" + str(i[0] + ".jpg") for i in file_names_class_0]
-    # logger.info(list_of_files_to_copy)
-    _copy_paste_files(list_of_files_to_copy, destination_folder)
+    for j in [0, 1]:
+        label_j = label_list[j]
+        
+        file_names_class_i = df_global_reclassified[df_global_reclassified.predicted_classes_new == label_j][["image_ids"]].values.tolist()
+    
+        # Clear files in classification folders
+        destination_folder = "static/images/review/predicted_" + str(j) + "/"
+        _clear_files(destination_folder)
 
-    ## Class 1 ##
-    file_names_class_1 = df[df.predicted_classes_new == 1][["image_ids"]].values.tolist()
+        # Copy paste classified images:
+        list_of_files_to_copy = ["static/images/review/inference_images/" + str(i[0] + ".jpg") for i in file_names_class_i]
+        # logger.info(list_of_files_to_copy)
+        _copy_paste_files(list_of_files_to_copy, destination_folder)
 
-    # Clear files in classification folders
-    destination_folder = "static/images/review/predicted_1/"
-    _clear_files(destination_folder)
-
-    # Copy paste classified images:
-    list_of_files_to_copy = ["static/images/review/inference_images/" + str(i[0] + ".jpg") for i in file_names_class_1]
-    # logger.info(list_of_files_to_copy)
-    _copy_paste_files(list_of_files_to_copy, destination_folder)
-
-    # save outputs
     _zip_files()
     
     # Get random images
@@ -194,6 +210,21 @@ def form_post3(request: Request, conf_lev: float = Form(...)):
                 'reclass_conf_lev_cutoff': model_cutoff,
                 'random_files_names': random_files_names
                 })
+
+
+@router.get("/review_randomize", response_class=HTMLResponse)
+def form_get2(request: Request):
+    global df_global, df_global_reclassified, global_class_list    
+    
+    random_files_names = random_files()
+
+    return templates.TemplateResponse('review.html', 
+        context={'request': request, 
+                # 'model_predictions': show_model_table_reclassified, 
+                # 'reclass_conf_lev_cutoff': model_cutoff,
+                'random_files_names': random_files_names
+                })
+
 
 def random_files():
     # 3 random class 0

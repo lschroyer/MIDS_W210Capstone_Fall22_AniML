@@ -196,6 +196,8 @@ def get_model_data():
                     (df["predicted_classes_original"] == 0), 
                     "predicted_classes_original"] = "not_animal_detected"
 
+    # shuffle data
+    df = df.sample(frac=1)
     return df, False, df["predicted_classes_original"].unique().tolist()
 
 # Initialize
