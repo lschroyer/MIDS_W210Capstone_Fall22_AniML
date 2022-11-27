@@ -58,14 +58,14 @@
     },
     {
       "image_id":"09180073_JPG.rf.7448f1e657b45ef54b66b72703577fa4",
-      "category_id":0,
+      "category_id":1,
       "bbox":[
          1.442,
          256.554,
          511.792,
          373.46
       ],
-      "score":0.2191
+      "score":0.6191
    },
     {
        "image_id":"09220113_JPG.rf.67904d0764563fd6d921e907e034ab23",

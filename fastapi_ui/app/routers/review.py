@@ -72,40 +72,45 @@ def get_model_data():
 
     # shuffle data
     df = df.sample(frac=1)
-    return df, False, df["predicted_classes_original"].unique().tolist()
 
-# Initialize
-df_global, already_reclassified, global_class_list = get_model_data()
+    # get initial conf table
+    df_classification_cuttoffs = pd.DataFrame({"animal_detected": "default", "not_animal_detected": "default"}, index=[0])
+
+    return df, False, df["predicted_classes_original"].unique().tolist(), df_classification_cuttoffs
+
+# Initialize for global variables
+df_global, already_reclassified, global_class_list, df_classification_cuttoffs = get_model_data()
 df_global_reclassified = df_global.copy()
 df_global_reclassified["predicted_classes_new"] = df_global_reclassified["predicted_classes_original"]
 
 
-def filter_low_conf_images(df, conf_level):
+def filter_low_conf_images(df, conf_level, filter_class = None):
+    filter_class_opposite = ["animal_detected", "not_animal_detected"]
+    filter_class_opposite.remove(filter_class)
 
-    label = "animal_detected"
+    logger.info("--------------")
+    logger.info(filter_class_opposite)
 
-    # raise ValueError("break - testing")
     for index, image_id in enumerate(df["image_ids"]):
-        if df["predicted_classes_original"][index] == label:
+        if df["predicted_classes_original"][index] == filter_class:
             if df["confidence_scores"][index] < conf_level:
-                df["predicted_classes_new"][index] = "not_" + label
+                df["predicted_classes_new"][index] = filter_class_opposite[0]
             else:
-                df["predicted_classes_new"][index] = label
+                df["predicted_classes_new"][index] = filter_class
         else:
             df["predicted_classes_new"][index] = str(df["predicted_classes_new"][index])
 
     return df
 
 
-
-
 @router.get("/review", response_class=HTMLResponse)
 def form_get(request: Request):
+    global df_global, global_class_list, df_classification_cuttoffs
 
     # Clear legacy outputs and create folders
     destination_folder = [
-        "static/images/review/predicted_0/",
-        "static/images/review/predicted_1/",
+        "static/images/review/predicted_not_animal_detected/",
+        "static/images/review/predicted_animal_detected/",
         "static/images/review/data_frame/",
         "static/images/review/outputs/"
     ]
@@ -115,14 +120,15 @@ def form_get(request: Request):
         if not os.path.exists(folder):
             os.mkdir(folder)
     
-    global df_global, global_class_list
 
     # Initialize data
-    df_global, already_reclassified, global_class_list = get_model_data()
+    df_global, already_reclassified, global_class_list, df_classification_cuttoffs = get_model_data()
 
     df_global['predicted_classes_original'] = df_global.predicted_classes_original.replace(' ', '_', regex=True)
-    dfi.export(df_global,"static/images/review/data_frame/conf_table_initial.png")
-
+    dfi.export(df_global.sort_index(),
+        "static/images/review/data_frame/conf_table_initial.png")
+    dfi.export(df_classification_cuttoffs.style.hide_index(), 
+        "static/images/review/data_frame/cutoff_levels_table_initial.png")
 
 
     ## Class 0 & 1 ##
@@ -133,7 +139,7 @@ def form_get(request: Request):
         file_names_class_i = df_global[df_global.predicted_classes_original == label_j][["image_ids"]].values.tolist()
     
         # Clear files in classification folders
-        destination_folder = "static/images/review/predicted_" + str(j) + "/"
+        destination_folder = "static/images/review/predicted_" + label_j + "/"
 
         # Copy paste classified images:
         list_of_files_to_copy = ["static/images/review/inference_images/" + str(i[0] + ".jpg") for i in file_names_class_i]
@@ -157,14 +163,14 @@ def form_get(request: Request):
 
 
 @router.post("/review_reclassify_predictions", response_class=HTMLResponse)
-def form_post3(request: Request, conf_lev: float = Form(...)):
-    global df_global_reclassified, already_reclassified
+def form_post3(request: Request, conf_lev: float = Form(...), reclassify_class_name_label: str = Form(...)):
+    global df_global_reclassified, already_reclassified, df_classification_cuttoffs
 
     # Clear legacy outputs for class of interest
     destination_folder = [
-        "static/images/review/predicted_0",
-        "static/images/review/predicted_1"
-        ]
+        "static/images/review/predicted_not_animal_detected/",
+        "static/images/review/predicted_animal_detected/",
+        "static/images/review/data_frame/"]
 
     for folder in destination_folder:
         _clear_files(folder)
@@ -172,12 +178,17 @@ def form_post3(request: Request, conf_lev: float = Form(...)):
             os.mkdir(folder)
 
    
-    df_global_reclassified = filter_low_conf_images(df_global_reclassified, conf_lev)
+    df_global_reclassified = filter_low_conf_images(df_global_reclassified, conf_lev, reclassify_class_name_label)
     
     already_reclassified = True
 
-    dfi.export(df_global_reclassified, "static/images/review/data_frame/conf_table_reclassified.png")
+    df_classification_cuttoffs[reclassify_class_name_label] = conf_lev
 
+    dfi.export(df_global_reclassified.sort_index(), 
+        "static/images/review/data_frame/conf_table_reclassified.png")
+
+    dfi.export(df_classification_cuttoffs.style.hide_index(), 
+        "static/images/review/data_frame/cutoff_levels_table_reclassified.png")
 
     # Class 0 & 1#
     label_list = ["not_animal_detected", "animal_detected"]
@@ -188,7 +199,7 @@ def form_post3(request: Request, conf_lev: float = Form(...)):
         file_names_class_i = df_global_reclassified[df_global_reclassified.predicted_classes_new == label_j][["image_ids"]].values.tolist()
     
         # Clear files in classification folders
-        destination_folder = "static/images/review/predicted_" + str(j) + "/"
+        destination_folder = "static/images/review/predicted_" + label_j + "/"
         _clear_files(destination_folder)
 
         # Copy paste classified images:
@@ -232,7 +243,7 @@ def random_files():
     i = 0
     while i < 15 :
         try:
-            file_name = random_script.list_random_files('review/predicted_0/')
+            file_name = random_script.list_random_files('review/predicted_not_animal_detected/')
             if file_name not in random_file_0:
                 random_file_0.append(file_name)
         except:
@@ -247,7 +258,7 @@ def random_files():
     i = 0
     while i < 15 :
         try:
-            file_name = random_script.list_random_files('review/predicted_1/')
+            file_name = random_script.list_random_files('review/predicted_animal_detected/')
             if file_name not in random_file_1:
                 random_file_1.append(file_name)
         except:
@@ -279,7 +290,7 @@ def _copy_paste_files(list_of_file_paths_to_copy, destination_folder):
 
 def _zip_files():
     _clear_files("static/images/review/outputs/")
-    for _class in ["predicted_0", "predicted_1"]:
+    for _class in ["predicted_not_animal_detected", "predicted_animal_detected"]:
         dst = "static/images/review/outputs/" + _class # where to save
         src = "static/images/review/" + _class + "/" # directory to be zipped
         shutil.make_archive(dst,'zip',src)

@@ -200,7 +200,7 @@ def get_model_data():
     df = df.sample(frac=1)
     return df, False, df["predicted_classes_original"].unique().tolist()
 
-# Initialize
+# Initialize for global variables
 df_global, already_reclassified, global_class_list = get_model_data()
 df_global_reclassified = df_global.copy()
 df_global_reclassified["predicted_classes_new"] = df_global_reclassified["predicted_classes_original"]

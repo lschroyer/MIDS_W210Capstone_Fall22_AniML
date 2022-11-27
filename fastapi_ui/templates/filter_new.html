@@ -12,10 +12,10 @@
 
 {% block page_content %}
 <h1 class="cap">Automatic Image Filtering</h1>
-<p>No more combing through thousands of false triggers! </p>
-    <br>
-<p>Add all your images below or a zip file of your images and we’ll 
-    cluster them into similar groups based on likeness. </p>
+<p>No more combing through thousands of false triggers! 
+    Add all your images below and we will filter out the images that contain 
+    objects of interest from those that are empty or don't contain any 
+    objects of interest (e.g. a car). </p>
     <br>
 
 <html>
@@ -31,7 +31,9 @@
 
 <body>
     <h2> AniML - Object Detection</h2>
-    <p style="text-align: center;">Upload images and perform filtering with YOLOv5 object detection</p>
+    <p style="text-align: left;">Upload images and click submit to perform filtering with the default YOLOv5 model.
+        You can view individual files to see how the model is working. Next you can click the "Review 
+        Filtered Image" tab to view and save the filtered results. </p>
     <div class="container">
         <div class="col-sm-12">
             <div class="form-row">
@@ -61,6 +63,9 @@
                         </div>
                     </div>
                 </div>
+                <p>
+                    Click the view button above to view individual filtering model results. 
+                </p>
                 <div class="form-row" id="row_detail">
                     <div class="col-md-3"><textarea id="result_txt" style="height: 800px; font-size: 12px;"></textarea></div>
                     <div class="col-md-9"><a id="result_link"><img id="result_img" width="600px" /></a></div>

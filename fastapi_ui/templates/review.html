@@ -27,18 +27,8 @@
 <h2>AniML - Filtering Empty Images</h2>
 <br>
 
-<h3>Randomize Images in table</h3>
-    <form action="/review_randomize" method="get">
-        <input type="submit" value="Randomize images by classes">
-        </form>
+<h3>Image Classification Results</h3>
 
-    </form>
-
-
-<body>
-<center>
-    <h1>Image Classification Results</h1>
-</center>
 
 <style type="text/css">
     table {
@@ -53,18 +43,27 @@
 </style>
 
 
-<table border="5" align="center"> 
+<table border="5" align="center" style="width:1300px;height:auto;"> 
     <tr>
         <th colspan="3">
-            <h3>
-                <center>Random Sample Images Per Class at Current Cutoff</center>
-            </h3>
+                <center>
+                    <h3>Randomly Sampled Images by Predicted Class</h3>
+                    <form action="/review_randomize" method="get">
+                        <input type="submit" value="Randomize images by class">
+                    </form>
+                </center>
         </th> 
     </tr>
     <tr id="one">
-        <th><center><h3>Model Prediction:</h3></center></th>
-        <th><font color="white">------</font></th>
-        <th><center><h3>Model Prediction:</h3></center></th>
+        {% if model_predictions %}
+            <th><center><h3>Adjusted Model Predictions:</h3></center></th>
+            <th><font color="white">------</font></th>
+            <th><center><h3>Adjusted Model Predictions:</h3></center></th>
+        {% else %}
+            <th><center><h3>Initial Model Predictions:</h3></center></th>
+            <th><font color="white">------</font></th>
+            <th><center><h3>Initial Model Predictions:</h3></center></th>
+        {% endif %}
     </tr>
     <tr id="one">
         <th><center><font color="black">Does Not Contain Animal</font></center></th>
@@ -74,7 +73,7 @@
     <tr id="one">
         <th>
             <center>
-                <a href="static/images/review/outputs/predicted_0.zip" download="class_0">
+                <a href="static/images/review/outputs/predicted_not_animal_detected.zip" download="class_0">
                 <button type="button">Download zip of prediction of no animal images</button>
                 </a>
             </center>
@@ -82,7 +81,7 @@
         <th></th>
         <th>
             <center>
-                <a href="static/images/review/outputs/predicted_1.zip" download="class_1">
+                <a href="static/images/review/outputs/predicted_animal_detected.zip" download="class_1">
                 <button type="button">Download zip of prediction of animal images</button>
                 </a>
             </center>
@@ -91,14 +90,14 @@
     <tr id="one">
         <td>
             <center><figure>
-                <img src="{{'static/images/review/predicted_0/' + random_files_names[0][0]}}" alt="Class No Animal - Random Image 1" style="width:300px;height:auto;">
+                <img src="{{'static/images/review/predicted_not_animal_detected/' + random_files_names[0][0]}}" alt="Class No Animal - Random Image 1" style="width:300px;height:auto;">
                 <figcaption>{{random_files_names[0][0]}}</figcaption>
             </figure></center>
         </td>
         <td></td>
         <td>
             <center><figure>
-                <img src="{{'static/images/review/predicted_1/' + random_files_names[1][0]}}" alt="Class Animal - Random Image 1" style="width:300px;height:auto;">
+                <img src="{{'static/images/review/predicted_animal_detected/' + random_files_names[1][0]}}" alt="Class Animal - Random Image 1" style="width:300px;height:auto;">
                 <figcaption>{{random_files_names[1][0]}}</figcaption>
             </figure></center>
         </td>
@@ -106,14 +105,14 @@
     <tr id="one">
         <td>
             <center><figure>
-                <img src="{{'static/images/review/predicted_0/' + random_files_names[0][1]}}" alt="Class No Animal - Random Image 2" style="width:300px;height:auto;">
+                <img src="{{'static/images/review/predicted_not_animal_detected/' + random_files_names[0][1]}}" alt="Class No Animal - Random Image 2" style="width:300px;height:auto;">
                 <figcaption>{{random_files_names[0][1]}}</figcaption>
             </figure></center>
         </td>
         <td></td>
         <td>
             <center><figure>
-                <img src="{{'static/images/review/predicted_1/' + random_files_names[1][1]}}" alt="Class Animal - Random Image 2" style="width:300px;height:auto;">
+                <img src="{{'static/images/review/predicted_animal_detected/' + random_files_names[1][1]}}" alt="Class Animal - Random Image 2" style="width:300px;height:auto;">
                 <figcaption>{{random_files_names[1][1]}}</figcaption>
             </figure></center>
         </td>
@@ -121,14 +120,14 @@
     <tr id="one">
         <td>
             <center><figure>
-                <img src="{{'static/images/review/predicted_0/' + random_files_names[0][2]}}" alt="Class No Animal - Random Image 3" style="width:300px;height:auto;">
+                <img src="{{'static/images/review/predicted_not_animal_detected/' + random_files_names[0][2]}}" alt="Class No Animal - Random Image 3" style="width:300px;height:auto;">
                 <figcaption>{{random_files_names[0][2]}}</figcaption>
             </figure></center>
         </td>        
         <td></td>
         <td>
             <center><figure>
-                <img src="{{'static/images/review/predicted_1/' + random_files_names[1][2]}}" alt="Class Animal - Random Image 3" style="width:300px;height:auto;">
+                <img src="{{'static/images/review/predicted_animal_detected/' + random_files_names[1][2]}}" alt="Class Animal - Random Image 3" style="width:300px;height:auto;">
                 <figcaption>{{random_files_names[1][2]}}</figcaption>
             </figure></center>
         </td>
@@ -136,14 +135,14 @@
     <tr id="one">
         <td>
             <center><figure>
-                <img src="{{'static/images/review/predicted_0/' + random_files_names[0][3]}}" alt="Class No Animal - Random Image 4" style="width:300px;height:auto;">
+                <img src="{{'static/images/review/predicted_not_animal_detected/' + random_files_names[0][3]}}" alt="Class No Animal - Random Image 4" style="width:300px;height:auto;">
                 <figcaption>{{random_files_names[0][3]}}</figcaption>
             </figure></center>
         </td>        
         <td></td>
         <td>
             <center><figure>
-                <img src="{{'static/images/review/predicted_1/' + random_files_names[1][3]}}" alt="Class Animal - Random Image 4" style="width:300px;height:auto;">
+                <img src="{{'static/images/review/predicted_animal_detected/' + random_files_names[1][3]}}" alt="Class Animal - Random Image 4" style="width:300px;height:auto;">
                 <figcaption>{{random_files_names[1][3]}}</figcaption>
             </figure></center>
         </td>
@@ -151,14 +150,14 @@
     <tr id="one">
         <td>
             <center><figure>
-                <img src="{{'static/images/review/predicted_0/' + random_files_names[0][4]}}" alt="Class No Animal - Random Image 5" style="width:300px;height:auto;">
+                <img src="{{'static/images/review/predicted_not_animal_detected/' + random_files_names[0][4]}}" alt="Class No Animal - Random Image 5" style="width:300px;height:auto;">
                 <figcaption>{{random_files_names[0][4]}}</figcaption>
             </figure></center>
         </td>        
         <td></td>
         <td>
             <center><figure>
-                <img src="{{'static/images/review/predicted_1/' + random_files_names[1][4]}}" alt="Class Animal - Random Image 5" style="width:300px;height:auto;">
+                <img src="{{'static/images/review/predicted_animal_detected/' + random_files_names[1][4]}}" alt="Class Animal - Random Image 5" style="width:300px;height:auto;">
                 <figcaption>{{random_files_names[1][4]}}</figcaption>
             </figure></center>
         </td>
@@ -168,31 +167,75 @@
 </body>
 
 <br><br>
-<h3>Reclassify with new confidence level</h3>
-<form action="/review_reclassify_predictions" method="post">
-    <input type="number" name="conf_lev" id="conf_lev"
-    max="1.0000000000000000" min="0.0000000000000000" 
-    placeholder="e.g. 0.50" step="0.01" 
-    value="" required />
-    <input type="submit">
-</form>
 
-<br>
-<h3>Reset classification to default model outputs</h3>
-<form action="/review" method="get">
-    <input type="submit" value="Reset classifications">
-</form>
+<h3>Adjust Image Classification Results</h3>
+<p>The model classifies an animal as detected (i.e. "animal_detected") or not detected (i.e. "not_animal_detected")
+    based on the confidence level that the image belongs to that class. For "animal_detected", a higher "confidence_score"
+    in the table means the model is more confident that it contains an animal, while for "not_animal_detected", a lower "confidence_score"
+    means that the model is less confident that an animal isn't in the image.
+    <br><br>
+    You may adjust the confidence thresholds for each class and see in the image results above how different 
+    confidence level thresholds affect the sensitivity of the model predictions above. You may save model results iteratively 
+    for different confidence scenarios, such as only saving results where the model has a high confidence that an animal isn't present
+    (i.e. a high confidence cutoff for "not_animal_detected"), a low confidence that an animal is present (i.e. a low confidence 
+    cutoff for "animal_detected"), a combination of the two levers, or some other scenario.
+    <br><br>
+    If you wish to view the inital
+    model predictions, you can reset the table below.
+</p>
+<table border="5" align="center" style="width:1300px;height:auto;">
+    <tr>
+        <td colspan="2" style="width: 259px; vertical-align:top">
+            <h3>Reclassify with new confidence level</h3>
+            <p>Keep class if confidence score greater than:</p>
+            <form action="/review_reclassify_predictions" method="post">
+                <!-- <input type="text" name="random_class_name" id="random_class_name" placeholder="e.g. fox or 'all_classes'" required> -->
+                <label>Select Class:<br>
+                    <input list="reclassify_class_name" id="reclassify_class_name_label" name="reclassify_class_name_label"/>
+                </label>
+                <datalist id="reclassify_class_name">
+                    <option value="animal_detected">
+                    <option value="not_animal_detected">
+                </datalist>
+                <input type="number" name="conf_lev" id="conf_lev"
+                max="1.0000000000000000" min="0.0000000000000000" 
+                placeholder="e.g. 0.50" step="0.01" 
+                value="" required />
+                <input type="submit">
+            </form>
+            <br><br>
+            <p>Confidence Score Cutoffs</p>
+            {% if model_predictions %}
+                <img src="static/images/review/data_frame/cutoff_levels_table_reclassified.png" alt="Cutoff Table" width=”200″ height=”200″>
+            {% else %}
+                <img src="static/images/review/data_frame/cutoff_levels_table_initial.png" alt="Cutoff Table" width=”200″ height=”200″>
+            {% endif %}
 
-<br><br>
-<h3>Model Predictions with cutoff of: </h3>
-<center>
-    <h4>Confidence score cutoff = {{reclass_conf_lev_cutoff}}</h4>
-    {% if model_predictions %}
-    <img src="static/images/review/data_frame/conf_table_reclassified.png" alt="Model Classification Table" width=”500″ height=”600″>
-    {% else %}
-    <img src="static/images/review/data_frame/conf_table_initial.png" alt="Model Classification Table" width=”500″ height=”600″>
-    {% endif %}
-</center>
+            <br><br><br>
+            <h3>Reset classification</h3>
+            <p>Reset the 'new' classifications to the default model outputs</p>
+            <form action="/review" method="get">
+                <input type="submit" value="Reset classifications">
+            </form>
+        </td> 
+        <td>
+            <center>
+                {% if model_predictions %}
+                <h4>Adjusted Model Results</h4>
+                <img src="static/images/review/data_frame/conf_table_reclassified.png" alt="Model Classification Table" width=”500″ height=”600″>
+                {% else %}
+                <h4>Initial Model Results</h4>
+                <img src="static/images/review/data_frame/conf_table_initial.png" alt="Model Classification Table" width=”500″ height=”600″>
+                {% endif %}
+            </center>
+        </td>
+    </tr>
+    
+    
+    <br><br>
+    
+    
+</table>
 
 
 
