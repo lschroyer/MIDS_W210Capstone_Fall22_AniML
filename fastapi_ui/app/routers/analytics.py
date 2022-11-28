@@ -55,7 +55,7 @@ def parse_yolo_json(yolo_json_path):
 
     return image_ids, pred_classes, bboxes, confs
 
-def make_class_chart(pred_df, width=700, height=400):
+def make_class_chart(pred_df, width=500, height=400):
     '''
     Function to parse DataFrame of model predictions and create an Altair/Vega-Lite histogram of confidence levels.
     Input:
@@ -86,7 +86,7 @@ def make_class_chart(pred_df, width=700, height=400):
     return class_chart
 
 
-def make_conf_chart(pred_df, width=1000, height=400):
+def make_conf_chart(pred_df, width=900, height=400):
     '''
     Function to parse DataFrame of model predictions and create an Altair/Vega-Lite histogram of confidence levels.
     Input:
@@ -157,14 +157,29 @@ def time_series(pred_df):
     ).configure_point(
         size = 100
     ).properties(
-        width = 2000,
+        width = 1200,
         height = 300,
         title = "Total Detected Animals Time Series"
+    ).configure_axis(
+        labelFontSize=20,
+        titleFontSize=20
+    ).configure_header(
+        labelFontSize=20,
+        titleFontSize=20
+    ).configure_title(
+        fontSize=20
+    ).configure_legend(
+        strokeColor='gray',
+        fillColor='#EEEEEE',
+        padding=10,
+        cornerRadius=10,
+        labelFontSize=20,
+        titleFontSize=15,
     )
     
     # creating concatenated time-series charts for each animal class detected in the dataset
     date_chart_class = alt.Chart(date_df_flat).mark_line(point=True, strokeWidth=2).encode(
-        column = alt.Column("predicted_classes_original:N", title = "Predicted Animal Type"),
+        row = alt.Row("predicted_classes_original:N", title = "Predicted Animal Type"),
         x = alt.X("monthdate(image_ids):T", title = "Image Date"),
         y = alt.Y("value:Q", title = "Count of Detected Animals"),
         color = alt.Color("predicted_classes_original:N", scale=alt.Scale(scheme="category10"), title="Predicted Animal Type"),
@@ -174,9 +189,24 @@ def time_series(pred_df):
     ).configure_point(
         size = 100
     ).properties(
-        width = 450,
+        width = 1200,
         height = 300,
         title = "Detected Animals Time Series by Animal Type"
+    ).configure_axis(
+        labelFontSize=20,
+        titleFontSize=20
+    ).configure_header(
+        labelFontSize=20,
+        titleFontSize=20
+    ).configure_title(
+        fontSize=20
+    ).configure_legend(
+        strokeColor='gray',
+        fillColor='#EEEEEE',
+        padding=10,
+        cornerRadius=10,
+        labelFontSize=20,
+        titleFontSize=15,
     )
     
     return date_chart_total, date_chart_class
@@ -288,7 +318,24 @@ def form_get(request: Request):
     time_series_class_json = time_series_class.to_json()
     
     # concatenating charts horizontally and saving as a JSON object to easily parse with JavaScript on the frontend
-    concat_chart = (class_chart | conf_chart).resolve_scale(y="shared")
+    concat_chart = (class_chart | conf_chart).resolve_scale(
+        y="shared"
+    ).configure_axis(
+        labelFontSize=20,
+        titleFontSize=20
+    ).configure_header(
+        labelFontSize=20,
+        titleFontSize=20
+    ).configure_title(
+        fontSize=20
+    ).configure_legend(
+        strokeColor='gray',
+        fillColor='#EEEEEE',
+        padding=10,
+        cornerRadius=10,
+        labelFontSize=20,
+        titleFontSize=15,
+    )
     concat_chart_json = concat_chart.to_json()
 
 
@@ -361,7 +408,24 @@ def form_post(request: Request, conf_lev: float = Form(...), pred_class: str = F
     time_series_class_json = time_series_class.to_json()
     
     # concatenating charts horizontally and saving as a JSON object to easily parse with JavaScript on the frontend
-    concat_chart = (class_chart | conf_chart).resolve_scale(y="shared")
+    concat_chart = (class_chart | conf_chart).resolve_scale(
+        y="shared"
+    ).configure_axis(
+        labelFontSize=20,
+        titleFontSize=20
+    ).configure_header(
+        labelFontSize=20,
+        titleFontSize=20
+    ).configure_title(
+        fontSize=20
+    ).configure_legend(
+        strokeColor='gray',
+        fillColor='#EEEEEE',
+        padding=10,
+        cornerRadius=10,
+        labelFontSize=20,
+        titleFontSize=15,
+    )
     concat_chart_json = concat_chart.to_json()
 
 
