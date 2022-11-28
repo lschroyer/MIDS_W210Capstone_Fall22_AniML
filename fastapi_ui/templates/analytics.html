@@ -35,11 +35,18 @@
     as well as the distribution of how confident the model was when classifying each image per 
     class (i.e. the confidence scores per class). If a class has a low confidence score, more images 
     during the training phase may be needed so that the model is better at recognizing the different
-    angles, lighting exposures, etc. of that animal when trying to classify it.
+    angles, lighting exposures, etc. of that animal when trying to classify it. Changes to the model class
+    cutoff scores in the next section will update these graphics.
 </p>
 <div id="vis1" class="vis">
     <div id="hist" class="vis-inner"/>
 </div>
+
+<br><br>
+<p>
+    Next are two timeline charts that show how many animals were observed over time. Again, changes to the model class
+    cutoff scores in the next section will update these graphics.
+</p>
 
 <div id="vis2" class="vis">
     <div id="timeseries-total" class="vis-inner"/>
@@ -56,18 +63,7 @@
 
 <body>
     <br><br>
-    
-    <center>
-        <h1>Image Classification Results</h1>
-    </center>
-    <br><br>
-
-    <h3>Randomize Images in table</h3>
-    <form action="/analytics_randomize_images" method="post">
-        <input type="text" name="random_class_name" id="random_class_name" placeholder="e.g. fox or 'all_classes'" required>
-        <input type="submit" value="Randomize class images">
-    </form>
-
+    <h3>Image Classification Results</h3>
     <style type="text/css">
         table {
             border-collapse: collapse;
@@ -80,23 +76,44 @@
         }
     </style>
     
+    <p>
+        This table shows a random sample of images that the filtering model predicted as containing and not containing animals.
+        To view more images in each class to get a sense of how the filterin model is performing, click the 'randomize images by class'
+        button. You can adjust the sensitivity of how a model classifies an image as containing an animal or not in the next section below.
+        When you are ready, you can save a zip file of your filtered results by clicking the 'Download zip' button at the top 
+        of either column. 
+    </p>
     
-    {% if class_name == "all_classes" %}
+
     <table border="5" align="center"> 
-        <tr>
-            <th colspan="1">
+        <tr id="one">
+            <th colspan="3">
                 <h3>
                     <center>Random Sample Images</center>
                 </h3>
             </th> 
         </tr>
-        <tr id="one">
-            <th>
+        <tr>
+            <th colspan="3">
                 <center>
-                    <a href={{"static/images/analytics/outputs/not_" + class_name + ".zip"}} download={{"class_" + class_name}}>
-                    <button type="button">Download zip of all images</button>
-                    </a>
+                    <p>Enter the animal type you wish to view and save the model classification results for. 
+                        <br>To see a random sample of all the images, enter 'all_classes'.</p>
+                    <form action="/analytics_randomize_images" method="post">
+                        <input type="text" name="random_class_name" id="random_class_name" placeholder="e.g. fox or 'all_classes'" required>
+                        <input type="submit" value="Randomize class images">
+                    </form>
+                    <br>
+                    {% if model_predictions %}
+                        <img src="static/images/analytics/data_frame/class_counts_reclassified.png" alt="Class Counts" width=”200″ height=”200″>
+                    {% else %}
+                        <img src="static/images/analytics/data_frame/class_counts_initial.png" alt="Class Counts" width=”200″ height=”200″>
+                    {% endif %}
                 </center>
+            </th>
+        </tr>
+        {% if class_name == "all_classes" %}
+        <tr id="one">
+            <th colspan="3">
             </th>
         </tr>
         <tr id="one">
@@ -159,16 +176,7 @@
                 </figure></center>
             </td>
         </tr>
-    </table>
-    {% else %}
-    <table border="5" align="center"> 
-        <tr>
-            <th colspan="3">
-                <h3>
-                    <center>Random Sample Images Per Class at Current Cutoff</center>
-                </h3>
-            </th> 
-        </tr>
+        {% else %}
         <tr id="one">
             <th><center><h3>Model Prediction:</h3></center></th>
             <th><font color="white">------</font></th>
@@ -241,41 +249,70 @@
                 </figure></center>
             </th>
         </tr>
+        {% endif %}
     </table>
-    {% endif %}
 
 <body>
 
 
-
 <br><br>
-<h3>Reclassify class with new confidence level</h3>
-<form action="/analytics_reclassify_predictions" method="post">
-    <input type="number" name="conf_lev" id="conf_lev"
-    max="1.0000000000000000" min="0.0000000000000000" 
-    placeholder="e.g. 0.50" step="0.01" 
-    value="" required />
-    <input type="text" name="pred_class" id="pred_class" placeholder="e.g. fox" required>
-    <input type="submit">
+<h3>Adjust Image Classification Results</h3>
+<p>Like the filtering model, this classification model identifies a specific animal type as detected or not detected
+    based on the confidence level that the image belongs to that class. 
+    <br><br>
+    You may adjust the confidence thresholds for each class and see in the image results above how different 
+    confidence level thresholds affect the sensitivity of the model predictions above. You can then download 
+    the files associated with each animal class after any final adjustments to the confidence level cutoff.
+    <br><br>
+    The analytics histograms and timelines above also are updated along with any adjustments to the confidence level 
+    cutoffs in this section.
+    <br><br>
+    If you wish to view the inital model predictions, you can reset the table below.
+</p>
+<table border="5" align="center" style="width:1300px;height:auto;">
+    <tr>
+        <td colspan="2" style="width: 259px; vertical-align:top">
+        <h3>Reclassify class with new confidence level</h3>
+        <p>Keep class if confidence score greater than:</p>
+        <form action="/analytics_reclassify_predictions" method="post">
+            <input type="text" name="pred_class" id="pred_class" placeholder="e.g. fox" required>
+            <input type="number" name="conf_lev" id="conf_lev"
+            max="1.0000000000000000" min="0.0000000000000000" 
+            placeholder="e.g. 0.50" step="0.01" 
+            value="" required />
+            <input type="submit">
+        </form>
 
-</form>
+        <br><br>
+        <p>Confidence Score Cutoffs</p>
+        {% if model_predictions %}
+            <img src="static/images/analytics/data_frame/cutoff_levels_table_reclassified.png" alt="Cutoff Table" width=”200″ height=”200″>
+        {% else %}
+            <img src="static/images/analytics/data_frame/cutoff_levels_table_initial.png" alt="Cutoff Table" width=”200″ height=”200″>
+        {% endif %}
 
-<br>
-<h3>Reset classification to default model outputs</h3>
-<form action="/analytics" method="get">
-    <input type="submit" value="Reset classifications">
-</form>
+        <br><br><br>
+        <h3>Reset classification</h3>
+        <p>Reset the 'new' classifications to the default model outputs</p>
+        <form action="/analytics" method="get">
+            <input type="submit" value="Reset classifications">
+        </form>
 
-<br><br>
-<h3>Model Predictions with cutoff of: </h3>
-<center>
-    <h4>Confidence score cutoff = {{reclass_conf_lev_cutoff}}</h4>
-    {% if model_predictions %}
-    <img src="static/images/analytics/data_frame/conf_table_reclassified.png" alt="Model Classification Table" width=”500″ height=”600″>
-    {% else %}
-    <img src="static/images/analytics/data_frame/conf_table_initial.png" alt="Model Classification Table" width=”500″ height=”600″>
-    {% endif %}
-</center>
+        </td>
+
+        <td>
+            <center>
+                {% if model_predictions %}
+                <h4>Adjusted Model Results</h4>
+                <img src="static/images/analytics/data_frame/conf_table_reclassified.png" alt="Model Classification Table" width=”500″ height=”600″>
+                {% else %}
+                <h4>Initial Model Results</h4>
+                <img src="static/images/analytics/data_frame/conf_table_initial.png" alt="Model Classification Table" width=”500″ height=”600″>
+                {% endif %}
+            </center>
+        </td>
+    </tr>
+
 
 <!-- scripts to fill histogram/analytics viz divs -->
 <script>

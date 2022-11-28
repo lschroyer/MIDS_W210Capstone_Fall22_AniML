@@ -1,7 +1,7 @@
 [
     {
        "image_id":"09220107_JPG.rf.1177492fb393be327df414b8180642db",
-       "category_id":1,
+       "category_id":"fox",
        "bbox":[
           0.0,
           369.061,
@@ -23,7 +23,7 @@
     },
     {
        "image_id":"09220113_JPG.rf.67904d0764563fd6d921e907e034ab23",
-       "category_id":1,
+       "category_id":"fox",
        "bbox":[
           510.871,
           301.129,
@@ -34,7 +34,7 @@
     },
     {
        "image_id":"09220114_JPG.rf.d3671bfbdda727793746fdfbd12b7371",
-       "category_id":1,
+       "category_id":"fox",
        "bbox":[
           488.906,
           304.736,
@@ -45,7 +45,7 @@
     },
     {
        "image_id":"09200088_JPG.rf.f087b7a8a23bf745b932d1da2e4b2a93",
-       "category_id":1,
+       "category_id":"fox",
        "bbox":[
           163.254,
           463.919,
@@ -67,7 +67,7 @@
     },
     {
        "image_id":"09260140_JPG.rf.92ae3de09b0a1e9f9353d7b07c814641",
-       "category_id":1,
+       "category_id":"fox",
        "bbox":[
           133.151,
           356.59,
@@ -78,7 +78,7 @@
     },
     {
        "image_id":"09260141_JPG.rf.a95ea71af019915331d8918030a7ec9a",
-       "category_id":1,
+       "category_id":"fox",
        "bbox":[
           26.815,
           373.175,
@@ -89,7 +89,7 @@
     },
     {
        "image_id":"09230121_JPG.rf.be314214a792202918e4028ec5ec71e7",
-       "category_id":1,
+       "category_id":"coyote",
        "bbox":[
           59.732,
           379.055,
@@ -100,7 +100,7 @@
     },
     {
        "image_id":"09230121_JPG.rf.be314214a792202918e4028ec5ec71e7",
-       "category_id":1,
+       "category_id":"fox",
        "bbox":[
           138.192,
           353.29,
@@ -144,7 +144,7 @@
     },
     {
        "image_id":"09110025_JPG.rf.9490847dd182c94e5cedb8fa5cf86500",
-       "category_id":1,
+       "category_id":"fox",
        "bbox":[
           238.679,
           327.429,
@@ -155,7 +155,7 @@
     },
     {
        "image_id":"09110027_JPG.rf.e5b2d6597a99d0013498af7ddeff15e4",
-       "category_id":1,
+       "category_id":"fox",
        "bbox":[
           435.901,
           332.851,
@@ -177,7 +177,7 @@
     },
     {
        "image_id":"09140037_JPG.rf.b826ac1744e01dd10edf59d212e143b1",
-       "category_id":1,
+       "category_id":"fox",
        "bbox":[
           264.661,
           341.029,
@@ -199,7 +199,7 @@
     },
     {
        "image_id":"09160055_JPG.rf.07b029d123229fd2e960b688ca24eaac",
-       "category_id":1,
+       "category_id":"fox",
        "bbox":[
           399.944,
           312.829,

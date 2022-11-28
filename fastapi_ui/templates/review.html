@@ -12,7 +12,7 @@
 {% block page_content %}
 <h1 class="cap">Review Image Classifications</h1>
 <p> Here we can see the results from our filtering model's prediction of which images are false triggers.
-    Adjust the sensitivity and randomly view a sample of the images 
+    Adjust the sensitivity and randomly view a sample of the images. 
 </p>
 
 <html>
@@ -28,7 +28,13 @@
 <br>
 
 <h3>Image Classification Results</h3>
-
+<p>
+    This table shows a random sample of images that the filtering model predicted as containing and not containing animals.
+    To view more images in each class to get a sense of how the filterin model is performing, click the 'randomize images by class'
+    button. You can adjust the sensitivity of how a model classifies an image as containing an animal or not in the next section below.
+    When you are ready, you can save a zip file of your filtered results by clicking the 'Download zip' button at the top 
+    of either column.
+</p>
 
 <style type="text/css">
     table {
@@ -49,7 +55,7 @@
                 <center>
                     <h3>Randomly Sampled Images by Predicted Class</h3>
                     <form action="/review_randomize" method="get">
-                        <input type="submit" value="Randomize images by class">
+                        <input type="submit" value="randomize images by class">
                     </form>
                 </center>
         </th> 
@@ -74,7 +80,7 @@
         <th>
             <center>
                 <a href="static/images/review/outputs/predicted_not_animal_detected.zip" download="class_0">
-                <button type="button">Download zip of prediction of no animal images</button>
+                <button type="button">download zip of prediction of no animal images</button>
                 </a>
             </center>
         </th>
@@ -82,7 +88,7 @@
         <th>
             <center>
                 <a href="static/images/review/outputs/predicted_animal_detected.zip" download="class_1">
-                <button type="button">Download zip of prediction of animal images</button>
+                <button type="button">download zip of prediction of animal images</button>
                 </a>
             </center>
         </th>
@@ -190,8 +196,9 @@
             <p>Keep class if confidence score greater than:</p>
             <form action="/review_reclassify_predictions" method="post">
                 <!-- <input type="text" name="random_class_name" id="random_class_name" placeholder="e.g. fox or 'all_classes'" required> -->
-                <label>Select Class:<br>
-                    <input list="reclassify_class_name" id="reclassify_class_name_label" name="reclassify_class_name_label"/>
+                <label>Select Class and New Confidence Cutoff Level:<br>
+                    <input list="reclassify_class_name" id="reclassify_class_name_label"
+                     name="reclassify_class_name_label" placeholder="select from dropdown "/>
                 </label>
                 <datalist id="reclassify_class_name">
                     <option value="animal_detected">

@@ -196,12 +196,25 @@ def get_model_data():
                     (df["predicted_classes_original"] == 0), 
                     "predicted_classes_original"] = "not_animal_detected"
 
+    df['predicted_classes_original'] = df.predicted_classes_original.replace(' ', '_', regex=True)
+
     # shuffle data
     df = df.sample(frac=1)
-    return df, False, df["predicted_classes_original"].unique().tolist()
+
+    # get initial conf table
+    label_list = df["predicted_classes_original"].unique()
+    df_classification_cuttoffs_initial = pd.DataFrame(
+        {"class_name": label_list, 
+        "confidence_cutoff": ["default"] * len(label_list)}
+        )
+
+    # get class counts
+    df_class_counts_initial = df['predicted_classes_original'].value_counts().to_frame().rename(columns={"predicted_classes_original": "count"})
+
+    return df, False, df["predicted_classes_original"].unique().tolist(), df_classification_cuttoffs_initial, df_class_counts_initial
 
 # Initialize for global variables
-df_global, already_reclassified, global_class_list = get_model_data()
+df_global, already_reclassified, global_class_list, df_classification_cuttoffs, df_class_counts = get_model_data()
 df_global_reclassified = df_global.copy()
 df_global_reclassified["predicted_classes_new"] = df_global_reclassified["predicted_classes_original"]
 
@@ -229,10 +242,10 @@ def filter_low_conf_images(df, conf_level, label = None):
 
 @router.get("/analytics", response_class=HTMLResponse)
 def form_get(request: Request):
-    global df_global, global_class_list
+    global df_global, global_class_list, df_classification_cuttoffs, df_class_counts
 
     # Initialize data
-    df_global, already_reclassified, global_class_list = get_model_data()
+    df_global, already_reclassified, global_class_list, df_classification_cuttoffs, df_class_counts = get_model_data()
 
     # Clear legacy outputs and create folders
     destination_folder = [
@@ -246,8 +259,13 @@ def form_get(request: Request):
         if not os.path.exists(folder):
             os.mkdir(folder)
 
-    df_global['predicted_classes_original'] = df_global.predicted_classes_original.replace(' ', '_', regex=True)
+
     dfi.export(df_global,"static/images/analytics/data_frame/conf_table_initial.png")
+    dfi.export(df_classification_cuttoffs.style.hide_index(), 
+        "static/images/analytics/data_frame/cutoff_levels_table_initial.png")
+    dfi.export(df_class_counts,
+        "static/images/analytics/data_frame/class_counts_initial.png")
+
 
     # ToDo - if time allows, change pandas table to html
     # with open('static/images/analytics/data_frame/conf_table_initial.html', 'w') as fo:
@@ -290,13 +308,14 @@ def form_get(request: Request):
 
 @router.post("/analytics_reclassify_predictions", response_class=HTMLResponse)
 def form_post(request: Request, conf_lev: float = Form(...), pred_class: str = Form(...)):
-    global df_global_reclassified, already_reclassified
+    global df_global_reclassified, already_reclassified, df_classification_cuttoffs
 
     # Clear legacy outputs for class of interest
     destination_folder = [
         "static/images/analytics/predicted_classes/predicted_" + pred_class,
-        "static/images/analytics/predicted_classes/predicted_not_" + pred_class
-        ]
+        "static/images/analytics/predicted_classes/predicted_not_" + pred_class,
+         "static/images/analytics/data_frame/"
+         ]
 
     for folder in destination_folder:
         _clear_files(folder)
@@ -309,7 +328,26 @@ def form_post(request: Request, conf_lev: float = Form(...), pred_class: str = F
         df_global_reclassified = filter_low_conf_images(df_global_reclassified, conf_lev, pred_class)
     already_reclassified = True
 
+    df_classification_cuttoffs.loc[(df_classification_cuttoffs.class_name ==  pred_class),["confidence_cutoff"]] = conf_lev
+
+    df_class_counts = df_global_reclassified.groupby(
+        ['predicted_classes_original','predicted_classes_new']
+        ).size().to_frame()
+    df_class_counts.index = df_class_counts.index.set_names(['predicted_classes_original', 'predicted_classes_new'])
+    df_class_counts = df_class_counts.reset_index()
+    # df_class_counts = df_class_counts.rename(
+    #     columns={"0": "count"})
+
+    logger.info("----------------------")
+    logger.info(df_class_counts)
+
     dfi.export(df_global_reclassified,"static/images/analytics/data_frame/conf_table_reclassified.png")
+    dfi.export(df_classification_cuttoffs.style.hide_index(), 
+        "static/images/analytics/data_frame/cutoff_levels_table_reclassified.png")
+    dfi.export(df_class_counts.style.hide_index(),
+        "static/images/analytics/data_frame/class_counts_reclassified.png")
+
+
 
     # Random files and outputs workflow
     random_files_names = random_file_workflow(df_global_reclassified)
@@ -347,8 +385,9 @@ async def form_post2(request: Request, random_class_name: str = Form(...)):
     global df_global, df_global_reclassified, global_class_list
     random_class_name = random_class_name.lower()
     
-    # Initialize data
-    # df_global, already_reclassified, global_class_list = get_model_data()
+    random_class_name = random_class_name.replace(' ', '_')
+    random_class_name = random_class_name.replace('"', '')
+    random_class_name = random_class_name.replace("'", '')
 
     df_filtered = df_global_reclassified[
         (df_global_reclassified.predicted_classes_new == random_class_name) |
