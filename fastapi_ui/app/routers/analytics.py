@@ -102,7 +102,7 @@ def make_conf_chart(pred_df, width=900, height=400):
 
     # defining altair chart and saving as JSON
     conf_chart = alt.Chart(pred_df).mark_bar().encode(
-        x = alt.X("confidence_scores:Q", bin=alt.Bin(maxbins=10), title="Predicted Class"),
+        x = alt.X("confidence_scores:Q", bin=alt.Bin(maxbins=10), title="Confidence Level"),
         y = alt.Y("count():Q", title="Count"),
         color = alt.Color("predicted_classes_original:N", scale=alt.Scale(scheme="category10"), title = "Predicted Class"),
         tooltip = [alt.Tooltip("confidence_scores:Q", bin=alt.Bin(maxbins=10), title="Confidence Interval"),
@@ -133,81 +133,90 @@ def time_series(pred_df):
     # retrieving date from first four digits of image names in dataframe
     # appended 2022 for convenience but we won't use the year in the time series
     dates = pred_df["image_ids"].apply(lambda x: x[:4]+"2022")
-    pred_df["image_ids"] = pd.to_datetime(dates, format="%m%d%Y")
-    # adding date as its own column
-    pred_df["image_ids"] = pd.to_datetime(dates, format="%m%d%Y")
+    # creating time series from parsed dates
+    try:
+        # adding date as its own column
+        pred_df["image_date"] = pd.to_datetime(dates, format="%m%d%Y")
+
+        # grouping by date, imputing missing dates, and flattening dataframe for altair chart
+        # this dataframe separates by predicted animal class
+        date_df = pred_df.groupby(["image_date", "predicted_classes_original"]).size().unstack(fill_value=0).reset_index()
+        date_df = date_df.set_index("image_date").asfreq("D", fill_value=0).reset_index()
+        date_df_flat = pd.melt(date_df, id_vars=["image_date"])
+
+        # further aggregating to calculate total animal counts, summing by predicted class
+        date_df_total = date_df_flat.drop(["predicted_classes_original"], axis=1).groupby(["image_date"]).agg(["sum"])
+        date_df_total.columns = date_df_total.columns.get_level_values(0)
+        date_df_total.reset_index(inplace=True)
+
+        # time-series chart for total detected animals in the dataset
+        date_chart_total = alt.Chart(date_df_total).mark_line(point=True, strokeWidth=2).encode(
+            x = alt.X("monthdate(image_date):T", title = "Image Date"),
+            y = alt.Y("value:Q", title = "Count of Detected Animals"),
+            tooltip = [alt.Tooltip("monthdate(image_date)", title = "Image Date"),
+                       alt.Tooltip("value:Q", title = "Count of Detected Animals")]
+        ).configure_point(
+            size = 100
+        ).properties(
+            width = 1200,
+            height = 300,
+            title = "Total Detected Animals Time Series"
+        ).configure_axis(
+            labelFontSize=20,
+            titleFontSize=20
+        ).configure_header(
+            labelFontSize=20,
+            titleFontSize=20
+        ).configure_title(
+            fontSize=20
+        ).configure_legend(
+            strokeColor='gray',
+            fillColor='#EEEEEE',
+            padding=10,
+            cornerRadius=10,
+            labelFontSize=20,
+            titleFontSize=15,
+        )
+
+        # defining title for center alignment
+        date_chart_class_title = alt.TitleParams("Detected Animals Time Series by Animal Type", anchor="middle")
+        # creating concatenated time-series charts for each animal class detected in the dataset
+        date_chart_class = alt.Chart(date_df_flat, title=date_chart_class_title).mark_line(point=True, strokeWidth=2).encode(
+            row = alt.Row("predicted_classes_original:N", title = "Predicted Animal Type"),
+            x = alt.X("monthdate(image_date):T", title = "Image Date"),
+            y = alt.Y("value:Q", title = "Count of Detected Animals"),
+            color = alt.Color("predicted_classes_original:N", scale=alt.Scale(scheme="category10"), title="Predicted Animal Type"),
+            tooltip = [alt.Tooltip("monthdate(image_date)", title = "Image Date"),
+                       alt.Tooltip("predicted_classes_original", title = "Animal Type"),
+                       alt.Tooltip("value", title = "Count of Detected Animals")]
+        ).configure_point(
+            size = 100
+        ).properties(
+            width = 1200,
+            height = 300,
+            # title = Detected Animals Time Series by Animal Type
+        ).configure_axis(
+            labelFontSize=20,
+            titleFontSize=20
+        ).configure_header(
+            labelFontSize=20,
+            titleFontSize=20
+        ).configure_title(
+            fontSize=20,
+
+        ).configure_legend(
+            strokeColor='gray',
+            fillColor='#EEEEEE',
+            padding=10,
+            cornerRadius=10,
+            labelFontSize=20,
+            titleFontSize=15,
+        )
     
-    # grouping by date, imputing missing dates, and flattening dataframe for altair chart
-    # this dataframe separates by predicted animal class
-    date_df = pred_df.groupby(["image_ids", "predicted_classes_original"]).size().unstack(fill_value=0).reset_index()
-    date_df = date_df.set_index("image_ids").asfreq("D", fill_value=0).reset_index()
-    date_df_flat = pd.melt(date_df, id_vars=["image_ids"])
-    
-    # further aggregating to calculate total animal counts, summing by predicted class
-    date_df_total = date_df_flat.drop(["predicted_classes_original"], axis=1).groupby(["image_ids"]).agg(["sum"])
-    date_df_total.columns = date_df_total.columns.get_level_values(0)
-    date_df_total.reset_index(inplace=True)
-    
-    # time-series chart for total detected animals in the dataset
-    date_chart_total = alt.Chart(date_df_total).mark_line(point=True, strokeWidth=2).encode(
-        x = alt.X("monthdate(image_ids):T", title = "Image Date"),
-        y = alt.Y("value:Q", title = "Count of Detected Animals"),
-        tooltip = [alt.Tooltip("monthdate(image_ids)", title = "Image Date"),
-                   alt.Tooltip("value:Q", title = "Count of Detected Animals")]
-    ).configure_point(
-        size = 100
-    ).properties(
-        width = 1200,
-        height = 300,
-        title = "Total Detected Animals Time Series"
-    ).configure_axis(
-        labelFontSize=20,
-        titleFontSize=20
-    ).configure_header(
-        labelFontSize=20,
-        titleFontSize=20
-    ).configure_title(
-        fontSize=20
-    ).configure_legend(
-        strokeColor='gray',
-        fillColor='#EEEEEE',
-        padding=10,
-        cornerRadius=10,
-        labelFontSize=20,
-        titleFontSize=15,
-    )
-    
-    # creating concatenated time-series charts for each animal class detected in the dataset
-    date_chart_class = alt.Chart(date_df_flat).mark_line(point=True, strokeWidth=2).encode(
-        row = alt.Row("predicted_classes_original:N", title = "Predicted Animal Type"),
-        x = alt.X("monthdate(image_ids):T", title = "Image Date"),
-        y = alt.Y("value:Q", title = "Count of Detected Animals"),
-        color = alt.Color("predicted_classes_original:N", scale=alt.Scale(scheme="category10"), title="Predicted Animal Type"),
-        tooltip = [alt.Tooltip("monthdate(image_ids)", title = "Image Date"),
-                   alt.Tooltip("predicted_classes_original", title = "Animal Type"),
-                   alt.Tooltip("value", title = "Count of Detected Animals")]
-    ).configure_point(
-        size = 100
-    ).properties(
-        width = 1200,
-        height = 300,
-        title = "Detected Animals Time Series by Animal Type"
-    ).configure_axis(
-        labelFontSize=20,
-        titleFontSize=20
-    ).configure_header(
-        labelFontSize=20,
-        titleFontSize=20
-    ).configure_title(
-        fontSize=20
-    ).configure_legend(
-        strokeColor='gray',
-        fillColor='#EEEEEE',
-        padding=10,
-        cornerRadius=10,
-        labelFontSize=20,
-        titleFontSize=15,
-    )
+    # if the dates in image names cannot be parsed, return None for time series charts
+    except ValueError:
+        date_chart_total = None
+        date_chart_class = None
     
     return date_chart_total, date_chart_class
 
@@ -290,11 +299,11 @@ def form_get(request: Request):
             os.mkdir(folder)
 
 
-    dfi.export(df_global,"static/images/analytics/data_frame/conf_table_initial.png")
-    dfi.export(df_classification_cuttoffs.style.hide_index(), 
-        "static/images/analytics/data_frame/cutoff_levels_table_initial.png")
-    dfi.export(df_class_counts,
-        "static/images/analytics/data_frame/class_counts_initial.png")
+    # dfi.export(df_global,"static/images/analytics/data_frame/conf_table_initial.png")
+    # dfi.export(df_classification_cuttoffs.style.hide_index(), 
+    #     "static/images/analytics/data_frame/cutoff_levels_table_initial.png")
+    # dfi.export(df_class_counts,
+    #     "static/images/analytics/data_frame/class_counts_initial.png")
 
 
     # ToDo - if time allows, change pandas table to html
@@ -314,8 +323,9 @@ def form_get(request: Request):
     conf_chart = make_conf_chart(df_global_copy)
     class_chart = make_class_chart(df_global_copy)
     time_series_total, time_series_class = time_series(df_global_copy)
-    time_series_total_json = time_series_total.to_json()
-    time_series_class_json = time_series_class.to_json()
+    # if the function returns None for the time series, create empty dict/JSON
+    time_series_total_json = time_series_total.to_json() if time_series_total else None
+    time_series_class_json = time_series_class.to_json() if time_series_class else None
     
     # concatenating charts horizontally and saving as a JSON object to easily parse with JavaScript on the frontend
     concat_chart = (class_chart | conf_chart).resolve_scale(
@@ -388,11 +398,11 @@ def form_post(request: Request, conf_lev: float = Form(...), pred_class: str = F
     logger.info("----------------------")
     logger.info(df_class_counts)
 
-    dfi.export(df_global_reclassified,"static/images/analytics/data_frame/conf_table_reclassified.png")
-    dfi.export(df_classification_cuttoffs.style.hide_index(), 
-        "static/images/analytics/data_frame/cutoff_levels_table_reclassified.png")
-    dfi.export(df_class_counts.style.hide_index(),
-        "static/images/analytics/data_frame/class_counts_reclassified.png")
+    # dfi.export(df_global_reclassified,"static/images/analytics/data_frame/conf_table_reclassified.png")
+    # dfi.export(df_classification_cuttoffs.style.hide_index(), 
+    #     "static/images/analytics/data_frame/cutoff_levels_table_reclassified.png")
+    # dfi.export(df_class_counts.style.hide_index(),
+    #     "static/images/analytics/data_frame/class_counts_reclassified.png")
 
 
 
@@ -404,8 +414,8 @@ def form_post(request: Request, conf_lev: float = Form(...), pred_class: str = F
     conf_chart = make_conf_chart(df_global_reclassified_copy)
     class_chart = make_class_chart(df_global_reclassified_copy)
     time_series_total, time_series_class = time_series(df_global_reclassified_copy)
-    time_series_total_json = time_series_total.to_json()
-    time_series_class_json = time_series_class.to_json()
+    time_series_total_json = time_series_total.to_json() if time_series_total else None
+    time_series_class_json = time_series_class.to_json() if time_series_total else None
     
     # concatenating charts horizontally and saving as a JSON object to easily parse with JavaScript on the frontend
     concat_chart = (class_chart | conf_chart).resolve_scale(
