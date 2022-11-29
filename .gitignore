@@ -14,7 +14,10 @@ fastapi_ui/static/images/review/outputs/
 fastapi_ui/static/images/analytics/data_frame/
 fastapi_ui/static/images/analytics/outputs/
 fastapi_ui/static/images/analytics/predicted_classes/
-
+venv/
+venv/*
+.venv
+.venv/
 
 # Distribution / packaging
 .Python
