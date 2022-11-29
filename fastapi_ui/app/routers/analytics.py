@@ -55,7 +55,7 @@ def parse_yolo_json(yolo_json_path):
 
     return image_ids, pred_classes, bboxes, confs
 
-def make_class_chart(pred_df, width=500, height=400):
+def make_class_chart(pred_df, width=450, height=300):
     '''
     Function to parse DataFrame of model predictions and create an Altair/Vega-Lite histogram of confidence levels.
     Input:
@@ -86,7 +86,7 @@ def make_class_chart(pred_df, width=500, height=400):
     return class_chart
 
 
-def make_conf_chart(pred_df, width=900, height=400):
+def make_conf_chart(pred_df, width=500, height=300):
     '''
     Function to parse DataFrame of model predictions and create an Altair/Vega-Lite histogram of confidence levels.
     Input:
@@ -158,8 +158,8 @@ def time_series(pred_df):
         ).configure_point(
             size = 100
         ).properties(
-            width = 1200,
-            height = 300,
+            width = 900,
+            height = 200,
             title = "Total Detected Animals Time Series"
         ).configure_axis(
             labelFontSize=20,
@@ -184,16 +184,16 @@ def time_series(pred_df):
         date_chart_class = alt.Chart(date_df_flat, title=date_chart_class_title).mark_line(point=True, strokeWidth=2).encode(
             row = alt.Row("predicted_classes_original:N", title = "Predicted Animal Type"),
             x = alt.X("monthdate(image_date):T", title = "Image Date"),
-            y = alt.Y("value:Q", title = "Count of Detected Animals"),
+            y = alt.Y("value:Q", title = "Detected Count"),
             color = alt.Color("predicted_classes_original:N", scale=alt.Scale(scheme="category10"), title="Predicted Animal Type"),
             tooltip = [alt.Tooltip("monthdate(image_date)", title = "Image Date"),
                        alt.Tooltip("predicted_classes_original", title = "Animal Type"),
-                       alt.Tooltip("value", title = "Count of Detected Animals")]
+                       alt.Tooltip("value", title = "Detected Count")]
         ).configure_point(
             size = 100
         ).properties(
-            width = 1200,
-            height = 300,
+            width = 900,
+            height = 200,
             # title = Detected Animals Time Series by Animal Type
         ).configure_axis(
             labelFontSize=20,
@@ -228,12 +228,12 @@ def get_model_data():
     
     df = pd.DataFrame.from_dict(model_predictions)
     
-    df.loc[(df["predicted_classes_original"] == "1") | 
-                    (df["predicted_classes_original"] == 1), 
-                    "predicted_classes_original"] = "animal_detected"
+    # df.loc[(df["predicted_classes_original"] == "1") | 
+    #                 (df["predicted_classes_original"] == 1), 
+    #                 "predicted_classes_original"] = "animal_detected"
     df.loc[(df["predicted_classes_original"] == "0") | 
                     (df["predicted_classes_original"] == 0), 
-                    "predicted_classes_original"] = "not_animal_detected"
+                    "predicted_classes_original"] = "no_animal_detected"
 
     df['predicted_classes_original'] = df.predicted_classes_original.replace(' ', '_', regex=True)
 
@@ -299,11 +299,11 @@ def form_get(request: Request):
             os.mkdir(folder)
 
 
-    # dfi.export(df_global,"static/images/analytics/data_frame/conf_table_initial.png")
-    # dfi.export(df_classification_cuttoffs.style.hide_index(), 
-    #     "static/images/analytics/data_frame/cutoff_levels_table_initial.png")
-    # dfi.export(df_class_counts,
-    #     "static/images/analytics/data_frame/class_counts_initial.png")
+    dfi.export(df_global,"static/images/analytics/data_frame/conf_table_initial.png")
+    dfi.export(df_classification_cuttoffs.style.hide_index(), 
+        "static/images/analytics/data_frame/cutoff_levels_table_initial.png")
+    dfi.export(df_class_counts,
+        "static/images/analytics/data_frame/class_counts_initial.png")
 
 
     # ToDo - if time allows, change pandas table to html
@@ -375,6 +375,8 @@ def form_post(request: Request, conf_lev: float = Form(...), pred_class: str = F
          ]
 
     for folder in destination_folder:
+        if not os.path.exists(folder):
+            os.mkdir(folder)
         _clear_files(folder)
         if not os.path.exists(folder):
             os.mkdir(folder)
@@ -398,11 +400,11 @@ def form_post(request: Request, conf_lev: float = Form(...), pred_class: str = F
     logger.info("----------------------")
     logger.info(df_class_counts)
 
-    # dfi.export(df_global_reclassified,"static/images/analytics/data_frame/conf_table_reclassified.png")
-    # dfi.export(df_classification_cuttoffs.style.hide_index(), 
-    #     "static/images/analytics/data_frame/cutoff_levels_table_reclassified.png")
-    # dfi.export(df_class_counts.style.hide_index(),
-    #     "static/images/analytics/data_frame/class_counts_reclassified.png")
+    dfi.export(df_global_reclassified,"static/images/analytics/data_frame/conf_table_reclassified.png")
+    dfi.export(df_classification_cuttoffs.style.hide_index(), 
+        "static/images/analytics/data_frame/cutoff_levels_table_reclassified.png")
+    dfi.export(df_class_counts.style.hide_index(),
+        "static/images/analytics/data_frame/class_counts_reclassified.png")
 
 
 

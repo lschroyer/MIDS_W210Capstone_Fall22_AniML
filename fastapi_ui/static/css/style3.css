@@ -58,7 +58,7 @@ a:focus {
     left: -250px;
     height: 100vh;
     z-index: 999;
-    background: #7386D5;
+    background: #D3D3D3;
     color: #fff;
     transition: all 0.3s;
     overflow-y: scroll;
@@ -74,7 +74,7 @@ a:focus {
     height: 35px;
     line-height: 35px;
     text-align: center;
-    background: #7386D5;
+    background: #D3D3D3;
     position: absolute;
     top: 10px;
     right: 10px;
@@ -86,7 +86,7 @@ a:focus {
 
 #dismiss:hover {
     background: #fff;
-    color: #7386D5;
+    color: #D3D3D3;
 }
 
 .overlay {
@@ -106,7 +106,7 @@ a:focus {
 
 #sidebar .sidebar-header {
     padding: 20px;
-    background: #6d7fcc;
+    background: #1eaaba;
 }
 
 #sidebar ul.components {
