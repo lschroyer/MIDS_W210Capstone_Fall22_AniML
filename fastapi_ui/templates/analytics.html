@@ -273,7 +273,7 @@
     <br><br>
     If you wish to view the inital model predictions, you can reset the table below.
 </p>
-<table border="5" align="center" style="width:1300px;height:auto;">
+<table border="5" align="center" style="width:1600px;height:auto;">
     <tr>
         <td colspan="2" style="width: 259px; vertical-align:top">
             <h3>Reclassify class with new confidence level</h3>
@@ -296,6 +296,10 @@
             {% endif %}
 
             <br><br>
+            <h3>Manually reclassify individual images</h3>
+            <p>If you see images above that you want to manually reclassify without changing model confidence cutoff scores
+                you can manually reclassify them here.     
+            </p>
             <form action="/analytics_reclassify_image" method="post">
                 <input type="text" name="img_name" id="img_name" placeholder="img name" required>
                 <input type="text" name="new_class" id="new_class" placeholder="e.g. fox" required>

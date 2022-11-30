@@ -45,17 +45,6 @@
     },
     {
        "image_id":"09200088_JPG.rf.f087b7a8a23bf745b932d1da2e4b2a93",
-       "category_id":"fox",
-       "bbox":[
-          163.254,
-          463.919,
-          355.552,
-          147.325
-       ],
-       "score":0.62989
-    },
-    {
-       "image_id":"09200088_JPG.rf.f087b7a8a23bf745b932d1da2e4b2a93",
        "category_id":0,
        "bbox":[
           157.283,

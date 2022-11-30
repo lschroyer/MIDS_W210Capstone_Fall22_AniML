@@ -253,15 +253,22 @@ def get_model_data():
 
     return df, False, df["predicted_classes_original"].unique().tolist(), df_classification_cuttoffs_initial, df_class_counts_initial
 
-# Initialize for global variables
+# Initialize global variables
 df_global, already_reclassified, global_class_list, df_classification_cuttoffs, df_class_counts = get_model_data()
 df_global_reclassified = df_global.copy()
 df_global_reclassified["predicted_classes_new"] = df_global_reclassified["predicted_classes_original"]
+df_global_reclassified["manually_reclassified"] = np.array(["no"] * len(df_global_reclassified["predicted_classes_new"]))
+show_model_table_reclassified = False
+
+
+####################### API ENDPOINTS ##########################
+
 
 def filter_low_conf_images(df, conf_level, label = None):
     
     if already_reclassified == False:
         df["predicted_classes_new"] = df["predicted_classes_original"]
+        df["manually_reclassified"] = np.array(["no"] * len(df["predicted_classes_original"]))
         label_list = df["predicted_classes_original"].unique()
     else:
         label_list = df["predicted_classes_new"].unique()
@@ -269,7 +276,7 @@ def filter_low_conf_images(df, conf_level, label = None):
     # raise ValueError("break - testing")
     if label not in label_list or label is not None:
         for index, image_id in enumerate(df["image_ids"]):
-            if df["predicted_classes_original"][index] == label:
+            if df["predicted_classes_original"][index] == label and df["manually_reclassified"][index] == "no":
                 if df["confidence_scores"][index] < conf_level:
                     df["predicted_classes_new"][index] = "not_" + label
                 else:
@@ -282,7 +289,7 @@ def filter_low_conf_images(df, conf_level, label = None):
 
 @router.get("/analytics", response_class=HTMLResponse)
 def form_get(request: Request):
-    global df_global, global_class_list, df_classification_cuttoffs, df_class_counts
+    global df_global, global_class_list, df_classification_cuttoffs, df_class_counts, show_model_table_reclassified
 
     # Initialize data
     df_global, already_reclassified, global_class_list, df_classification_cuttoffs, df_class_counts = get_model_data()
@@ -366,7 +373,7 @@ def form_get(request: Request):
 
 @router.post("/analytics_reclassify_predictions", response_class=HTMLResponse)
 def form_post(request: Request, conf_lev: float = Form(...), pred_class: str = Form(...)):
-    global df_global_reclassified, already_reclassified, df_classification_cuttoffs
+    global df_global_reclassified, already_reclassified, df_classification_cuttoffs, show_model_table_reclassified
 
     # Clear legacy outputs for class of interest
     destination_folder = [
@@ -454,7 +461,7 @@ def form_post(request: Request, conf_lev: float = Form(...), pred_class: str = F
 
 @router.post("/analytics_randomize_images", response_class=HTMLResponse)
 async def form_post2(request: Request, random_class_name: str = Form(...)):
-    global df_global, df_global_reclassified, global_class_list
+    global df_global, df_global_reclassified, global_class_list, show_model_table_reclassified
     
     random_class_name = random_class_name.lower()
     random_class_name = random_class_name.replace(' ', '_')
@@ -488,6 +495,7 @@ async def form_post2(request: Request, random_class_name: str = Form(...)):
     return templates.TemplateResponse('analytics.html',
         context={'request': request, 
                 'random_files_names': random_files_names,
+                'model_predictions': show_model_table_reclassified,
                 'concat_chart': concat_chart_json,
                 'time_series_total': time_series_total_json,
                 'time_series_class': time_series_class_json,
@@ -495,8 +503,8 @@ async def form_post2(request: Request, random_class_name: str = Form(...)):
                 "class_list": global_class_list})
 
 @router.post("/analytics_reclassify_image", response_class=HTMLResponse)
-def form_post2(request: Request, img_name: str = Form(...), new_class: str = Form(...)):
-    global df_global, df_global_reclassified, global_class_list
+def form_post3(request: Request, img_name: str = Form(...), new_class: str = Form(...)):
+    global df_global, df_global_reclassified, global_class_list, show_model_table_reclassified, already_reclassified
 
     new_class = new_class.lower()
     new_class = new_class.replace(' ', '_')
@@ -508,6 +516,10 @@ def form_post2(request: Request, img_name: str = Form(...), new_class: str = For
     df_global_reclassified.loc[(
         df_global_reclassified["image_ids"] == img_name_no_suffix), 
                     "predicted_classes_new"] = new_class
+    df_global_reclassified.loc[(
+        df_global_reclassified["image_ids"] == img_name_no_suffix), 
+                    "manually_reclassified"] = "yes"
+    
 
     df_class_counts = df_global_reclassified.groupby(
         ['predicted_classes_original','predicted_classes_new']
@@ -543,6 +555,8 @@ def form_post2(request: Request, img_name: str = Form(...), new_class: str = For
     concat_chart = (class_chart | conf_chart).resolve_scale(y="shared")
     concat_chart_json = concat_chart.to_json()
 
+
+    already_reclassified = True
     show_model_table_reclassified = True
 
 
@@ -564,6 +578,9 @@ def form_post2(request: Request, img_name: str = Form(...), new_class: str = For
 #     return jsonify({'reply':'success'})
 
 
+####################### HELPER FUNCTIONS ##########################
+
+
 def random_file_workflow(df):
     global global_class_list
     random_file_names = {}
@@ -579,17 +596,12 @@ def random_file_workflow(df):
     class_list.extend(x for x in global_class_list if x not in class_list)
     class_list = list(set(class_list))
 
-    logger.info("-------------")
-    logger.info(class_list)
-
     for class_name in class_list:
         if "not_" + class_name.replace('not_', '') not in class_list:
             class_list = np.append(class_list, ["not_" + class_name])
 
     # Loop over all classes and 'not' classes
     for class_name in class_list:
-        logger.info("************")
-        logger.info(class_name)
         # Create files
         dst = "static/images/analytics/predicted_classes/predicted_" + class_name 
         if not os.path.exists(dst):
@@ -623,7 +635,6 @@ def random_file_workflow(df):
         random_file_names[class_name] = random_files_i(class_name)
     
     return random_file_names
-
 
 def random_files_i(class_name: str = "", predicted_path = 'analytics/predicted_classes/predicted_'):
     # 5 random class i
@@ -660,7 +671,6 @@ def _clear_files(path):
 def _copy_paste_files(list_of_file_paths_to_copy, destination_folder):
     for file in list_of_file_paths_to_copy: 
         shutil.copy(file, destination_folder)
-
 
 def _zip_files(class_name, specific_class = True):
     if specific_class:
