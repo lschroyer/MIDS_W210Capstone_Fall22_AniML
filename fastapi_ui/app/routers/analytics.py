@@ -242,6 +242,7 @@ def get_model_data():
 
     # get initial conf table
     label_list = df["predicted_classes_original"].unique()
+    
     df_classification_cuttoffs_initial = pd.DataFrame(
         {"class_name": label_list, 
         "confidence_cutoff": ["default"] * len(label_list)}
@@ -394,11 +395,6 @@ def form_post(request: Request, conf_lev: float = Form(...), pred_class: str = F
         ).size().to_frame()
     df_class_counts.index = df_class_counts.index.set_names(['predicted_classes_original', 'predicted_classes_new'])
     df_class_counts = df_class_counts.reset_index()
-    # df_class_counts = df_class_counts.rename(
-    #     columns={"0": "count"})
-
-    logger.info("----------------------")
-    logger.info(df_class_counts)
 
     dfi.export(df_global_reclassified,"static/images/analytics/data_frame/conf_table_reclassified.png")
     dfi.export(df_classification_cuttoffs.style.hide_index(), 
@@ -459,8 +455,8 @@ def form_post(request: Request, conf_lev: float = Form(...), pred_class: str = F
 @router.post("/analytics_randomize_images", response_class=HTMLResponse)
 async def form_post2(request: Request, random_class_name: str = Form(...)):
     global df_global, df_global_reclassified, global_class_list
-    random_class_name = random_class_name.lower()
     
+    random_class_name = random_class_name.lower()
     random_class_name = random_class_name.replace(' ', '_')
     random_class_name = random_class_name.replace('"', '')
     random_class_name = random_class_name.replace("'", '')
@@ -488,14 +484,9 @@ async def form_post2(request: Request, random_class_name: str = Form(...)):
     # concatenating charts horizontally and saving as a JSON object to easily parse with JavaScript on the frontend
     concat_chart = (class_chart | conf_chart).resolve_scale(y="shared")
     concat_chart_json = concat_chart.to_json()
-
-    model_cutoff = "default model prediction"
-    show_model_table_initial = False
     
     return templates.TemplateResponse('analytics.html',
         context={'request': request, 
-                # 'model_predictions': show_model_table_initial,
-                # 'reclass_conf_lev_cutoff': model_cutoff,
                 'random_files_names': random_files_names,
                 'concat_chart': concat_chart_json,
                 'time_series_total': time_series_total_json,
@@ -503,31 +494,102 @@ async def form_post2(request: Request, random_class_name: str = Form(...)):
                 'class_name': random_class_name,
                 "class_list": global_class_list})
 
+@router.post("/analytics_reclassify_image", response_class=HTMLResponse)
+def form_post2(request: Request, img_name: str = Form(...), new_class: str = Form(...)):
+    global df_global, df_global_reclassified, global_class_list
+
+    new_class = new_class.lower()
+    new_class = new_class.replace(' ', '_')
+    new_class = new_class.replace('"', '')
+    new_class = new_class.replace("'", '')
+    img_name_no_suffix = img_name.replace('.jpg', '')
+
+    # Reclassify Individual image
+    df_global_reclassified.loc[(
+        df_global_reclassified["image_ids"] == img_name_no_suffix), 
+                    "predicted_classes_new"] = new_class
+
+    df_class_counts = df_global_reclassified.groupby(
+        ['predicted_classes_original','predicted_classes_new']
+        ).size().to_frame()
+    df_class_counts.index = df_class_counts.index.set_names(['predicted_classes_original', 'predicted_classes_new'])
+    df_class_counts = df_class_counts.reset_index()
+
+
+    # Get standard UI outputs
+    dfi.export(df_global_reclassified,"static/images/analytics/data_frame/conf_table_reclassified.png")
+    dfi.export(df_class_counts.style.hide_index(),
+        "static/images/analytics/data_frame/class_counts_reclassified.png")
+    
+    df_filtered = df_global_reclassified[
+        (df_global_reclassified.predicted_classes_new == new_class) |
+        (df_global_reclassified.predicted_classes_new == "not_" + new_class)]
+
+    if new_class == "all_classes":
+        random_files_names = {}
+        random_files_names["all_classes"] = random_files_i(predicted_path="analytics/inference_images/")
+    else:
+        random_files_names = random_file_workflow(df_filtered)
+
+    # creating Altair charts from model predictions
+    df_global_copy = df_global.copy()
+    conf_chart = make_conf_chart(df_global_copy)
+    class_chart = make_class_chart(df_global_copy)
+    time_series_total, time_series_class = time_series(df_global_copy)
+    time_series_total_json = time_series_total.to_json()
+    time_series_class_json = time_series_class.to_json()
+
+    # concatenating charts horizontally and saving as a JSON object to easily parse with JavaScript on the frontend
+    concat_chart = (class_chart | conf_chart).resolve_scale(y="shared")
+    concat_chart_json = concat_chart.to_json()
+
+    show_model_table_reclassified = True
+
+
+    return templates.TemplateResponse('analytics.html',
+        context={'request': request, 
+                'random_files_names': random_files_names,
+                'model_predictions': show_model_table_reclassified,
+                'concat_chart': concat_chart_json,
+                'time_series_total': time_series_total_json,
+                'time_series_class': time_series_class_json,
+                'class_name': new_class,
+                "class_list": global_class_list})
+
+
+# @app.route('/pass_val',methods=['POST'])
+# def pass_val():
+#     name=request.args.get('value')
+#     print('name',name)
+#     return jsonify({'reply':'success'})
+
 
 def random_file_workflow(df):
-
+    global global_class_list
     random_file_names = {}
-
+    
     if "predicted_classes_new" in df.columns:
         class_list = np.concatenate(
             (df["predicted_classes_original"].unique(),
             df["predicted_classes_new"].unique()),
-            axis=None)
+            axis=None).tolist()
     else:
-        class_list = df["predicted_classes_original"].unique()
-    
-    # logger.info("-----------------")
-    # logger.info(df)
-    # logger.info(class_list)
+        class_list = df["predicted_classes_original"].unique().tolist()
+
+    class_list.extend(x for x in global_class_list if x not in class_list)
+    class_list = list(set(class_list))
+
+    logger.info("-------------")
+    logger.info(class_list)
 
     for class_name in class_list:
         if "not_" + class_name.replace('not_', '') not in class_list:
             class_list = np.append(class_list, ["not_" + class_name])
 
     # Loop over all classes and 'not' classes
-
-
     for class_name in class_list:
+        logger.info("************")
+        logger.info(class_name)
         # Create files
         dst = "static/images/analytics/predicted_classes/predicted_" + class_name 
         if not os.path.exists(dst):

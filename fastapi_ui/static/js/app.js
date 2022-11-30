@@ -59,6 +59,20 @@ jQuery(document).ready(function () {
                 $("#row_results").show();
             }
 
+            // Lucas test
+            // https://stackoverflow.com/questions/2894946/passing-javascript-variable-to-python
+            // var reply=data.reply;
+            // if (reply=="success")
+            // {
+            //     return;
+            // }
+            // else
+            //     {
+            //     alert("some error ocured in session agent")
+            //     }
+            // End Lucas test
+
+
             var interval = setInterval(refresh, 1000);
 
             function refresh() {

@@ -276,31 +276,39 @@
 <table border="5" align="center" style="width:1300px;height:auto;">
     <tr>
         <td colspan="2" style="width: 259px; vertical-align:top">
-        <h3>Reclassify class with new confidence level</h3>
-        <p>Keep class if confidence score greater than:</p>
-        <form action="/analytics_reclassify_predictions" method="post">
-            <input type="text" name="pred_class" id="pred_class" placeholder="e.g. fox" required>
-            <input type="number" name="conf_lev" id="conf_lev"
-            max="1.0000000000000000" min="0.0000000000000000" 
-            placeholder="e.g. 0.50" step="0.01" 
-            value="" required />
-            <input type="submit">
-        </form>
+            <h3>Reclassify class with new confidence level</h3>
+            <p>Keep class if confidence score greater than:</p>
+            <form action="/analytics_reclassify_predictions" method="post">
+                <input type="text" name="pred_class" id="pred_class" placeholder="e.g. fox" required>
+                <input type="number" name="conf_lev" id="conf_lev"
+                max="1.0000000000000000" min="0.0000000000000000" 
+                placeholder="e.g. 0.50" step="0.01" 
+                value="" required />
+                <input type="submit">
+            </form>
 
-        <br><br>
-        <p>Confidence Score Cutoffs</p>
-        {% if model_predictions %}
-            <img src="static/images/analytics/data_frame/cutoff_levels_table_reclassified.png" alt="Cutoff Table" width=”200″ height=”200″>
-        {% else %}
-            <img src="static/images/analytics/data_frame/cutoff_levels_table_initial.png" alt="Cutoff Table" width=”200″ height=”200″>
-        {% endif %}
+            <br><br>
+            <p>Confidence Score Cutoffs</p>
+            {% if model_predictions %}
+                <img src="static/images/analytics/data_frame/cutoff_levels_table_reclassified.png" alt="Cutoff Table" width=”200″ height=”200″>
+            {% else %}
+                <img src="static/images/analytics/data_frame/cutoff_levels_table_initial.png" alt="Cutoff Table" width=”200″ height=”200″>
+            {% endif %}
 
-        <br><br><br>
-        <h3>Reset classification</h3>
-        <p>Reset the 'new' classifications to the default model outputs</p>
-        <form action="/analytics" method="get">
-            <input type="submit" value="Reset classifications">
-        </form>
+            <br><br>
+            <form action="/analytics_reclassify_image" method="post">
+                <input type="text" name="img_name" id="img_name" placeholder="img name (no '.jpg' ending)" required>
+                <input type="text" name="new_class" id="new_class" placeholder="e.g. fox" required>
+                <input type="submit">
+            </form>
+
+            <br><br>
+            <h3>Reset classification</h3>
+            <p>Reset the 'new' classifications to the default model outputs</p>
+            <form action="/analytics" method="get">
+                <input type="submit" value="Reset classifications">
+            </form>
+
 
         </td>
 

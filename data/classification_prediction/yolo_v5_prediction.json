@@ -12,7 +12,7 @@
     },
     {
        "image_id":"09220112_JPG.rf.82197ddbc728a10e41d72941f8af6116",
-       "category_id":1,
+       "category_id":"fox",
        "bbox":[
           245.57,
           369.219,
@@ -111,7 +111,7 @@
     },
     {
        "image_id":"09180079_JPG.rf.b655f8164e6875d1c2479aa844f757e8",
-       "category_id":1,
+       "category_id":"fox",
        "bbox":[
           535.498,
           349.717,
@@ -166,7 +166,7 @@
     },
     {
        "image_id":"09110028_JPG.rf.b89b5415b9eacf9342ecca992529923a",
-       "category_id":1,
+       "category_id":"fox",
        "bbox":[
           284.274,
           354.643,
@@ -188,7 +188,7 @@
     },
     {
        "image_id":"09150049_JPG.rf.f6700938d1c467deacb4458e30df8dfc",
-       "category_id":1,
+       "category_id":0,
        "bbox":[
           566.619,
           436.691,
@@ -210,7 +210,7 @@
     },
     {
        "image_id":"09170068_JPG.rf.908e9552076f92367e02bacf0eeff9df",
-       "category_id":1,
+       "category_id":"fox",
        "bbox":[
           496.053,
           286.381,
