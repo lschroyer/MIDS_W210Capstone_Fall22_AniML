@@ -294,15 +294,25 @@
             {% else %}
                 <img src="static/images/analytics/data_frame/cutoff_levels_table_initial.png" alt="Cutoff Table" width=”200″ height=”200″>
             {% endif %}
-
             <br><br>
+            <p>Any changes to predicted classes from new cutoff scores does not override any manual classifications below: </p>
+
+            
             <h3>Manually reclassify individual images</h3>
-            <p>If you see images above that you want to manually reclassify without changing model confidence cutoff scores
-                you can manually reclassify them here.     
+            <p>If you see image(s) above that you want to manually reclassify without changing model confidence cutoff scores,
+                you can manually reclassify them here.
+                <br><br>
+                Example format for single input:<br>img name = [image_name_1], new class = fox
+                <br><br>
+                Example format for multi input:<br>img name = [image_name_1, image_name_2], new class = fox
+                
             </p>
             <form action="/analytics_reclassify_image" method="post">
-                <input type="text" name="img_name" id="img_name" placeholder="img name" required>
-                <input type="text" name="new_class" id="new_class" placeholder="e.g. fox" required>
+                <input type="text" name="img_name" id="img_name" size="50"
+                placeholder="{{'img name(s). e.g.: [image_name_1]'}}"
+                  required>
+                <br>
+                <input type="text" name="new_class" id="new_class" placeholder="new class, e.g.: fox" required>
                 <input type="submit">
             </form>
 

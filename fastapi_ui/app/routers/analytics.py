@@ -263,30 +263,6 @@ show_model_table_reclassified = False
 
 ####################### API ENDPOINTS ##########################
 
-
-def filter_low_conf_images(df, conf_level, label = None):
-    
-    if already_reclassified == False:
-        df["predicted_classes_new"] = df["predicted_classes_original"]
-        df["manually_reclassified"] = np.array(["no"] * len(df["predicted_classes_original"]))
-        label_list = df["predicted_classes_original"].unique()
-    else:
-        label_list = df["predicted_classes_new"].unique()
-
-    # raise ValueError("break - testing")
-    if label not in label_list or label is not None:
-        for index, image_id in enumerate(df["image_ids"]):
-            if df["predicted_classes_original"][index] == label and df["manually_reclassified"][index] == "no":
-                if df["confidence_scores"][index] < conf_level:
-                    df["predicted_classes_new"][index] = "not_" + label
-                else:
-                    df["predicted_classes_new"][index] = label
-            else:
-                df["predicted_classes_new"][index] = str(df["predicted_classes_new"][index])
-    else:
-        raise ValueError("need correct class or 'all'")
-    return df
-
 @router.get("/analytics", response_class=HTMLResponse)
 def form_get(request: Request):
     global df_global, global_class_list, df_classification_cuttoffs, df_class_counts, show_model_table_reclassified
@@ -307,7 +283,7 @@ def form_get(request: Request):
             os.mkdir(folder)
 
 
-    dfi.export(df_global,"static/images/analytics/data_frame/conf_table_initial.png")
+    dfi.export(df_global.sort_index(),"static/images/analytics/data_frame/conf_table_initial.png")
     dfi.export(df_classification_cuttoffs.style.hide_index(), 
         "static/images/analytics/data_frame/cutoff_levels_table_initial.png")
     dfi.export(df_class_counts,
@@ -357,12 +333,10 @@ def form_get(request: Request):
     concat_chart_json = concat_chart.to_json()
 
 
-    model_cutoff = "default model prediction"
     show_model_table_initial = False
     return templates.TemplateResponse('analytics.html',
         context={'request': request, 
                 'model_predictions': show_model_table_initial,
-                'reclass_conf_lev_cutoff': model_cutoff,
                 'random_files_names': random_files_names,
                 'concat_chart': concat_chart_json,
                 'time_series_total': time_series_total_json,
@@ -403,13 +377,11 @@ def form_post(request: Request, conf_lev: float = Form(...), pred_class: str = F
     df_class_counts.index = df_class_counts.index.set_names(['predicted_classes_original', 'predicted_classes_new'])
     df_class_counts = df_class_counts.reset_index()
 
-    dfi.export(df_global_reclassified,"static/images/analytics/data_frame/conf_table_reclassified.png")
+    dfi.export(df_global_reclassified.sort_index(),"static/images/analytics/data_frame/conf_table_reclassified.png")
     dfi.export(df_classification_cuttoffs.style.hide_index(), 
         "static/images/analytics/data_frame/cutoff_levels_table_reclassified.png")
     dfi.export(df_class_counts.style.hide_index(),
         "static/images/analytics/data_frame/class_counts_reclassified.png")
-
-
 
     # Random files and outputs workflow
     random_files_names = random_file_workflow(df_global_reclassified)
@@ -443,21 +415,17 @@ def form_post(request: Request, conf_lev: float = Form(...), pred_class: str = F
     )
     concat_chart_json = concat_chart.to_json()
 
-
     show_model_table_reclassified = True
-    model_cutoff = float(conf_lev)
 
     return templates.TemplateResponse('analytics.html', 
         context={'request': request, 
                 'model_predictions': show_model_table_reclassified,
-                'reclass_conf_lev_cutoff': model_cutoff,
                 'random_files_names': random_files_names,
                 'concat_chart': concat_chart_json,
                 'time_series_total': time_series_total_json,
                 'time_series_class': time_series_class_json,
                 'class_name': pred_class,
                 "class_list": global_class_list})
-
 
 @router.post("/analytics_randomize_images", response_class=HTMLResponse)
 async def form_post2(request: Request, random_class_name: str = Form(...)):
@@ -504,21 +472,25 @@ async def form_post2(request: Request, random_class_name: str = Form(...)):
 
 @router.post("/analytics_reclassify_image", response_class=HTMLResponse)
 def form_post3(request: Request, img_name: str = Form(...), new_class: str = Form(...)):
-    global df_global, df_global_reclassified, global_class_list, show_model_table_reclassified, already_reclassified
+    global df_global, df_global_reclassified, df_classification_cuttoffs, global_class_list, show_model_table_reclassified, already_reclassified
 
     new_class = new_class.lower()
     new_class = new_class.replace(' ', '_')
     new_class = new_class.replace('"', '')
     new_class = new_class.replace("'", '')
-    img_name_no_suffix = img_name.replace('.jpg', '')
+
+    img_list_no_suffix = img_name.replace('.jpg', '')
+    img_list_no_suffix = img_list_no_suffix.replace('.png', '')
+    img_list_no_suffix = img_list_no_suffix.strip('][').split(', ')
 
     # Reclassify Individual image
-    df_global_reclassified.loc[(
-        df_global_reclassified["image_ids"] == img_name_no_suffix), 
-                    "predicted_classes_new"] = new_class
-    df_global_reclassified.loc[(
-        df_global_reclassified["image_ids"] == img_name_no_suffix), 
-                    "manually_reclassified"] = "yes"
+    for img_name_no_suffix in img_list_no_suffix:
+        df_global_reclassified.loc[(
+            df_global_reclassified["image_ids"] == img_name_no_suffix), 
+                        "predicted_classes_new"] = new_class
+        df_global_reclassified.loc[(
+            df_global_reclassified["image_ids"] == img_name_no_suffix), 
+                        "manually_reclassified"] = "yes"
     
 
     df_class_counts = df_global_reclassified.groupby(
@@ -529,7 +501,9 @@ def form_post3(request: Request, img_name: str = Form(...), new_class: str = For
 
 
     # Get standard UI outputs
-    dfi.export(df_global_reclassified,"static/images/analytics/data_frame/conf_table_reclassified.png")
+    dfi.export(df_global_reclassified.sort_index(),"static/images/analytics/data_frame/conf_table_reclassified.png")
+    dfi.export(df_classification_cuttoffs.style.hide_index(), 
+        "static/images/analytics/data_frame/cutoff_levels_table_reclassified.png")
     dfi.export(df_class_counts.style.hide_index(),
         "static/images/analytics/data_frame/class_counts_reclassified.png")
     
@@ -580,6 +554,28 @@ def form_post3(request: Request, img_name: str = Form(...), new_class: str = For
 
 ####################### HELPER FUNCTIONS ##########################
 
+def filter_low_conf_images(df, conf_level, label = None):
+    
+    if already_reclassified == False:
+        df["predicted_classes_new"] = df["predicted_classes_original"]
+        df["manually_reclassified"] = np.array(["no"] * len(df["predicted_classes_original"]))
+        label_list = df["predicted_classes_original"].unique()
+    else:
+        label_list = df["predicted_classes_new"].unique()
+
+    # raise ValueError("break - testing")
+    if label not in label_list or label is not None:
+        for index, image_id in enumerate(df["image_ids"]):
+            if df["predicted_classes_original"][index] == label and df["manually_reclassified"][index] == "no":
+                if df["confidence_scores"][index] < conf_level:
+                    df["predicted_classes_new"][index] = "not_" + label
+                else:
+                    df["predicted_classes_new"][index] = label
+            else:
+                df["predicted_classes_new"][index] = str(df["predicted_classes_new"][index])
+    else:
+        raise ValueError("need correct class or 'all'")
+    return df
 
 def random_file_workflow(df):
     global global_class_list
