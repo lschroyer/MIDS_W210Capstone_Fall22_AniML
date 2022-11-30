@@ -233,7 +233,7 @@ def get_model_data():
     #                 "predicted_classes_original"] = "animal_detected"
     df.loc[(df["predicted_classes_original"] == "0") | 
                     (df["predicted_classes_original"] == 0), 
-                    "predicted_classes_original"] = "no_animal_detected"
+                    "predicted_classes_original"] = "unknown_classification"
 
     df['predicted_classes_original'] = df.predicted_classes_original.replace(' ', '_', regex=True)
 
