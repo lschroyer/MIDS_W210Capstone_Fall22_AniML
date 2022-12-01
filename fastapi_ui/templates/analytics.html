@@ -40,10 +40,13 @@
     cutoff scores in the next section will update these graphics. Click the three elipses '...' at the top right of each graphic
     if you wish to save them.
 </p>
-<div id="vis1" class="vis">
-    <div id="hist" class="vis-inner"/>
-</div>
-<hr>
+<center>
+    <div id="vis1" class="vis">
+        <div id="hist" class="vis-inner"/>
+    </div>
+    <hr>
+</center>
+
 <br><br>
 {% if time_series_total %}
 <p>
@@ -51,18 +54,21 @@
     cutoff scores in the next section will update these graphics.
 </p>
 
-<div id="vis2" class="vis">
-    <div id="timeseries-total" class="vis-inner"/>
-</div>
-<hr size="10"/>
-<div id="vis3" class="vis">
-    <div id="timeseries-class" class="vis-inner"/>
-</div>
+<center>
+    <div id="vis2" class="vis">
+        <div id="timeseries-total" class="vis-inner"/>
+    </div>
+    <hr size="10"/>
+    <div id="vis3" class="vis">
+        <div id="timeseries-class" class="vis-inner"/>
+    </div>
+    
+    <div id="space" class="space">
+    <!--     this is just for some spacing so the image doesn't show up in a weird place -->
+    </div>
+    <hr>
+</center>
 
-<div id="space" class="space">
-<!--     this is just for some spacing so the image doesn't show up in a weird place -->
-</div>
-<hr>
 {% endif %}
 
 <body>
@@ -187,9 +193,9 @@
             <th><center><h3>Model Prediction:</h3></center></th>
         </tr>
         <tr id="one">
-            <th><center><font color="black">Does Not Contain {{class_name}}</font></center></th>
+            <th><center><font color="black">Low confidence that image contains: {{class_name}}</font></center></th>
             <th><font color="white">------</font></th>
-            <th><center><font color="black">Does Contain {{class_name}}</font></center></th>
+            <th><center><font color="black">High confidence that image contains: {{class_name}}</font></center></th>
         </tr>
         <tr id="one">
             <th>

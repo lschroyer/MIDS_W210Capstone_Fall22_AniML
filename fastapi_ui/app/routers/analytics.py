@@ -376,6 +376,8 @@ def form_post(request: Request, conf_lev: float = Form(...), pred_class: str = F
         ).size().to_frame()
     df_class_counts.index = df_class_counts.index.set_names(['predicted_classes_original', 'predicted_classes_new'])
     df_class_counts = df_class_counts.reset_index()
+    df_class_counts = df_class_counts.rename(columns={0:"count"})
+
 
     dfi.export(df_global_reclassified.sort_index(),"static/images/analytics/data_frame/conf_table_reclassified.png")
     dfi.export(df_classification_cuttoffs.style.hide_index(), 
@@ -498,6 +500,7 @@ def form_post3(request: Request, img_name: str = Form(...), new_class: str = For
         ).size().to_frame()
     df_class_counts.index = df_class_counts.index.set_names(['predicted_classes_original', 'predicted_classes_new'])
     df_class_counts = df_class_counts.reset_index()
+    df_class_counts = df_class_counts.rename(columns={0:"count"})
 
 
     # Get standard UI outputs
