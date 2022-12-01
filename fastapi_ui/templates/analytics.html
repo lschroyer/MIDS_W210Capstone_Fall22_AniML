@@ -284,6 +284,7 @@
         <td colspan="2" style="width: 259px; vertical-align:top">
             <h3>Reclassify class with new confidence level</h3>
             <p>Keep class if confidence score greater than:</p>
+            <center>
             <form action="/analytics_reclassify_predictions" method="post">
                 <input type="text" name="pred_class" id="pred_class" placeholder="e.g. fox" required>
                 <input type="number" name="conf_lev" id="conf_lev"
@@ -292,14 +293,17 @@
                 value="" required />
                 <input type="submit">
             </form>
-
+            </center>
+            
             <br><br>
             <p>Confidence Score Cutoffs</p>
+            <center>
             {% if model_predictions %}
                 <img src="static/images/analytics/data_frame/cutoff_levels_table_reclassified.png" alt="Cutoff Table" width=”200″ height=”200″>
             {% else %}
                 <img src="static/images/analytics/data_frame/cutoff_levels_table_initial.png" alt="Cutoff Table" width=”200″ height=”200″>
             {% endif %}
+            </center>
             <br><br>
             <p>Any changes to predicted classes from new cutoff scores does not override any manual classifications below: </p>
 
@@ -313,21 +317,25 @@
                 Example format for multi input:<br>img name = [image_name_1, image_name_2], new class = fox
                 
             </p>
-            <form action="/analytics_reclassify_image" method="post">
-                <input type="text" name="img_name" id="img_name" size="50"
-                placeholder="{{'img name(s). e.g.: [image_name_1]'}}"
+            <form action="/analytics_reclassify_image" method="post" style="text-align: center;">
+                <input type="text" name="img_name" id="img_name" size="42"
+                placeholder="{{'img name(s). e.g.: [image_name_1] or [img1, img2]'}}"
                   required>
                 <br>
-                <input type="text" name="new_class" id="new_class" placeholder="new class, e.g.: fox" required>
-                <input type="submit">
+                <input type="text" name="new_class" id="new_class" size="34.5"
+                placeholder="new class, e.g.: fox" required>
+                <input type="submit" size="10">
             </form>
 
             <br><br>
             <h3>Reset classification</h3>
             <p>Reset the 'new' classifications to the default model outputs</p>
-            <form action="/analytics" method="get">
-                <input type="submit" value="Reset classifications">
-            </form>
+            <center>
+                <form action="/analytics" method="get">
+                    <input type="submit" value="Reset classifications">
+                </form>
+            </center>
+            
 
 
         </td>
@@ -336,9 +344,11 @@
             <center>
                 {% if model_predictions %}
                 <h4>Adjusted Model Results</h4>
+                <br>
                 <img src="static/images/analytics/data_frame/conf_table_reclassified.png" alt="Model Classification Table" width=”500″ height=”600″>
                 {% else %}
                 <h4>Initial Model Results</h4>
+                <br>
                 <img src="static/images/analytics/data_frame/conf_table_initial.png" alt="Model Classification Table" width=”500″ height=”600″>
                 {% endif %}
             </center>
