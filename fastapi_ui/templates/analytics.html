@@ -106,7 +106,7 @@
             </th> 
         </tr>
         <tr>
-            <th colspan="3">
+            <th id="one" colspan="3">
                 <center>
                     <p>Enter the animal type you wish to view and save the model classification results for. 
                         <br>To see a random sample of all the images, enter 'all_classes'.</p>
@@ -321,7 +321,7 @@
             </p>
             <form action="/analytics_reclassify_image" method="post" style="text-align: center;">
                 <input type="text" name="img_name" id="img_name" size="42"
-                placeholder="{{'img name(s). e.g.: [image_name_1] or [img1, img2]'}}"
+                placeholder="{{'img name(s), e.g.: [image_name_1] or [img1, img2]'}}"
                   required>
                 <br>
                 <input type="text" name="new_class" id="new_class" size="34.5"

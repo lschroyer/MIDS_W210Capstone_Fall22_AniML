@@ -52,8 +52,8 @@
 
 
 <table border="5" align="center" style="width:1300px;height:auto;"> 
-    <tr>
-        <th colspan="3">
+    <tr id="one">
+        <th id="one" colspan="3">
                 <center>
                     <h3>Randomly Sampled Images by Predicted Class</h3>
                     <form action="/review_randomize" method="get">
@@ -192,13 +192,13 @@
     model predictions, you can reset the table below.
 </p>
 <table border="5" align="center" style="width:1300px;height:auto;">
-    <tr>
+    <tr id="one">
         <td colspan="2" style="width: 259px; vertical-align:top">
             <h3>Reclassify with new confidence level</h3>
             <p>Keep class if confidence score greater than:</p>
             <form action="/review_reclassify_predictions" method="post">
                 <!-- <input type="text" name="random_class_name" id="random_class_name" placeholder="e.g. fox or 'all_classes'" required> -->
-                <label>Select Class and New Confidence Cutoff Level:<br>
+                <label>Select Class (i.e. 'animal_detected' or 'not_animal_detected') and New Confidence Cutoff Level:<br>
                     <input list="reclassify_class_name" id="reclassify_class_name_label"
                      name="reclassify_class_name_label" placeholder="select from dropdown "/>
                 </label>

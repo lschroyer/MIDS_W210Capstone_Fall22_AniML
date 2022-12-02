@@ -86,6 +86,7 @@ jQuery(document).ready(function () {
                             $('#' + id).html(status)
                             if ((status == 'SUCCESS') || (status == 'FAILED')) {
                                 $($('#' + id).siblings()[1]).children().show()
+                                // Call another javascript function to write response to file. basically copy view button script format
                                 n_success++
                             }
                         },

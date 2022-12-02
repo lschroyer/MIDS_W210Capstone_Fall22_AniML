@@ -47,10 +47,6 @@ def form_get(request: Request):
             if not os.path.exists(folder):
                 os.mkdir(folder)
 
-
-        logger.info("-------------------")
-        logger.info(df_global)
-
         dfi.export(df_global.sort_index(),"static/images/analytics/data_frame/conf_table_initial.png")
         dfi.export(df_classification_cuttoffs.style.hide_index(), 
             "static/images/analytics/data_frame/cutoff_levels_table_initial.png")
@@ -85,7 +81,7 @@ def form_get(request: Request):
                     "class_list": global_class_list})
     except Exception as e:
         return templates.TemplateResponse('error.html', 
-            context={'error_message': str(e)}
+            context={'request': request, 'error_message': str(e)}
             )
 
 
@@ -93,6 +89,13 @@ def form_get(request: Request):
 def form_post(request: Request, conf_lev: float = Form(...), pred_class: str = Form(...)):
     try:
         global df_global_reclassified, already_reclassified, df_classification_cuttoffs, show_model_table_reclassified
+
+        pred_class = pred_class.lower()
+        pred_class = pred_class.replace(' ', '_')
+        pred_class = pred_class.replace('"', '')
+        pred_class = pred_class.replace("'", '')
+        if pred_class not in global_class_list:
+            raise KeyError("The submitted class for animal reclassification not in current animal list. Please ensure spelling is correct.")
 
         # Clear legacy outputs for class of interest
         destination_folder = [
@@ -148,9 +151,11 @@ def form_post(request: Request, conf_lev: float = Form(...), pred_class: str = F
                     'time_series_class': time_series_class_json,
                     'class_name': pred_class,
                     "class_list": global_class_list})
+    
     except Exception as e:
         return templates.TemplateResponse('error.html', 
-            context={'error_message': str(e)}
+            context={'request': request,
+                    'error_message': str(e)}
             )
 
 # randomize what images to show the front end
@@ -163,6 +168,12 @@ async def form_post2(request: Request, random_class_name: str = Form(...)):
         random_class_name = random_class_name.replace(' ', '_')
         random_class_name = random_class_name.replace('"', '')
         random_class_name = random_class_name.replace("'", '')
+
+        logger.info("---------")
+        logger.info(random_class_name)
+        if random_class_name not in global_class_list and random_class_name != "all_classes":
+            raise KeyError("The submitted class for image randomization not in current animal list. Please ensure spelling is correct.")
+            
 
         df_filtered = df_global_reclassified[
             (df_global_reclassified.predicted_classes_new == random_class_name) |
@@ -189,75 +200,80 @@ async def form_post2(request: Request, random_class_name: str = Form(...)):
                     "class_list": global_class_list})
     except Exception as e:
         return templates.TemplateResponse('error.html', 
-            context={'error_message': str(e)}
+            context={'request': request, 'error_message': str(e)}
             )
 
 # reclassify image based on image name
 @router.post("/analytics_reclassify_image", response_class=HTMLResponse)
 def form_post3(request: Request, img_name: str = Form(...), new_class: str = Form(...)):
-    global df_global, df_global_reclassified, df_classification_cuttoffs, global_class_list, show_model_table_reclassified, already_reclassified
+    try:
+        global df_global, df_global_reclassified, df_classification_cuttoffs, global_class_list, show_model_table_reclassified, already_reclassified
 
-    new_class = new_class.lower()
-    new_class = new_class.replace(' ', '_')
-    new_class = new_class.replace('"', '')
-    new_class = new_class.replace("'", '')
+        new_class = new_class.lower()
+        new_class = new_class.replace(' ', '_')
+        new_class = new_class.replace('"', '')
+        new_class = new_class.replace("'", '')
 
-    img_list_no_suffix = img_name.replace('.jpg', '')
-    img_list_no_suffix = img_list_no_suffix.replace('.png', '')
-    img_list_no_suffix = img_list_no_suffix.strip('][').split(', ')
+        img_list_no_suffix = img_name.replace('.jpg', '')
+        img_list_no_suffix = img_list_no_suffix.replace('.png', '')
+        img_list_no_suffix = img_list_no_suffix.strip('][').split(', ')
 
-    # Reclassify Individual image
-    for img_name_no_suffix in img_list_no_suffix:
-        df_global_reclassified.loc[(
-            df_global_reclassified["image_ids"] == img_name_no_suffix), 
-                        "predicted_classes_new"] = new_class
-        df_global_reclassified.loc[(
-            df_global_reclassified["image_ids"] == img_name_no_suffix), 
-                        "manually_reclassified"] = "yes"
-    
+        # Reclassify Individual image
+        for img_name_no_suffix in img_list_no_suffix:
+            df_global_reclassified.loc[(
+                df_global_reclassified["image_ids"] == img_name_no_suffix), 
+                            "predicted_classes_new"] = new_class
+            df_global_reclassified.loc[(
+                df_global_reclassified["image_ids"] == img_name_no_suffix), 
+                            "manually_reclassified"] = "yes"
+        
 
-    df_class_counts = df_global_reclassified.groupby(
-        ['predicted_classes_original','predicted_classes_new']
-        ).size().to_frame()
-    df_class_counts.index = df_class_counts.index.set_names(['predicted_classes_original', 'predicted_classes_new'])
-    df_class_counts = df_class_counts.reset_index()
-    df_class_counts = df_class_counts.rename(columns={0:"count"})
+        df_class_counts = df_global_reclassified.groupby(
+            ['predicted_classes_original','predicted_classes_new']
+            ).size().to_frame()
+        df_class_counts.index = df_class_counts.index.set_names(['predicted_classes_original', 'predicted_classes_new'])
+        df_class_counts = df_class_counts.reset_index()
+        df_class_counts = df_class_counts.rename(columns={0:"count"})
 
 
-    # Get standard UI outputs
-    dfi.export(df_global_reclassified.sort_index(),"static/images/analytics/data_frame/conf_table_reclassified.png")
-    dfi.export(df_classification_cuttoffs.style.hide_index(), 
-        "static/images/analytics/data_frame/cutoff_levels_table_reclassified.png")
-    dfi.export(df_class_counts.style.hide_index(),
-        "static/images/analytics/data_frame/class_counts_reclassified.png")
-    
-    df_filtered = df_global_reclassified[
-        (df_global_reclassified.predicted_classes_new == new_class) |
-        (df_global_reclassified.predicted_classes_new == "not_" + new_class)]
+        # Get standard UI outputs
+        dfi.export(df_global_reclassified.sort_index(),"static/images/analytics/data_frame/conf_table_reclassified.png")
+        dfi.export(df_classification_cuttoffs.style.hide_index(), 
+            "static/images/analytics/data_frame/cutoff_levels_table_reclassified.png")
+        dfi.export(df_class_counts.style.hide_index(),
+            "static/images/analytics/data_frame/class_counts_reclassified.png")
+        
+        df_filtered = df_global_reclassified[
+            (df_global_reclassified.predicted_classes_new == new_class) |
+            (df_global_reclassified.predicted_classes_new == "not_" + new_class)]
 
-    if new_class == "all_classes":
-        random_files_names = {}
-        random_files_names["all_classes"] = random_files_i(predicted_path="analytics/inference_images/")
-    else:
-        random_files_names = random_file_workflow(df_filtered)
+        if new_class == "all_classes":
+            random_files_names = {}
+            random_files_names["all_classes"] = random_files_i(predicted_path="analytics/inference_images/")
+        else:
+            random_files_names = random_file_workflow(df_filtered)
 
-    # creating Altair charts from model predictions
-    df_global_reclassified_copy = df_global_reclassified.copy()
-    concat_chart_json, time_series_total_json, time_series_class_json = _custom_user_graphics(df_global_reclassified_copy)
+        # creating Altair charts from model predictions
+        df_global_reclassified_copy = df_global_reclassified.copy()
+        concat_chart_json, time_series_total_json, time_series_class_json = _custom_user_graphics(df_global_reclassified_copy)
 
-    already_reclassified = True
-    show_model_table_reclassified = True
+        already_reclassified = True
+        show_model_table_reclassified = True
+        global_class_list.append(new_class)
 
-    return templates.TemplateResponse('analytics.html',
-        context={'request': request, 
-                'random_files_names': random_files_names,
-                'model_predictions': show_model_table_reclassified,
-                'concat_chart': concat_chart_json,
-                'time_series_total': time_series_total_json,
-                'time_series_class': time_series_class_json,
-                'class_name': new_class,
-                "class_list": global_class_list})
-
+        return templates.TemplateResponse('analytics.html',
+            context={'request': request, 
+                    'random_files_names': random_files_names,
+                    'model_predictions': show_model_table_reclassified,
+                    'concat_chart': concat_chart_json,
+                    'time_series_total': time_series_total_json,
+                    'time_series_class': time_series_class_json,
+                    'class_name': new_class,
+                    "class_list": global_class_list})
+    except Exception as e:
+        return templates.TemplateResponse('error.html', 
+            context={'request': request, 'error_message': str(e)}
+            )
 
 # @app.route('/pass_val',methods=['POST'])
 # def pass_val():
