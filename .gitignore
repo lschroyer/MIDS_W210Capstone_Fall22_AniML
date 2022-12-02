@@ -32,6 +32,10 @@ share/python-wheels/
 *.egg
 MANIFEST
 
+# custom
+fastapi_ui/google-chrome-stable_current_amd64.deb
+google-chrome-stable_current_amd64.deb
+
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.

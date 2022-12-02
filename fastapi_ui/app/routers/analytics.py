@@ -29,150 +29,168 @@ cwd = os.getcwd()
 
 @router.get("/analytics", response_class=HTMLResponse)
 def form_get(request: Request):
-    global df_global, global_class_list, df_classification_cuttoffs, df_class_counts, show_model_table_reclassified
+    try:
+        global df_global, global_class_list, df_classification_cuttoffs, df_class_counts, show_model_table_reclassified
 
-    # Initialize data
-    df_global, already_reclassified, global_class_list, df_classification_cuttoffs, df_class_counts = get_model_data()
+        # Initialize data
+        df_global, already_reclassified, global_class_list, df_classification_cuttoffs, df_class_counts = get_model_data()
 
-    # Clear legacy outputs and create folders
-    destination_folder = [
-        "static/images/analytics/predicted_classes/",
-        "static/images/analytics/data_frame/",
-        "static/images/analytics/outputs/"
-    ]
-    
-    for folder in destination_folder:
-        _clear_files(folder)
-        if not os.path.exists(folder):
-            os.mkdir(folder)
-
-
-    dfi.export(df_global.sort_index(),"static/images/analytics/data_frame/conf_table_initial.png")
-    dfi.export(df_classification_cuttoffs.style.hide_index(), 
-        "static/images/analytics/data_frame/cutoff_levels_table_initial.png")
-    dfi.export(df_class_counts,
-        "static/images/analytics/data_frame/class_counts_initial.png")
+        # Clear legacy outputs and create folders
+        destination_folder = [
+            "static/images/analytics/predicted_classes/",
+            "static/images/analytics/data_frame/",
+            "static/images/analytics/outputs/"
+        ]
+        
+        for folder in destination_folder:
+            _clear_files(folder)
+            if not os.path.exists(folder):
+                os.mkdir(folder)
 
 
-    # ToDo - if time allows, change pandas table to html
-    # with open('static/images/analytics/data_frame/conf_table_initial.html', 'w') as fo:
-    #     df_global.to_html(fo)
+        logger.info("-------------------")
+        logger.info(df_global)
 
-    # Zip all classes and get random files for all classes
-    _zip_files(class_name = "all_classes", specific_class = False)
-    random_files_names = {"all_classes": random_files_i(predicted_path="analytics/inference_images/")}
+        dfi.export(df_global.sort_index(),"static/images/analytics/data_frame/conf_table_initial.png")
+        dfi.export(df_classification_cuttoffs.style.hide_index(), 
+            "static/images/analytics/data_frame/cutoff_levels_table_initial.png")
+        dfi.export(df_class_counts,
+            "static/images/analytics/data_frame/class_counts_initial.png")
 
-    # Random files and outputs workflow
-    random_file_workflow(df_global)
 
-    # creating Altair charts from model predictions
-    df_global_copy = df_global.copy()
-    concat_chart_json, time_series_total_json, time_series_class_json = _custom_user_graphics(df_global_copy)
+        # ToDo - if time allows, change pandas table to html
+        # with open('static/images/analytics/data_frame/conf_table_initial.html', 'w') as fo:
+        #     df_global.to_html(fo)
 
-    show_model_table_initial = False
-    return templates.TemplateResponse('analytics.html',
-        context={'request': request, 
-                'model_predictions': show_model_table_initial,
-                'random_files_names': random_files_names,
-                'concat_chart': concat_chart_json,
-                'time_series_total': time_series_total_json,
-                'time_series_class': time_series_class_json,
-                'class_name': "all_classes",
-                "class_list": global_class_list})
+        # Zip all classes and get random files for all classes
+        _zip_files(class_name = "all_classes", specific_class = False)
+        random_files_names = {"all_classes": random_files_i(predicted_path="analytics/inference_images/")}
+
+        # Random files and outputs workflow
+        random_file_workflow(df_global)
+
+        # creating Altair charts from model predictions
+        df_global_copy = df_global.copy()
+        concat_chart_json, time_series_total_json, time_series_class_json = _custom_user_graphics(df_global_copy)
+
+        show_model_table_initial = False
+        return templates.TemplateResponse('analytics.html',
+            context={'request': request, 
+                    'model_predictions': show_model_table_initial,
+                    'random_files_names': random_files_names,
+                    'concat_chart': concat_chart_json,
+                    'time_series_total': time_series_total_json,
+                    'time_series_class': time_series_class_json,
+                    'class_name': "all_classes",
+                    "class_list": global_class_list})
+    except Exception as e:
+        return templates.TemplateResponse('error.html', 
+            context={'error_message': str(e)}
+            )
 
 
 @router.post("/analytics_reclassify_predictions", response_class=HTMLResponse)
 def form_post(request: Request, conf_lev: float = Form(...), pred_class: str = Form(...)):
-    global df_global_reclassified, already_reclassified, df_classification_cuttoffs, show_model_table_reclassified
+    try:
+        global df_global_reclassified, already_reclassified, df_classification_cuttoffs, show_model_table_reclassified
 
-    # Clear legacy outputs for class of interest
-    destination_folder = [
-        "static/images/analytics/predicted_classes/predicted_" + pred_class,
-        "static/images/analytics/predicted_classes/predicted_not_" + pred_class,
-         "static/images/analytics/data_frame/"
-         ]
+        # Clear legacy outputs for class of interest
+        destination_folder = [
+            "static/images/analytics/predicted_classes/predicted_" + pred_class,
+            "static/images/analytics/predicted_classes/predicted_not_" + pred_class,
+            "static/images/analytics/data_frame/"
+            ]
 
-    for folder in destination_folder:
-        if not os.path.exists(folder):
-            os.mkdir(folder)
-        _clear_files(folder)
-        if not os.path.exists(folder):
-            os.mkdir(folder)
+        for folder in destination_folder:
+            if not os.path.exists(folder):
+                os.mkdir(folder)
+            _clear_files(folder)
+            if not os.path.exists(folder):
+                os.mkdir(folder)
 
-    if already_reclassified == False:
-        df_global_reclassified = filter_low_conf_images(df_global, conf_lev, pred_class)   
-    else:
-        df_global_reclassified = filter_low_conf_images(df_global_reclassified, conf_lev, pred_class)
-    already_reclassified = True
+        if already_reclassified == False:
+            df_global_reclassified = filter_low_conf_images(df_global, conf_lev, pred_class)   
+        else:
+            df_global_reclassified = filter_low_conf_images(df_global_reclassified, conf_lev, pred_class)
+        already_reclassified = True
 
-    df_classification_cuttoffs.loc[(df_classification_cuttoffs.class_name ==  pred_class),["confidence_cutoff"]] = conf_lev
+        df_classification_cuttoffs.loc[(df_classification_cuttoffs.class_name ==  pred_class),["confidence_cutoff"]] = conf_lev
 
-    df_class_counts = df_global_reclassified.groupby(
-        ['predicted_classes_original','predicted_classes_new']
-        ).size().to_frame()
-    df_class_counts.index = df_class_counts.index.set_names(['predicted_classes_original', 'predicted_classes_new'])
-    df_class_counts = df_class_counts.reset_index()
-    df_class_counts = df_class_counts.rename(columns={0:"count"})
+        df_class_counts = df_global_reclassified.groupby(
+            ['predicted_classes_original','predicted_classes_new']
+            ).size().to_frame()
+        df_class_counts.index = df_class_counts.index.set_names(['predicted_classes_original', 'predicted_classes_new'])
+        df_class_counts = df_class_counts.reset_index()
+        df_class_counts = df_class_counts.rename(columns={0:"count"})
 
 
-    dfi.export(df_global_reclassified.sort_index(),"static/images/analytics/data_frame/conf_table_reclassified.png")
-    dfi.export(df_classification_cuttoffs.style.hide_index(), 
-        "static/images/analytics/data_frame/cutoff_levels_table_reclassified.png")
-    dfi.export(df_class_counts.style.hide_index(),
-        "static/images/analytics/data_frame/class_counts_reclassified.png")
+        dfi.export(df_global_reclassified.sort_index(),"static/images/analytics/data_frame/conf_table_reclassified.png")
+        dfi.export(df_classification_cuttoffs.style.hide_index(), 
+            "static/images/analytics/data_frame/cutoff_levels_table_reclassified.png")
+        dfi.export(df_class_counts.style.hide_index(),
+            "static/images/analytics/data_frame/class_counts_reclassified.png")
 
-    # Random files and outputs workflow
-    random_files_names = random_file_workflow(df_global_reclassified)
+        # Random files and outputs workflow
+        random_files_names = random_file_workflow(df_global_reclassified)
 
-    # creating Altair charts from model predictions
-    df_global_reclassified_copy = df_global_reclassified.copy()
-    concat_chart_json, time_series_total_json, time_series_class_json = _custom_user_graphics(df_global_reclassified_copy)
+        # creating Altair charts from model predictions
+        df_global_reclassified_copy = df_global_reclassified.copy()
+        concat_chart_json, time_series_total_json, time_series_class_json = _custom_user_graphics(df_global_reclassified_copy)
 
-    show_model_table_reclassified = True
+        show_model_table_reclassified = True
 
-    return templates.TemplateResponse('analytics.html', 
-        context={'request': request, 
-                'model_predictions': show_model_table_reclassified,
-                'random_files_names': random_files_names,
-                'concat_chart': concat_chart_json,
-                'time_series_total': time_series_total_json,
-                'time_series_class': time_series_class_json,
-                'class_name': pred_class,
-                "class_list": global_class_list})
+        return templates.TemplateResponse('analytics.html', 
+            context={'request': request, 
+                    'model_predictions': show_model_table_reclassified,
+                    'random_files_names': random_files_names,
+                    'concat_chart': concat_chart_json,
+                    'time_series_total': time_series_total_json,
+                    'time_series_class': time_series_class_json,
+                    'class_name': pred_class,
+                    "class_list": global_class_list})
+    except Exception as e:
+        return templates.TemplateResponse('error.html', 
+            context={'error_message': str(e)}
+            )
 
 # randomize what images to show the front end
 @router.post("/analytics_randomize_images", response_class=HTMLResponse)
 async def form_post2(request: Request, random_class_name: str = Form(...)):
-    global df_global, df_global_reclassified, global_class_list, show_model_table_reclassified
+    try:
+        global df_global, df_global_reclassified, global_class_list, show_model_table_reclassified
     
-    random_class_name = random_class_name.lower()
-    random_class_name = random_class_name.replace(' ', '_')
-    random_class_name = random_class_name.replace('"', '')
-    random_class_name = random_class_name.replace("'", '')
+        random_class_name = random_class_name.lower()
+        random_class_name = random_class_name.replace(' ', '_')
+        random_class_name = random_class_name.replace('"', '')
+        random_class_name = random_class_name.replace("'", '')
 
-    df_filtered = df_global_reclassified[
-        (df_global_reclassified.predicted_classes_new == random_class_name) |
-        (df_global_reclassified.predicted_classes_new == "not_" + random_class_name)]
+        df_filtered = df_global_reclassified[
+            (df_global_reclassified.predicted_classes_new == random_class_name) |
+            (df_global_reclassified.predicted_classes_new == "not_" + random_class_name)]
 
-    if random_class_name == "all_classes":
-        random_files_names = {}
-        random_files_names["all_classes"] = random_files_i(predicted_path="analytics/inference_images/")
-    else:
-        random_files_names = random_file_workflow(df_filtered)
+        if random_class_name == "all_classes":
+            random_files_names = {}
+            random_files_names["all_classes"] = random_files_i(predicted_path="analytics/inference_images/")
+        else:
+            random_files_names = random_file_workflow(df_filtered)
 
-    # creating Altair charts from model predictions
-    df_global_reclassified_copy = df_global_reclassified.copy()
-    concat_chart_json, time_series_total_json, time_series_class_json = _custom_user_graphics(df_global_reclassified_copy)
-    
-    return templates.TemplateResponse('analytics.html',
-        context={'request': request, 
-                'random_files_names': random_files_names,
-                'model_predictions': show_model_table_reclassified,
-                'concat_chart': concat_chart_json,
-                'time_series_total': time_series_total_json,
-                'time_series_class': time_series_class_json,
-                'class_name': random_class_name,
-                "class_list": global_class_list})
+        # creating Altair charts from model predictions
+        df_global_reclassified_copy = df_global_reclassified.copy()
+        concat_chart_json, time_series_total_json, time_series_class_json = _custom_user_graphics(df_global_reclassified_copy)
+        
+        return templates.TemplateResponse('analytics.html',
+            context={'request': request, 
+                    'random_files_names': random_files_names,
+                    'model_predictions': show_model_table_reclassified,
+                    'concat_chart': concat_chart_json,
+                    'time_series_total': time_series_total_json,
+                    'time_series_class': time_series_class_json,
+                    'class_name': random_class_name,
+                    "class_list": global_class_list})
+    except Exception as e:
+        return templates.TemplateResponse('error.html', 
+            context={'error_message': str(e)}
+            )
 
 # reclassify image based on image name
 @router.post("/analytics_reclassify_image", response_class=HTMLResponse)
