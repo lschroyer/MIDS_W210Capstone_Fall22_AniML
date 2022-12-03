@@ -40,45 +40,55 @@
 
 <style type="text/css">
     table {
-        border-collapse: collapse;
+        border-spacing: 0;
+        border: 5px solid black;
+        /* border-collapse: collapse; */
     }
-    #one th {
-        border: 1px solid white; 
+    tr, th, td {  
+        border: 1px solid white;
+        border-right: 1px solid white;  
     }
-    #one td {
-        border: 1px solid white; 
+    #blue_color tr, #blue_color th, #blue_color td {
+        border: 1px solid #1eaaba;
+        background-color: #1eaaba;
+    }
+    #side_border tr, #side_border th, #side_border td {
+        border-right: 1px solid black;
+    }
+    #top_border tr, #top_border th, #top_border td {
+        border-top: 3px solid black;
     }
 </style>
 
-
+<body>
 <table border="5" align="center" style="width:1300px;height:auto;"> 
-    <tr id="one">
-        <th id="one" colspan="3">
+    <tr id="blue_color">
+        <th id="blue_color" colspan="3">
                 <center>
-                    <h3>Randomly Sampled Images by Predicted Class</h3>
+                    <font color=white><h3>Randomly Sampled Images by Predicted Class</h3></font>
                     <form action="/review_randomize" method="get">
                         <input type="submit" value="randomize images by class">
                     </form>
                 </center>
         </th> 
     </tr>
-    <tr id="one">
+    <tr id="blue_color">
         {% if model_predictions %}
-            <th><center><h3>Adjusted Model Predictions:</h3></center></th>
-            <th><font color="white">------</font></th>
-            <th><center><h3>Adjusted Model Predictions:</h3></center></th>
+            <th><center><h3>Adjusted Model Predictions</h3></center></th>
+            <th><font color="#1eaaba">------</font></th>
+            <th><center><h3>Adjusted Model Predictions</h3></center></th>
         {% else %}
-            <th><center><h3>Initial Model Predictions:</h3></center></th>
-            <th><font color="white">------</font></th>
-            <th><center><h3>Initial Model Predictions:</h3></center></th>
+            <th><center><font color=white><h3>Initial Model Predictions</h3></font></center></th>
+            <th><font color="#1eaaba">------</font></th>
+            <th><center><font color=white><h3>Initial Model Predictions</h3></font></center></th>
         {% endif %}
     </tr>
-    <tr id="one">
+    <tr id="blue_color">
         <th><center><font color="black">Low likelihood image contains animal</font></center></th>
-        <th><font color="white">------</font></th>
+        <th><font color="#1eaaba">------</font></th>
         <th><center><font color="black">High likelihood image contains animal</font></center></th>
     </tr>
-    <tr id="one">
+    <tr id="blue_color">
         <th>
             <center>
                 <a href="static/images/review/outputs/predicted_not_animal_detected.zip" download="class_0">
@@ -95,22 +105,22 @@
             </center>
         </th>
     </tr>
-    <tr id="one">
-        <td>
+    <tr id="top_border">
+        <td id="top_border">
             <center><figure>
                 <img src="{{'static/images/review/predicted_not_animal_detected/' + random_files_names[0][0]}}" alt="Class No Animal - Random Image 1" style="width:200px;height:auto;">
                 <figcaption>{{random_files_names[0][0]}}</figcaption>
             </figure></center>
         </td>
-        <td></td>
-        <td>
+        <td id="top_border"></td>
+        <td id="top_border">
             <center><figure>
                 <img src="{{'static/images/review/predicted_animal_detected/' + random_files_names[1][0]}}" alt="Class Animal - Random Image 1" style="width:200px;height:auto;">
                 <figcaption>{{random_files_names[1][0]}}</figcaption>
             </figure></center>
         </td>
     </tr>
-    <tr id="one">
+    <tr>
         <td>
             <center><figure>
                 <img src="{{'static/images/review/predicted_not_animal_detected/' + random_files_names[0][1]}}" alt="Class No Animal - Random Image 2" style="width:200px;height:auto;">
@@ -125,7 +135,7 @@
             </figure></center>
         </td>
     </tr>
-    <tr id="one">
+    <tr>
         <td>
             <center><figure>
                 <img src="{{'static/images/review/predicted_not_animal_detected/' + random_files_names[0][2]}}" alt="Class No Animal - Random Image 3" style="width:200px;height:auto;">
@@ -140,7 +150,7 @@
             </figure></center>
         </td>
     </tr>
-    <tr id="one">
+    <tr>
         <td>
             <center><figure>
                 <img src="{{'static/images/review/predicted_not_animal_detected/' + random_files_names[0][3]}}" alt="Class No Animal - Random Image 4" style="width:200px;height:auto;">
@@ -155,7 +165,7 @@
             </figure></center>
         </td>
     </tr>
-    <tr id="one">
+    <tr>
         <td>
             <center><figure>
                 <img src="{{'static/images/review/predicted_not_animal_detected/' + random_files_names[0][4]}}" alt="Class No Animal - Random Image 5" style="width:200px;height:auto;">
@@ -171,8 +181,6 @@
         </td>
     </tr>
 </table>
-
-</body>
 
 <br><br>
 
@@ -192,8 +200,8 @@
     model predictions, you can reset the table below.
 </p>
 <table border="5" align="center" style="width:1300px;height:auto;">
-    <tr id="one">
-        <td colspan="2" style="width: 259px; vertical-align:top">
+    <tr id="side_border">
+        <td id="side_border" colspan="2" style="width: 259px; vertical-align:top">
             <h3>Reclassify with new confidence level</h3>
             <p>Keep class if confidence score greater than:</p>
             <form action="/review_reclassify_predictions" method="post">
@@ -245,7 +253,8 @@
     
     
 </table>
-
+</body>
+</html>
 
 
 {% endblock %}

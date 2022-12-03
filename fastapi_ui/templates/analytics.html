@@ -78,14 +78,24 @@
     <h3>Image Classification Results</h3>
     <style type="text/css">
         table {
-            border-collapse: collapse;
+        border-spacing: 0;
+        border: 5px solid black;
+        /* border-collapse: collapse; */
         }
-        #one th {
-            border: 1px solid white; 
+        tr, th, td {  
+            border: 1px solid white;
+            border-right: 1px solid white;  
         }
-        #one td {
-            border: 1px solid white; 
+        #blue_color tr, #blue_color th, #blue_color td {
+            border: 1px solid #1eaaba;
+            background-color: #1eaaba;
         }
+        #side_border tr, #side_border th, #side_border td {
+            border-right: 1px solid black;
+        }
+        #top_border tr, #top_border th, #top_border td {
+            border-top: 3px solid black;
+    }
     </style>
     
     <p>
@@ -98,15 +108,15 @@
     
 
     <table border="5" align="center"> 
-        <tr id="one">
+        <tr id="blue_color">
             <th colspan="3">
                 <h3>
-                    <center>Random Sample Images</center>
+                    <center><font color="white">Random Sample Images</font></center>
                 </h3>
             </th> 
         </tr>
         <tr>
-            <th id="one" colspan="3">
+            <th colspan="3">
                 <center>
                     <p>Enter the animal type you wish to view and save the model classification results for. 
                         <br>To see a random sample of all the images, enter 'all_classes'.</p>
@@ -124,31 +134,32 @@
             </th>
         </tr>
         {% if class_name == "all_classes" %}
-        <tr id="one">
-            <th colspan="3">
-            </th>
+        <tr>
+            <th><center><font color="white">------</font></center></th>
+            <th><font color="white">------</font></th>
+            <th><center><font color="white">------</font></center></th>
         </tr>
-        <tr id="one">
-            <td>
+        <tr id="top_border">
+            <td id="top_border">
                 <center><figure>
                     <img src="{{'static/images/analytics/inference_images/' + random_files_names[class_name][0]}}" alt="Any Class - Random Image 1" style="width:200px;height:auto;">
                     <figcaption>{{random_files_names[class_name][0]}}</figcaption>
                 </figure></center>
             </td>
-            <td>
+            <td id="top_border">
                 <center><figure>
                     <img src="{{'static/images/analytics/inference_images/' + random_files_names[class_name][1]}}" alt="Any Class - Random Image 2" style="width:200px;height:auto;">
                     <figcaption>{{random_files_names[class_name][1]}}</figcaption>
                 </figure></center>
             </td>
-            <td>
+            <td id="top_border">
                 <center><figure>
                     <img src="{{'static/images/analytics/inference_images/' + random_files_names[class_name][2]}}" alt="Any Class - Random Image 3" style="width:200px;height:auto;">
                     <figcaption>{{random_files_names[class_name][2]}}</figcaption>
                 </figure></center>
             </td>
         </tr>
-        <tr id="one">
+        <tr>
             <td>
                 <center><figure>
                     <img src="{{'static/images/analytics/inference_images/' + random_files_names[class_name][3]}}" alt="Any Class - Random Image 4" style="width:200px;height:auto;">
@@ -168,7 +179,7 @@
                 </figure></center>
             </td>
         </tr>
-        <tr id="one">
+        <tr>
             <td>
                 <center><figure>
                     <img src="{{'static/images/analytics/inference_images/' + random_files_names[class_name][6]}}" alt="Any Class - Random Image 7" style="width:200px;height:auto;">
@@ -189,17 +200,17 @@
             </td>
         </tr>
         {% else %}
-        <tr id="one">
-            <th><center><h3>Model Prediction:</h3></center></th>
+        <tr>
+            <th><center><font color="black"><h3>Model Predictions</h3></font></center></th>
             <th><font color="white">------</font></th>
-            <th><center><h3>Model Prediction:</h3></center></th>
-        </tr>
-        <tr id="one">
+            <th><center><font color="black"><h3>Model Predictions</h3></font></center></th>
+s        </tr>
+        <tr >
             <th><center><font color="black">Low confidence that image contains: {{class_name}}</font></center></th>
             <th><font color="white">------</font></th>
             <th><center><font color="black">High confidence that image contains: {{class_name}}</font></center></th>
         </tr>
-        <tr id="one">
+        <tr id="top_border">
             <th>
                 <center>
                     <a href={{"static/images/analytics/outputs/not_" + class_name + ".zip"}} download={{"class_not_" + class_name}}>
@@ -216,7 +227,7 @@
                 </center>
             </th>
         </tr>
-        <tr id="one">
+        <tr>
             <th>
                 <center><figure>
                     <img src={{"static/images/analytics/predicted_classes/predicted_not_" + class_name + "/" + random_files_names["not_"+class_name][0]}} alt={{"Class_not_" + class_name + " - Random Image 1"}} style="width:200px;height:auto;">
@@ -231,7 +242,7 @@
                 </figure></center>
             </th>
         </tr>
-        <tr id="one">
+        <tr>
             <th>
                 <center><figure>
                     <img src={{"static/images/analytics/predicted_classes/predicted_not_" + class_name + "/" + random_files_names["not_"+class_name][1]}} alt={{"Class_not_" + class_name + " - Random Image 2"}} style="width:200px;height:auto;">
@@ -246,7 +257,7 @@
                 </figure></center>
             </th>
         </tr>
-        <tr id="one">
+        <tr>
             <th>
                 <center><figure>
                     <img src={{"static/images/analytics/predicted_classes/predicted_not_" + class_name + "/" + random_files_names["not_"+class_name][2]}} alt={{"Class_not_" + class_name + " - Random Image 3"}} style="width:200px;height:auto;">
@@ -263,6 +274,7 @@
         </tr>
         {% endif %}
     </table>
+</body>
 
 <body>
 
@@ -282,8 +294,8 @@
     If you wish to view the inital model predictions, you can reset the table below.
 </p>
 <table border="5" align="center" style="width:1600px;height:auto;">
-    <tr>
-        <td colspan="2" style="width: 259px; vertical-align:top">
+    <tr id="side_border">
+        <td id="side_border" colspan="2" style="width: 259px; vertical-align:top">
             <h3>Reclassify class with new confidence level</h3>
             <p>Keep class if confidence score greater than:</p>
             <center>
@@ -356,7 +368,8 @@
             </center>
         </td>
     </tr>
-
+</table>
+</body>
 
 <!-- scripts to fill histogram/analytics viz divs -->
 <script>

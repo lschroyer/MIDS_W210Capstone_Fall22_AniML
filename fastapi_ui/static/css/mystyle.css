@@ -25,12 +25,17 @@ footer {
 }
 
 table {
-    border: 5px solid black;
+    border: 5px solid white;
     /* table-layout: fixed; */
     width: 1200px;
   }
 th, td {
 	border: 1px solid white;
+	/* width: 300px; */
+	overflow: hidden;
+}
+tr {
+    border: 1px solid white;
 	/* width: 300px; */
 	overflow: hidden;
 }

@@ -55,9 +55,8 @@ span.class-name {
 	text-align: center !important;
 }
 
-th,
-td {
-	border: 1px solid;
+th,tr,td {
+	border: 1px solid white;
 	padding: 10px;
 }
 
