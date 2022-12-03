@@ -84,9 +84,18 @@ def form_get(request: Request):
             context={'request': request, 'error_message': str(e)}
             )
 
+@router.get("/analytics_reclassify_predictions", response_class=HTMLResponse)
+async def form_get_cutoff(request: Request):
+    try:
+        raise ConnectionResetError("Please do not refresh the page. Click the '(3.2) Review and Download Classified Images' tab if you would like to reload")
+        # webbrowser.open("/analytics", new=0, autoraise=True)
+    except Exception as e:
+        return templates.TemplateResponse('error.html', 
+            context={'request': request, 'error_message': str(e)}
+            )
 
 @router.post("/analytics_reclassify_predictions", response_class=HTMLResponse)
-def form_post(request: Request, conf_lev: float = Form(...), pred_class: str = Form(...)):
+def form_post_cutoff(request: Request, conf_lev: float = Form(...), pred_class: str = Form(...)):
     try:
         global df_global_reclassified, already_reclassified, df_classification_cuttoffs, show_model_table_reclassified
 
@@ -159,8 +168,19 @@ def form_post(request: Request, conf_lev: float = Form(...), pred_class: str = F
             )
 
 # randomize what images to show the front end
+
+@router.get("/analytics_randomize_images", response_class=HTMLResponse)
+async def form_get_randomize(request: Request):
+    try:
+        raise ConnectionResetError("Please do not refresh the page. Click the '(3.2) Review and Download Classified Images' tab if you would like to reload")
+        # webbrowser.open("/analytics", new=0, autoraise=True)
+    except Exception as e:
+        return templates.TemplateResponse('error.html', 
+            context={'request': request, 'error_message': str(e)}
+            )
+
 @router.post("/analytics_randomize_images", response_class=HTMLResponse)
-async def form_post2(request: Request, random_class_name: str = Form(...)):
+async def form_post_randomize(request: Request, random_class_name: str = Form(...)):
     try:
         global df_global, df_global_reclassified, global_class_list, show_model_table_reclassified
     
@@ -204,8 +224,18 @@ async def form_post2(request: Request, random_class_name: str = Form(...)):
             )
 
 # reclassify image based on image name
+@router.get("/analytics_reclassify_image", response_class=HTMLResponse)
+async def form_get_reclassify(request: Request):
+    try:
+        raise ConnectionResetError("Please do not refresh the page. Click the '(3.2) Review and Download Classified Images' tab if you would like to reload")
+        # webbrowser.open("/analytics", new=0, autoraise=True)
+    except Exception as e:
+        return templates.TemplateResponse('error.html', 
+            context={'request': request, 'error_message': str(e)}
+            )
+
 @router.post("/analytics_reclassify_image", response_class=HTMLResponse)
-def form_post3(request: Request, img_name: str = Form(...), new_class: str = Form(...)):
+def form_post_reclassify(request: Request, img_name: str = Form(...), new_class: str = Form(...)):
     try:
         global df_global, df_global_reclassified, df_classification_cuttoffs, global_class_list, show_model_table_reclassified, already_reclassified
 
@@ -218,15 +248,20 @@ def form_post3(request: Request, img_name: str = Form(...), new_class: str = For
         img_list_no_suffix = img_list_no_suffix.replace('.png', '')
         img_list_no_suffix = img_list_no_suffix.strip('][').split(', ')
 
+  
+
         # Reclassify Individual image
         for img_name_no_suffix in img_list_no_suffix:
+            if img_name_no_suffix not in df_global["image_ids"].to_list():
+                raise ValueError('file name "' + img_name_no_suffix + '"is not in the image list.')
+            
             df_global_reclassified.loc[(
                 df_global_reclassified["image_ids"] == img_name_no_suffix), 
                             "predicted_classes_new"] = new_class
             df_global_reclassified.loc[(
                 df_global_reclassified["image_ids"] == img_name_no_suffix), 
                             "manually_reclassified"] = "yes"
-        
+            
 
         df_class_counts = df_global_reclassified.groupby(
             ['predicted_classes_original','predicted_classes_new']

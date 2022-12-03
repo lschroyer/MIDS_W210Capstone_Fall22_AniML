@@ -90,6 +90,14 @@ def form_get(request: Request):
             context={'request': request, 'error_message': str(e)}
             )
         
+@router.get("/review_reclassify_predictions", response_class=HTMLResponse)
+async def form_get_randomize(request: Request):
+    try:
+        raise ConnectionResetError("Please do not refresh the page. Click the '(1.2) Review and Download Filtered Images' tab if you would like to reload")
+    except Exception as e:
+        return templates.TemplateResponse('error.html', 
+            context={'request': request, 'error_message': str(e)}
+            )
 
 @router.post("/review_reclassify_predictions", response_class=HTMLResponse)
 def form_post3(request: Request, conf_lev: float = Form(...), reclassify_class_name_label: str = Form(...)):
