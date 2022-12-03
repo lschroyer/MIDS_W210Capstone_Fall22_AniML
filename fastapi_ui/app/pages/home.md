@@ -12,6 +12,10 @@
             <th id="page">
                 <h1 class="cap">Welcome to AniMLs. </h1> 
                 <h3 class="cap">Computer Vision made easy for automated image processing.</h3>
+                <br>
+                <font font-family='Poppins', sans-serif; font-size= 1.1em; font-weight= 300; line-height= 1.7em; color= "gray";>
+                AniMLs is an easy tool for the rapid creation of computer vision systems for analyzing and filtering<br> a large set of raw images down to images of interest
+                </font>
             </th>
             <th id="page">
             <img style='vertical-align:left;' src="static/website_images/animl_logo.png" alt="Logo" width=”500″ height=”600″>
@@ -25,7 +29,7 @@ text text
 <h1 class="cap">Computer Vision made easy for automated image processing.</h1>
 </div> -->
 
-<p>AniMLs is an easy tool for the rapid creation of computer vision systems for analyzing filtering a large set of raw images down to images of interest <br></p>
+<p><font color="white">------</font></p>
 
 ## AniML - Home Page
 
