@@ -1,5 +1,30 @@
-<h1 class="cap">Welcome to AniMLs.</h1>
+<!-- /* Apply this to your `table` element. */ -->
+<style type="text/css">
+    #page tr, #page th {
+        padding: 0; 
+        margin: 0;
+        }
+</style>
+
+<!-- And this to your table's `td` elements. */ -->
+<table border="0" align="left"> 
+        <tr id="page">
+            <th id="page">
+                <h1 class="cap">Welcome to AniMLs. </h1> 
+                <h3 class="cap">Computer Vision made easy for automated image processing.</h3>
+            </th>
+            <th id="page">
+            <img style='vertical-align:left;' src="static/website_images/animl_logo.png" alt="Logo" width=”500″ height=”600″>
+            <font color="white">------</font>
+            </th>
+        </tr>
+</table>
+<!-- <div style='vertical-align:middle; display:inline;'>
+text text
+<h1 class="cap">Welcome to AniMLs. </h1> 
 <h1 class="cap">Computer Vision made easy for automated image processing.</h1>
+</div> -->
+
 <p>AniMLs is an easy tool for the rapid creation of computer vision systems for analyzing filtering a large set of raw images down to images of interest <br></p>
 
 ## AniML - Home Page
