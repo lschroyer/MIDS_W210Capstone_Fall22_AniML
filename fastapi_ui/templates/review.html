@@ -252,11 +252,11 @@
         <td>
             <center>
                 {% if model_predictions %}
-                <h4>Adjusted Model Results</h4>
+                <h3>Adjusted Model Results</h3>
                 <iframe src="static/images/review/data_frame/conf_table_reclassified.html" alt="Model Classification Table" width="1000" height="500"></iframe>
                 <!-- <img src="static/images/review/data_frame/conf_table_reclassified.png" alt="Model Classification Table" width=”500″ height=”600″> -->
                 {% else %}
-                <h4>Initial Model Results</h4>
+                <h3>Initial Model Results</h3>
                 <!-- <img src="static/images/review/data_frame/conf_table_initial.png" alt="Model Classification Table" width=”500″ height=”600″> -->
                 <iframe src="static/images/review/data_frame/conf_table_initial.html" alt="Model Classification Table" width="900" height="500"></iframe>
                 {% endif %}
