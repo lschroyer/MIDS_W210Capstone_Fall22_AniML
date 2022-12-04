@@ -27,6 +27,20 @@ cwd = os.getcwd()
 
 ####################### API ENDPOINTS ##########################
 
+pd.set_option('display.width', 1000)
+pd.set_option('colheader_justify', 'center')   # FOR TABLE <th>
+
+html_string = '''
+<html>
+  <head><title>HTML Pandas Dataframe with CSS</title></head>
+  <link rel="stylesheet" type="text/css" href="../../../../static/css/df_style.css"/>
+  <body>
+    {table}
+  </body>
+</html>.
+'''
+
+
 @router.get("/analytics", response_class=HTMLResponse)
 def form_get(request: Request):
     try:
@@ -54,9 +68,11 @@ def form_get(request: Request):
             "static/images/analytics/data_frame/class_counts_initial.png")
 
 
+
         # ToDo - if time allows, change pandas table to html
-        # with open('static/images/analytics/data_frame/conf_table_initial.html', 'w') as fo:
-        #     df_global.to_html(fo)
+        with open('static/images/analytics/data_frame/conf_table_initial.html', 'w') as fo:
+            fo.write(html_string.format(table=df_global.sort_index().to_html(classes='mystyle')))
+            # df_global.sort_index().to_html(fo, classes='mystyle')
 
         # Zip all classes and get random files for all classes
         _zip_files(class_name = "all_classes", specific_class = False)
@@ -88,7 +104,6 @@ def form_get(request: Request):
 async def form_get_cutoff(request: Request):
     try:
         raise ConnectionResetError("Please do not refresh the page. Click the '(3.2) Review and Download Classified Images' tab if you would like to reload")
-        # webbrowser.open("/analytics", new=0, autoraise=True)
     except Exception as e:
         return templates.TemplateResponse('error.html', 
             context={'request': request, 'error_message': str(e)}
@@ -141,6 +156,11 @@ def form_post_cutoff(request: Request, conf_lev: float = Form(...), pred_class: 
             "static/images/analytics/data_frame/cutoff_levels_table_reclassified.png")
         dfi.export(df_class_counts.style.hide_index(),
             "static/images/analytics/data_frame/class_counts_reclassified.png")
+                # ToDo - if time allows, change pandas table to html
+        with open('static/images/analytics/data_frame/conf_table_reclassified.html', 'w') as fo:
+                fo.write(html_string.format(table=df_global_reclassified.sort_index().to_html(classes='mystyle')))
+                # df_global_reclassified.sort_index().to_html(fo)
+
 
         # Random files and outputs workflow
         random_files_names = random_file_workflow(df_global_reclassified)
@@ -168,12 +188,10 @@ def form_post_cutoff(request: Request, conf_lev: float = Form(...), pred_class: 
             )
 
 # randomize what images to show the front end
-
 @router.get("/analytics_randomize_images", response_class=HTMLResponse)
 async def form_get_randomize(request: Request):
     try:
         raise ConnectionResetError("Please do not refresh the page. Click the '(3.2) Review and Download Classified Images' tab if you would like to reload")
-        # webbrowser.open("/analytics", new=0, autoraise=True)
     except Exception as e:
         return templates.TemplateResponse('error.html', 
             context={'request': request, 'error_message': str(e)}
@@ -228,7 +246,6 @@ async def form_post_randomize(request: Request, random_class_name: str = Form(..
 async def form_get_reclassify(request: Request):
     try:
         raise ConnectionResetError("Please do not refresh the page. Click the '(3.2) Review and Download Classified Images' tab if you would like to reload")
-        # webbrowser.open("/analytics", new=0, autoraise=True)
     except Exception as e:
         return templates.TemplateResponse('error.html', 
             context={'request': request, 'error_message': str(e)}
@@ -247,8 +264,6 @@ def form_post_reclassify(request: Request, img_name: str = Form(...), new_class:
         img_list_no_suffix = img_name.replace('.jpg', '')
         img_list_no_suffix = img_list_no_suffix.replace('.png', '')
         img_list_no_suffix = img_list_no_suffix.strip('][').split(', ')
-
-  
 
         # Reclassify Individual image
         for img_name_no_suffix in img_list_no_suffix:
@@ -278,6 +293,11 @@ def form_post_reclassify(request: Request, img_name: str = Form(...), new_class:
         dfi.export(df_class_counts.style.hide_index(),
             "static/images/analytics/data_frame/class_counts_reclassified.png")
         
+        with open('static/images/analytics/data_frame/conf_table_reclassified.html', 'w') as fo:
+            # df_global_reclassified.sort_index().to_html(fo)
+            fo.write(html_string.format(table=df_global_reclassified.sort_index().to_html(classes='mystyle')))
+
+
         df_filtered = df_global_reclassified[
             (df_global_reclassified.predicted_classes_new == new_class) |
             (df_global_reclassified.predicted_classes_new == "not_" + new_class)]
@@ -309,13 +329,6 @@ def form_post_reclassify(request: Request, img_name: str = Form(...), new_class:
         return templates.TemplateResponse('error.html', 
             context={'request': request, 'error_message': str(e)}
             )
-
-# @app.route('/pass_val',methods=['POST'])
-# def pass_val():
-#     name=request.args.get('value')
-#     print('name',name)
-#     return jsonify({'reply':'success'})
-
 
 ####################### GET DATA & CREATE GRAPHICS ##########################
 

@@ -106,7 +106,6 @@
         of either column. 
     </p>
     
-
     <table border="5" align="center"> 
         <tr id="blue_color">
             <th colspan="3">
@@ -316,6 +315,7 @@ s        </tr>
                 <img src="static/images/analytics/data_frame/cutoff_levels_table_reclassified.png" alt="Cutoff Table" width=”200″ height=”200″>
             {% else %}
                 <img src="static/images/analytics/data_frame/cutoff_levels_table_initial.png" alt="Cutoff Table" width=”200″ height=”200″>
+
             {% endif %}
             </center>
             <br><br>
@@ -359,11 +359,15 @@ s        </tr>
                 {% if model_predictions %}
                 <h4>Adjusted Model Results</h4>
                 <br>
-                <img src="static/images/analytics/data_frame/conf_table_reclassified.png" alt="Model Classification Table" width=”500″ height=”600″>
+                <!-- <img src="static/images/analytics/data_frame/conf_table_reclassified.png" alt="Model Classification Table" width=”500″ height=”600″> -->
+                <iframe src="static/images/analytics/data_frame/conf_table_reclassified.html" width="1200" height="600"></iframe>
                 {% else %}
                 <h4>Initial Model Results</h4>
                 <br>
-                <img src="static/images/analytics/data_frame/conf_table_initial.png" alt="Model Classification Table" width=”500″ height=”600″>
+                <!-- <img src="static/images/analytics/data_frame/conf_table_initial.png" alt="Model Classification Table" width=”500″ height=”600″> -->
+                <iframe src="static/images/analytics/data_frame/conf_table_initial.html" width="900" height="600"></iframe>
+                <!-- <input type = "button" onclick = "load_home()" value = "Display">   -->
+            
                 {% endif %}
             </center>
         </td>
@@ -381,7 +385,11 @@ s        </tr>
     vegaEmbed("#timeseries-class", time_series_class, {mode: "vega-lite"}).then(console.log).catch(console.warn);
 </script>
 
-
+<script>
+    function load_home() {
+     document.getElementById("content").innerHTML='<object type="text/html" data="static/images/analytics/data_frame/conf_table_initial.html" ></object>';
+}
+</script>
 
 {% endblock %}
 
