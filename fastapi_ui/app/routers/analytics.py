@@ -25,8 +25,7 @@ templates = Jinja2Templates(directory="templates/")
 # get wd
 cwd = os.getcwd()
 
-####################### API ENDPOINTS ##########################
-
+# Set table formatting
 pd.set_option('display.width', 1000)
 pd.set_option('colheader_justify', 'center')   # FOR TABLE <th>
 
@@ -40,6 +39,8 @@ html_string = '''
 </html>.
 '''
 
+
+####################### API ENDPOINTS ##########################
 
 @router.get("/analytics", response_class=HTMLResponse)
 def form_get(request: Request):
@@ -61,15 +62,11 @@ def form_get(request: Request):
             if not os.path.exists(folder):
                 os.mkdir(folder)
 
-        dfi.export(df_global.sort_index(),"static/images/analytics/data_frame/conf_table_initial.png")
+        # dfi.export(df_global.sort_index(),"static/images/analytics/data_frame/conf_table_initial.png")
         dfi.export(df_classification_cuttoffs.style.hide_index(), 
             "static/images/analytics/data_frame/cutoff_levels_table_initial.png")
         dfi.export(df_class_counts,
             "static/images/analytics/data_frame/class_counts_initial.png")
-
-
-
-        # ToDo - if time allows, change pandas table to html
         with open('static/images/analytics/data_frame/conf_table_initial.html', 'w') as fo:
             fo.write(html_string.format(table=df_global.sort_index().to_html(classes='mystyle')))
             # df_global.sort_index().to_html(fo, classes='mystyle')
@@ -151,12 +148,11 @@ def form_post_cutoff(request: Request, conf_lev: float = Form(...), pred_class: 
         df_class_counts = df_class_counts.rename(columns={0:"count"})
 
 
-        dfi.export(df_global_reclassified.sort_index(),"static/images/analytics/data_frame/conf_table_reclassified.png")
+        # dfi.export(df_global_reclassified.sort_index(),"static/images/analytics/data_frame/conf_table_reclassified.png")
         dfi.export(df_classification_cuttoffs.style.hide_index(), 
             "static/images/analytics/data_frame/cutoff_levels_table_reclassified.png")
         dfi.export(df_class_counts.style.hide_index(),
             "static/images/analytics/data_frame/class_counts_reclassified.png")
-                # ToDo - if time allows, change pandas table to html
         with open('static/images/analytics/data_frame/conf_table_reclassified.html', 'w') as fo:
                 fo.write(html_string.format(table=df_global_reclassified.sort_index().to_html(classes='mystyle')))
                 # df_global_reclassified.sort_index().to_html(fo)

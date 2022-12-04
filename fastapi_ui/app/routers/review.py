@@ -25,6 +25,20 @@ templates = Jinja2Templates(directory="templates/")
 
 cwd = os.getcwd()
 
+# Set table formatting
+pd.set_option('display.width', 1000)
+pd.set_option('colheader_justify', 'center')   # FOR TABLE <th>
+
+html_string = '''
+<html>
+  <head><title>HTML Pandas Dataframe with CSS</title></head>
+  <link rel="stylesheet" type="text/css" href="../../../../static/css/df_style.css"/>
+  <body>
+    {table}
+  </body>
+</html>.
+'''
+
 ####################### API ENDPOINTS ##########################
 
 @router.get("/review", response_class=HTMLResponse)
@@ -50,11 +64,13 @@ def form_get(request: Request):
         df_global, already_reclassified, global_class_list, df_classification_cuttoffs = get_model_data()
 
         df_global['predicted_classes_original'] = df_global.predicted_classes_original.replace(' ', '_', regex=True)
-        dfi.export(df_global.sort_index(),
-            "static/images/review/data_frame/conf_table_initial.png")
+        # dfi.export(df_global.sort_index(),
+        #     "static/images/review/data_frame/conf_table_initial.png")
         dfi.export(df_classification_cuttoffs.style.hide_index(), 
             "static/images/review/data_frame/cutoff_levels_table_initial.png")
-
+        with open('static/images/review/data_frame/conf_table_initial.html', 'w') as fo:
+            fo.write(html_string.format(table=df_global.sort_index().to_html(classes='mystyle')))
+            # df_global.sort_index().to_html(fo, classes='mystyle')
 
         ## Class 0 & 1 ##
         label_list = ["not_animal_detected", "animal_detected"]
@@ -130,11 +146,14 @@ def form_post3(request: Request, conf_lev: float = Form(...), reclassify_class_n
 
         df_classification_cuttoffs[reclassify_class_name_label] = conf_lev
 
-        dfi.export(df_global_reclassified.sort_index(), 
-            "static/images/review/data_frame/conf_table_reclassified.png")
-
+        # dfi.export(df_global_reclassified.sort_index(), 
+        #     "static/images/review/data_frame/conf_table_reclassified.png")
         dfi.export(df_classification_cuttoffs.style.hide_index(), 
             "static/images/review/data_frame/cutoff_levels_table_reclassified.png")
+
+        with open('static/images/review/data_frame/conf_table_reclassified.html', 'w') as fo:
+            fo.write(html_string.format(table=df_global_reclassified.sort_index().to_html(classes='mystyle')))
+            # df_global.sort_index().to_html(fo, classes='mystyle')
 
         # Class 0 & 1#
         label_list = ["not_animal_detected", "animal_detected"]

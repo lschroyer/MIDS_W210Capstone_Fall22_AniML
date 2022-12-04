@@ -55,21 +55,33 @@
     Next are two timeline charts that show how many animals were observed over time. Again, changes to the model class
     cutoff scores in the next section will update these graphics.
 </p>
+<style type="text/css">
+    #slide {
+    width: auto;
+    height: 700px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    white-space: nowrap;
+}
+</style>
 
-<center>
-    <div id="vis2" class="vis">
-        <div id="timeseries-total" class="vis-inner"/>
-    </div>
-    <hr size="10"/>
-    <div id="vis3" class="vis">
-        <div id="timeseries-class" class="vis-inner"/>
-    </div>
-    
-    <div id="space" class="space">
-    <!--     this is just for some spacing so the image doesn't show up in a weird place -->
-    </div>
-    <hr>
-</center>
+
+<div id="slide">
+    <center>
+        <div id="vis2" class="vis">
+            <div id="timeseries-total" class="vis-inner"/>
+        </div>
+        <hr size="10"/>
+        <div id="vis3" class="vis">
+            <div id="timeseries-class" class="vis-inner"/>
+        </div>
+        
+        <div id="space" class="space">
+        <!--     this is just for some spacing so the image doesn't show up in a weird place -->
+        </div>
+    </center>
+</div>
+<hr>
 
 {% endif %}
 
@@ -298,12 +310,14 @@ s        </tr>
             <h3>Reclassify class with new confidence level</h3>
             <p>Keep class if confidence score greater than:</p>
             <center>
-            <form action="/analytics_reclassify_predictions" method="post">
+            <form action="/analytics_reclassify_predictions" method="post" style="text-align: left;">
                 <input type="text" name="pred_class" id="pred_class" placeholder="e.g. fox" required>
+                <br>
                 <input type="number" name="conf_lev" id="conf_lev"
                 max="1.0000000000000000" min="0.0000000000000000" 
                 placeholder="e.g. 0.50" step="0.01" 
                 value="" required />
+                <br>
                 <input type="submit">
             </form>
             </center>
@@ -331,13 +345,14 @@ s        </tr>
                 Example format for multi input:<br>img name = [image_name_1, image_name_2], new class = fox
                 
             </p>
-            <form action="/analytics_reclassify_image" method="post" style="text-align: center;">
+            <form action="/analytics_reclassify_image" method="post" style="text-align: left;">
                 <input type="text" name="img_name" id="img_name" size="42"
                 placeholder="{{'img name(s), e.g.: [image_name_1] or [img1, img2]'}}"
                   required>
                 <br>
-                <input type="text" name="new_class" id="new_class" size="34.5"
+                <input type="text" name="new_class" id="new_class" size="42"
                 placeholder="new class, e.g.: fox" required>
+                <br>
                 <input type="submit" size="10">
             </form>
 
