@@ -10,7 +10,7 @@
 <table border="0" align="left"> 
         <tr id="page">
             <th id="page">
-                <h1 class="cap">Welcome to AniMLs. </h1> 
+                <h1 class="cap">Welcome to AniML. </h1> 
                 <h3 class="cap">Computer Vision made easy for automated image processing.</h3>
                 <br>
                 <font font-family='Poppins', sans-serif; font-size= 1.1em; font-weight= 300; line-height= 1.7em; color= "gray";>
