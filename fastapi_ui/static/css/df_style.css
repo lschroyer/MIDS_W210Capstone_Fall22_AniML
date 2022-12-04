@@ -8,8 +8,16 @@
 
 }
 
-.mystyle td, th {
+.mystyle td {
     padding: 5px;
+}
+
+.mystyle tr:first-child>th{
+    padding: 5px;
+    position: sticky;
+    top: 0;
+    background-color: white;
+    border: 1px solid silver;
 }
 
 .mystyle tr:nth-child(even) {
