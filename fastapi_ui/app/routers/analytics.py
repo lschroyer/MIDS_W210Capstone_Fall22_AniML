@@ -62,7 +62,7 @@ def form_get(request: Request):
             if not os.path.exists(folder):
                 os.mkdir(folder)
 
-        # dfi.export(df_global.sort_index(),"static/images/analytics/data_frame/conf_table_initial.png")
+        dfi.export(df_global.sort_index(),"static/images/analytics/data_frame/conf_table_initial.png")
         dfi.export(df_classification_cuttoffs.style.hide_index(), 
             "static/images/analytics/data_frame/cutoff_levels_table_initial.png")
         dfi.export(df_class_counts,
@@ -487,6 +487,7 @@ def time_series(pred_df):
 
         # time-series chart for total detected animals in the dataset
         date_chart_total = alt.Chart(date_df_total).mark_line(point=True, strokeWidth=2).encode(
+            
             x = alt.X("monthdate(image_date):T", title = "Image Date"),
             y = alt.Y("value:Q", title = "Count of Detected Animals"),
             tooltip = [alt.Tooltip("monthdate(image_date)", title = "Image Date"),
@@ -547,6 +548,7 @@ def time_series(pred_df):
             cornerRadius=10,
             labelFontSize=20,
             titleFontSize=15,
+            orient='top'
         )
     
     # if the dates in image names cannot be parsed, return None for time series charts
