@@ -12,7 +12,8 @@
 
 {% block page_content %}
 <h1 class="cap">Automatic Image Detection</h1>
-    <p>Now that you've downloaded your empty and non-empty images, it's time to classify what animal is in each photo! <br>
+    <p>Now that you've downloaded your empty and non-empty images, it's time to classify what animal is in each photo!
+        <br>
     The newly trained model you created will help in the tagging of different animal classes based on the learning from your images you uploaded.
     <br>
 </p>
@@ -70,8 +71,51 @@
 
             </div>
         </div>
+<br><br>
+<p>Save files once you have viewed that they have an animal (do not save null images, donated by '[]'</p>
+<button onclick="tableloopfx()">Save animal files</button>
 
-    </body>
+<script>
+    function tableloopfx() {
+    var table = document.getElementById("result_txt").value;
+    var df = {"dataframe": table}
+    console.log("---------------")
+    console.log(df)
+    
+    $.ajax(
+            {
+                type:'GET',
+                contentType:'application/json;charset-utf-08',
+                url:'http://127.0.0.1:8080/inference_post/' + table,
+                // async: true,
+                // url:'http://127.0.0.1:8080/inference_post' , table
+                dataType:'json',
+                // data: JSON.stringify(df),
+                // data: '{"test_key": "test_value"}',
+                success: function (result) {
+                    console.log(result)
+                    // var reply=data.reply;
+                    // if (reply=="success")
+                    // {
+                    //     return;
+                    // }
+                    // else
+                        // {
+                        // alert("some error ocured in session agent")
+                        // }
+                },
+                error: function (xhr, resp, text){
+                    console.log(xhr, resp, text)
+                }
+
+                }
+            
+        );
+}
+    
+</script>
+
+</body>
 
 </html>
 

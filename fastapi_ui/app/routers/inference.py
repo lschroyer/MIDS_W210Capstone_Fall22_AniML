@@ -1,12 +1,16 @@
 import logging
+
 import boto3
+import json
+
 from botocore.exceptions import ClientError
 import os
 import pathlib
 
-
-from fastapi import Request, UploadFile, File, APIRouter, HTTPException
+from fastapi.responses import HTMLResponse
+from fastapi import Request, Form, APIRouter
 from fastapi.templating import Jinja2Templates
+
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates/")
@@ -14,39 +18,37 @@ templates = Jinja2Templates(directory="templates/")
 logging.basicConfig()
 logging.root.setLevel(logging.NOTSET)
 logging.basicConfig(level=logging.NOTSET)
-logging.info("end of logging configs")
-
-@router.post("/inference")
-def upload(file: UploadFile = File(...)):
-    file_name = file.filename
-    destination_file_path = "images_uploads/" + file_name #output file path
-    logging.debug("Logging Test")
-    try:
-        contents = file.file.read()
-        with open(destination_file_path, "wb") as f:
-            f.write(contents)
-    except Exception:
-        raise HTTPException(status_code=404, detail="There was an error uploading the file")
-    finally:
-        file.file.close()
-
-    try:
-        s3 = boto3.client("s3")
-        bucket_name = "famlive"
-        bucket_folder = "training_upload"
-        object_name = file_name 
-        local_file_path = os.path.join(pathlib.Path(__file__).parent.resolve(), "../../" + destination_file_path)
-
-        response = s3.upload_file(local_file_path, bucket_name, '%s/%s' % (bucket_folder,object_name ))
-
-
-    except Exception:
-        raise HTTPException(status_code=400, detail="There was an error uploading the file to S3")
-        
-
-    return {"message": f"Successfuly uploaded {file.filename}"}
-
 
 @router.get("/inference")
 def main(request: Request):
+    # clear contents when initializing the page
+    filename = "../data/classification_prediction/yolo_v5_prediction_inference.json"
+    open(filename, 'w').close()
+
     return templates.TemplateResponse("inference.html", {"request": request})
+
+
+
+
+@router.get("/inference_post/{name1}", response_class=HTMLResponse)
+def api_async_save(request: Request, name1: str):
+    name1 = name1.replace(" ", "")
+    name1 = name1.replace("\\", "")
+    name1_dict = json.loads(name1)[0]
+
+    filename = "../data/classification_prediction/yolo_v5_prediction_inference.json"
+
+    with open(filename, "r") as file:
+        try:
+            data = json.load(file)
+            data.append(name1_dict)
+        except:
+            data = [name1_dict]
+
+    with open(filename, "w") as file:
+        json.dump(data, file, indent=2)
+
+    return templates.TemplateResponse('inference.html', 
+            context={'request': request, 
+                    })
+

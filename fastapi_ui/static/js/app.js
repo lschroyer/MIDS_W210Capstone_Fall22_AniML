@@ -10,17 +10,6 @@ var results = []
 var status_list = []
 var res = ''
 
-// Lucas code:
-// function download(content, fileName, contentType) {
-//     var a = document.createElement("a");
-//     var file = new Blob([content], {type: contentType});
-//     a.href = URL.createObjectURL(file);
-//     a.download = fileName;
-//     a.click();
-// }
-// end Lucas code
-
-
 jQuery(document).ready(function () {
     $('#row_detail').hide()
     $("#row_results").hide();
@@ -45,6 +34,7 @@ jQuery(document).ready(function () {
                 $("#table_result > tbody").html('');
                 $('#row_detail').hide();
                 $("#row_results").hide();
+                // $("#row_save").html('');
             },
         }).done(function (jsondata, textStatus, jqXHR) {
             for (i = 0; i < jsondata.length; i++) {
@@ -52,26 +42,13 @@ jQuery(document).ready(function () {
                 task_id = jsondata[i]['task_id']
                 status = jsondata[i]['status']
                 results.push(URL + jsondata[i]['url_result'])
-                // download(jsonData, jsondata[i] + '_json.txt', 'text/plain'); //Lucas code
                 status_list.push(task_id)
                 result_button = `<button class="btn btn-small btn-success" style="display: none" id="btn-view" data=${i}>View</a>`
                 $("#table_result > tbody").append(`<tr><td>${task_id}</td><td id=${task_id}>${status}</td><td>${result_button}</td></tr>`);
                 $("#row_results").show();
+                // export_button = `<button class="btn btn-small btn-success" style="display: none" id="btn-save" data=${i}>Download</a>`
+                // $("#row_save").append(`${export_button}`)
             }
-
-            // Lucas test
-            // https://stackoverflow.com/questions/2894946/passing-javascript-variable-to-python
-            // var reply=data.reply;
-            // if (reply=="success")
-            // {
-            //     return;
-            // }
-            // else
-            //     {
-            //     alert("some error ocured in session agent")
-            //     }
-            // End Lucas test
-
 
             var interval = setInterval(refresh, 1000);
 
@@ -108,6 +85,7 @@ jQuery(document).ready(function () {
         id = $(e.target).attr('data')
         $.get(results[id], function (data) {
             res = data
+            console.log(res)
             if (data['status'] == 'SUCCESS') {
                 $('#row_detail').show()
                 $('#result_txt').val(JSON.stringify(res.result['bbox'], undefined, 4))
@@ -120,9 +98,29 @@ jQuery(document).ready(function () {
         });
     })
 
-            // $.post('/create_binary_file.php', res, function(retData) {
-            //     $("body").append("<iframe src='" + retData.url+ "' style='display: none;' ></iframe>");
-            //   });    
+    $(document).on('click', '#btn-save', function (e) {
+        id = $(e.target).attr('data')
+        $.get(results[id], function (data) {
+            res = data
+            
+            
+
+            if (data['status'] == 'SUCCESS') {
+                var blob = new Blob(JSON.stringify(res.result['bbox'], undefined, 4),
+                    { type: "text/plain;charset=utf-8" });
+                
+                saveAs(blob, "../../" + res.result.file_name + ".txt");
+                // $('#row_detail').show()
+                $('#result_txt').val(JSON.stringify(res.result['bbox'], undefined, 4))
+                // $('#result_img').attr('src', URL + '/' + res.result.file_name)
+                // $('#result_link').attr('href', URL + '/' + res.result.file_name)
+            } else {
+                alert('Result not ready or already consumed!')
+                $('#row_detail').hide()
+            }
+        });
+    })       
+
 
     $(document).on('click', '#btn-refresh', function (e) {
         for (i = 0; i < status_list.length; i++) {
@@ -139,5 +137,8 @@ jQuery(document).ready(function () {
             });
         }
     })
+
+    
+
 
 })
