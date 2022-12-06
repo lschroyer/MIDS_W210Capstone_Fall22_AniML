@@ -1,6 +1,8 @@
 # MIDS_W210Capstone_Fall22_AniML
 W210 - Section 7 - AniML Group
 
+## AniML: No Code ML Vision for Specialists with no CV experience
+
 Ivan Wong,
 Lana Elauria,
 Lucas Harvey-Schroyer, 
