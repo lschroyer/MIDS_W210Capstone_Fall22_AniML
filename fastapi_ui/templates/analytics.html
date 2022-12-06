@@ -311,11 +311,12 @@
             <p>Keep class if confidence score greater than:</p>
             <center>
             <form action="/analytics_reclassify_predictions" method="post" style="text-align: left;">
-                <input type="text" name="pred_class" id="pred_class" placeholder="e.g. fox" required>
+                <input type="text" name="pred_class" id="pred_class" 
+                placeholder="e.g. fox" size="30" required>
                 <br>
                 <input type="number" name="conf_lev" id="conf_lev"
                 max="1.0000000000000000" min="0.0000000000000000" 
-                placeholder="e.g. 0.50" step="0.01" 
+                placeholder="e.g. 0.50" step="0.01" size="30"
                 value="" required />
                 <br>
                 <input type="submit">
