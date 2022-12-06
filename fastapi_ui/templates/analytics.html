@@ -136,7 +136,7 @@
                         <input type="submit" value="Randomize class images">
                     </form>
                     <br>
-                    {% if model_predictions %}
+                    {% if show_model_table_reclassified %}
                         <img src="static/images/analytics/data_frame/class_counts_reclassified.png" alt="Class Counts" width=”200″ height=”200″>
                     {% else %}
                         <img src="static/images/analytics/data_frame/class_counts_initial.png" alt="Class Counts" width=”200″ height=”200″>
@@ -283,6 +283,81 @@
                 </figure></center>
             </th>
         </tr>
+        <tr>
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_not_" + class_name + "/" + random_files_names["not_"+class_name][3]}} alt={{"Class_not_" + class_name + " - Random Image 4"}} style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names["not_"+class_name][3]}}</figcaption>
+                </figure></center>
+            </th>
+            <th></th>
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_" + class_name + "/" + random_files_names[class_name][3]}} alt={{"Class_" + class_name + " - Random Image 4"}} style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][3]}}</figcaption>
+                </figure></center>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_not_" + class_name + "/" + random_files_names["not_"+class_name][4]}} alt={{"Class_not_" + class_name + " - Random Image 5"}} style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names["not_"+class_name][4]}}</figcaption>
+                </figure></center>
+            </th>
+            <th></th>
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_" + class_name + "/" + random_files_names[class_name][4]}} alt={{"Class_" + class_name + " - Random Image 5"}} style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][4]}}</figcaption>
+                </figure></center>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_not_" + class_name + "/" + random_files_names["not_"+class_name][5]}} alt={{"Class_not_" + class_name + " - Random Image 6"}} style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names["not_"+class_name][5]}}</figcaption>
+                </figure></center>
+            </th>
+            <th></th>
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_" + class_name + "/" + random_files_names[class_name][5]}} alt={{"Class_" + class_name + " - Random Image 6"}} style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][5]}}</figcaption>
+                </figure></center>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_not_" + class_name + "/" + random_files_names["not_"+class_name][6]}} alt={{"Class_not_" + class_name + " - Random Image 7"}} style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names["not_"+class_name][6]}}</figcaption>
+                </figure></center>
+            </th>
+            <th></th>
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_" + class_name + "/" + random_files_names[class_name][6]}} alt={{"Class_" + class_name + " - Random Image 7"}} style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][6]}}</figcaption>
+                </figure></center>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_not_" + class_name + "/" + random_files_names["not_"+class_name][7]}} alt={{"Class_not_" + class_name + " - Random Image 8"}} style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names["not_"+class_name][7]}}</figcaption>
+                </figure></center>
+            </th>
+            <th></th>
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_" + class_name + "/" + random_files_names[class_name][7]}} alt={{"Class_" + class_name + " - Random Image 8"}} style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][7]}}</figcaption>
+                </figure></center>
+            </th>
+        </tr>
         {% endif %}
     </table>
 </body>
@@ -311,11 +386,12 @@
             <p>Keep class if confidence score greater than:</p>
             <center>
             <form action="/analytics_reclassify_predictions" method="post" style="text-align: left;">
-                <input type="text" name="pred_class" id="pred_class" placeholder="e.g. fox" required>
+                <input type="text" name="pred_class" id="pred_class" 
+                placeholder="e.g. fox"  required style="width: 100px;">
                 <br>
                 <input type="number" name="conf_lev" id="conf_lev"
-                max="1.0000000000000000" min="0.0000000000000000" 
-                placeholder="e.g. 0.50" step="0.01" 
+                max="1.000000000000000" min="0.000000000000000" 
+                placeholder="e.g. 0.50" step="0.01" style="width: 100px;"
                 value="" required />
                 <br>
                 <input type="submit">
@@ -325,7 +401,7 @@
             <br><br>
             <p>Confidence Score Cutoffs</p>
             <center>
-            {% if model_predictions %}
+            {% if show_model_table_reclassified %}
                 <img src="static/images/analytics/data_frame/cutoff_levels_table_reclassified.png" alt="Cutoff Table" width=”200″ height=”200″>
             {% else %}
                 <img src="static/images/analytics/data_frame/cutoff_levels_table_initial.png" alt="Cutoff Table" width=”200″ height=”200″>
@@ -371,7 +447,7 @@
 
         <td>
             <center>
-                {% if model_predictions %}
+                {% if show_model_table_reclassified %}
                 <h3>Adjusted Model Results</h3>
                 <br>
                 <!-- <img src="static/images/analytics/data_frame/conf_table_reclassified.png" alt="Model Classification Table" width=”500″ height=”600″> -->

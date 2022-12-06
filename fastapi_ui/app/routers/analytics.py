@@ -48,7 +48,7 @@ def form_get(request: Request):
         global df_global, global_class_list, df_classification_cuttoffs, df_class_counts, show_model_table_reclassified
 
         # Initialize data
-        df_global, already_reclassified, global_class_list, df_classification_cuttoffs, df_class_counts = get_model_data()
+        df_global, show_model_table_reclassified, global_class_list, df_classification_cuttoffs, df_class_counts = get_model_data()
 
         # Clear legacy outputs and create folders
         destination_folder = [
@@ -69,7 +69,6 @@ def form_get(request: Request):
             "static/images/analytics/data_frame/class_counts_initial.png")
         with open('static/images/analytics/data_frame/conf_table_initial.html', 'w') as fo:
             fo.write(html_string.format(table=df_global.sort_index().to_html(classes='mystyle')))
-            # df_global.sort_index().to_html(fo, classes='mystyle')
 
         # Zip all classes and get random files for all classes
         _zip_files(class_name = "all_classes", specific_class = False)
@@ -82,10 +81,9 @@ def form_get(request: Request):
         df_global_copy = df_global.copy()
         concat_chart_json, time_series_total_json, time_series_class_json = _custom_user_graphics(df_global_copy)
 
-        show_model_table_initial = False
         return templates.TemplateResponse('analytics.html',
             context={'request': request, 
-                    'model_predictions': show_model_table_initial,
+                    'show_model_table_reclassified': show_model_table_reclassified,
                     'random_files_names': random_files_names,
                     'concat_chart': concat_chart_json,
                     'time_series_total': time_series_total_json,
@@ -109,7 +107,7 @@ async def form_get_cutoff(request: Request):
 @router.post("/analytics_reclassify_predictions", response_class=HTMLResponse)
 def form_post_cutoff(request: Request, conf_lev: float = Form(...), pred_class: str = Form(...)):
     try:
-        global df_global_reclassified, already_reclassified, df_classification_cuttoffs, show_model_table_reclassified
+        global df_global_reclassified, df_classification_cuttoffs, show_model_table_reclassified
 
         pred_class = pred_class.lower()
         pred_class = pred_class.replace(' ', '_')
@@ -132,11 +130,11 @@ def form_post_cutoff(request: Request, conf_lev: float = Form(...), pred_class: 
             if not os.path.exists(folder):
                 os.mkdir(folder)
 
-        if already_reclassified == False:
+        if show_model_table_reclassified == False:
             df_global_reclassified = filter_low_conf_images(df_global, conf_lev, pred_class)   
         else:
             df_global_reclassified = filter_low_conf_images(df_global_reclassified, conf_lev, pred_class)
-        already_reclassified = True
+        show_model_table_reclassified = True
 
         df_classification_cuttoffs.loc[(df_classification_cuttoffs.class_name ==  pred_class),["confidence_cutoff"]] = conf_lev
 
@@ -165,11 +163,10 @@ def form_post_cutoff(request: Request, conf_lev: float = Form(...), pred_class: 
         df_global_reclassified_copy = df_global_reclassified.copy()
         concat_chart_json, time_series_total_json, time_series_class_json = _custom_user_graphics(df_global_reclassified_copy)
 
-        show_model_table_reclassified = True
 
         return templates.TemplateResponse('analytics.html', 
             context={'request': request, 
-                    'model_predictions': show_model_table_reclassified,
+                    'show_model_table_reclassified': show_model_table_reclassified,
                     'random_files_names': random_files_names,
                     'concat_chart': concat_chart_json,
                     'time_series_total': time_series_total_json,
@@ -196,7 +193,7 @@ async def form_get_randomize(request: Request):
 @router.post("/analytics_randomize_images", response_class=HTMLResponse)
 async def form_post_randomize(request: Request, random_class_name: str = Form(...)):
     try:
-        global df_global, df_global_reclassified, global_class_list, show_model_table_reclassified
+        global df_global, df_global_reclassified, global_class_list, show_model_table_reclassified, df_classification_cuttoffs, df_class_counts
     
         random_class_name = random_class_name.lower()
         random_class_name = random_class_name.replace(' ', '_')
@@ -219,6 +216,27 @@ async def form_post_randomize(request: Request, random_class_name: str = Form(..
         else:
             random_files_names = random_file_workflow(df_filtered)
 
+
+        if show_model_table_reclassified is True:
+            df_class_counts = df_global_reclassified.groupby(
+                ['predicted_classes_original','predicted_classes_new']
+                ).size().to_frame()
+            dfi.export(df_classification_cuttoffs.style.hide_index(), 
+                "static/images/analytics/data_frame/cutoff_levels_table_reclassified.png")
+            dfi.export(df_class_counts.style.hide_index(),
+                "static/images/analytics/data_frame/class_counts_reclassified.png")
+            with open('static/images/analytics/data_frame/conf_table_reclassified.html', 'w') as fo:
+                    fo.write(html_string.format(table=df_global_reclassified.sort_index().to_html(classes='mystyle')))
+        else:
+            dfi.export(df_global.sort_index(),"static/images/analytics/data_frame/conf_table_initial.png")
+            dfi.export(df_classification_cuttoffs.style.hide_index(), 
+                "static/images/analytics/data_frame/cutoff_levels_table_initial.png")
+            dfi.export(df_class_counts,
+                "static/images/analytics/data_frame/class_counts_initial.png")
+            with open('static/images/analytics/data_frame/conf_table_initial.html', 'w') as fo:
+                fo.write(html_string.format(table=df_global.sort_index().to_html(classes='mystyle')))
+
+
         # creating Altair charts from model predictions
         df_global_reclassified_copy = df_global_reclassified.copy()
         concat_chart_json, time_series_total_json, time_series_class_json = _custom_user_graphics(df_global_reclassified_copy)
@@ -226,7 +244,7 @@ async def form_post_randomize(request: Request, random_class_name: str = Form(..
         return templates.TemplateResponse('analytics.html',
             context={'request': request, 
                     'random_files_names': random_files_names,
-                    'model_predictions': show_model_table_reclassified,
+                    'show_model_table_reclassified': show_model_table_reclassified,
                     'concat_chart': concat_chart_json,
                     'time_series_total': time_series_total_json,
                     'time_series_class': time_series_class_json,
@@ -250,7 +268,7 @@ async def form_get_reclassify(request: Request):
 @router.post("/analytics_reclassify_image", response_class=HTMLResponse)
 def form_post_reclassify(request: Request, img_name: str = Form(...), new_class: str = Form(...)):
     try:
-        global df_global, df_global_reclassified, df_classification_cuttoffs, global_class_list, show_model_table_reclassified, already_reclassified
+        global df_global, df_global_reclassified, df_classification_cuttoffs, global_class_list, show_model_table_reclassified
 
         new_class = new_class.lower()
         new_class = new_class.replace(' ', '_')
@@ -308,14 +326,13 @@ def form_post_reclassify(request: Request, img_name: str = Form(...), new_class:
         df_global_reclassified_copy = df_global_reclassified.copy()
         concat_chart_json, time_series_total_json, time_series_class_json = _custom_user_graphics(df_global_reclassified_copy)
 
-        already_reclassified = True
         show_model_table_reclassified = True
         global_class_list.append(new_class)
 
         return templates.TemplateResponse('analytics.html',
             context={'request': request, 
                     'random_files_names': random_files_names,
-                    'model_predictions': show_model_table_reclassified,
+                    'show_model_table_reclassified': show_model_table_reclassified,
                     'concat_chart': concat_chart_json,
                     'time_series_total': time_series_total_json,
                     'time_series_class': time_series_class_json,
@@ -360,11 +377,11 @@ def parse_yolo_json(yolo_json_path):
 
 def get_model_data():
     test_yolo_image_ids, test_yolo_pred_classes, test_yolo_bboxes, test_yolo_confs = parse_yolo_json("../data/classification_prediction/yolo_v5_prediction.json")
-    model_predictions = {"image_ids": test_yolo_image_ids, 
+    model_predictions_tmp = {"image_ids": test_yolo_image_ids, 
                 "confidence_scores": test_yolo_confs, 
                 "predicted_classes_original": test_yolo_pred_classes}
     
-    df = pd.DataFrame.from_dict(model_predictions)
+    df = pd.DataFrame.from_dict(model_predictions_tmp)
     
     # df.loc[(df["predicted_classes_original"] == "1") | 
     #                 (df["predicted_classes_original"] == 1), 
@@ -594,7 +611,7 @@ def _custom_user_graphics(df_copy):
 # reclassify images based on new confidence threshold
 def filter_low_conf_images(df, conf_level, label = None):
     
-    if already_reclassified == False:
+    if show_model_table_reclassified == False:
         df["predicted_classes_new"] = df["predicted_classes_original"]
         df["manually_reclassified"] = np.array(["no"] * len(df["predicted_classes_original"]))
         label_list = df["predicted_classes_original"].unique()
@@ -719,7 +736,7 @@ def _zip_files(class_name, specific_class = True):
         shutil.make_archive(dst,'zip',src)
         
 # Initialize global variables
-df_global, already_reclassified, global_class_list, df_classification_cuttoffs, df_class_counts = get_model_data()
+df_global, show_model_table_reclassified, global_class_list, df_classification_cuttoffs, df_class_counts = get_model_data()
 df_global_reclassified = df_global.copy()
 df_global_reclassified["predicted_classes_new"] = df_global_reclassified["predicted_classes_original"]
 df_global_reclassified["manually_reclassified"] = np.array(["no"] * len(df_global_reclassified["predicted_classes_new"]))

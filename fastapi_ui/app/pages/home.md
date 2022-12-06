@@ -46,22 +46,17 @@ text text
 </head>
 </html>
 
-1. <span style="color:black"> **Filter, Review, and Download**</span>
+1. <span style="color:black"> **Clean up your dataset**</span>
 
+    Take control of a chaotic dataset by uploading it to the platform - AniML automatically sorts and finds images with objects of interest, which you will later label and use to train a supervised ML model.
 
-    Upload your unfiltered images and we'll auto sort them by if the image contains an object or is empty! You can then review and adjust the filtering model results before saving the images that contain the animals or objects of interest. You can then save all the images that have objects of interest in them. If that's all you need, your done! However, if you'd like our AniML to classify what type of objects are in each non-empty photo, continue on to step 2.
+2. <span style="color:black"> **Train your own AI vision system**</span>
 
-2. <span style="color:black"> **Label and Train**</span>
+    Using the filtered images from step 1, add labels detailing the class and location of each object you’re trying to detect. Using the labeled dataset, train your own custom ML model that will automatically detect objects of interest for you.
 
-    From the resulting groups, choose a few sample images that contain the items of interest you want to detect to manually label. Then our algorithm can automatically find these categories in future images you upload.
+3. <span style="color:black"> **Use your vision system to find objects and generate insights**</span>
 
-    Using your mannualy labeled dataset, we train a custom Artificial Intelligence (AI) model that will accurately hone in on your objects of interest.
-
-3. <span style="color:black"> **Classify, Review, and Download**</span>
-
-    With your model hosted on an API endpoint, simple add images as you need and we’ll do the rest. Relax as your huge datasets are filtered down to items of interest and beautiful analytics are shared.
-
-    After any final adjustments that you make the the final model classifications, you can then download the files into folders seperated by object type! 
+    With your new model, automate away all your previously manual steps! Upload new images and AniML will automatically find images with objects of interest AND generate a comprehensive dashboards of metrics detailing what the model found.
 
 &nbsp;
    
