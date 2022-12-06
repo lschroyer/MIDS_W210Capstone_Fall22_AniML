@@ -8,7 +8,7 @@ Whit Blodgett
 
 Introducing AniML, the no code AI computer vision tool that allows anyone, even those without a technical backgrounds, to easily build and implement their own computer vision systems. Take control of a chaotic image folder by uploading it to the platform where it automatically filters down to images with objects of interest. Label these representative images and easily train your own custom model which you can use to further streamline your workflow. Once trained, AniML models generate a detailed analytics dashboard full of rich insights. 
 
-AniML was originally designed to help biologists automatically sort through hundereds of thousands of field camera images tracking animal populations. Automating this previosuly manual process, AniML frees up biologists' time so they can focus where it counts - applying their unique skills to advance our knowledge and understanding of the natural world. 
+AniML was originally designed to help biologists automatically sort through hundereds of thousands of field camera images tracking animal populations. Automating this previosuly manual process, AniML frees up biologists' time so they can focus where it counts - applying their unique skills to solve pressing global challenges, such as climate change, disease outbreaks, and food insecurity.
 
 
 
