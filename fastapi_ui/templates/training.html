@@ -49,7 +49,7 @@
                 </div>
                 <div class="form-group col-md-4">
                     <label>&nbsp;</label>
-                    <button type="button" class="btn btn-primary btn-block" id="btn-training">Training</button>
+                    <button type="button" class="btn btn-primary btn-block" id="btn-training">Train Custom Model</button>
                 </div>
             </div>
             <div class="form-row" id="row_results">
@@ -75,6 +75,68 @@
 
             </div>
         </div>
+
+
+        <style type="text/css">
+            /* Callout box - fixed position at the bottom of the page */
+            .callout {
+            position: fixed;
+            bottom: 35px;
+            right: 20px;
+            margin-left: 20px;
+            max-width: 700px;
+            }
+
+            /* Callout header */
+            .callout-header {
+            padding: 25px 15px;
+            background: #555;
+            font-size: 30px;
+            color: white;
+            }
+
+            /* Callout container/body */
+            .callout-container {
+            padding: 15px;
+            background-color: #ccc;
+            color: black
+            }
+
+            /* Close button */
+            .closebtn {
+            position: absolute;
+            top: 5px;
+            right: 15px;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            }
+
+            /* Change color on mouse-over */
+            .closebtn:hover {
+            color: lightgrey;
+            }
+        </style>
+
+        <!-- <div class="callout">
+            <div class="callout-header">**Please note**</div>
+            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+            <div class="callout-container">
+              <p style="color: black; font-size:12pt;"></pstyle>Please contact AniML when you have finished labeling your data and we will train and deploy your zipped roboflow file on our server
+                for you so you will be able to access it in step 3.1. Future versions of this tool will automatically
+                deploy your trained model however this step currently needs to be configured manually on 
+                the backend during AniML's beta launch.
+                <br><br>
+                The good news is once the AniML team has deployed your customized model, you can come back to steps 3.1 and 3.2 as 
+                many times as you'd like and it will still be customized for you!
+                <br><br>
+                If you would like to see how training works with the beta testing zip file you've previously downloaded, do not upload any files here. Simply hit the train button as it 
+                is already configured in the backend. You can explore the files in the folder "model 2 training images" if you wish to explore the labeled datasets used for training.  
+              </p>
+            </div>
+          </div> -->
+
+
 </body>
 
 </html>
