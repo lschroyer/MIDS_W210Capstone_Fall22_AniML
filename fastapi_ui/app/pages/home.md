@@ -68,3 +68,60 @@ Whit Blodgett
 
 UC Berkeley, School of Information 2022 - Masters of Information and Data Science
 
+<style type="text/css">
+            /* Callout box - fixed position at the bottom of the page */
+            .callout {
+            position: fixed;
+            bottom: 35px;
+            right: 20px;
+            margin-left: 20px;
+            max-width: 300px;
+            }
+
+            /* Callout header */
+            .callout-header {
+            padding: 25px 15px;
+            background: #555;
+            font-size: 30px;
+            color: white;
+            }
+
+            /* Callout container/body */
+            .callout-container {
+            padding: 15px;
+            background-color: #ccc;
+            color: black
+            }
+
+            /* Close button */
+            .closebtn {
+            position: absolute;
+            top: 5px;
+            right: 15px;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            }
+
+            /* Change color on mouse-over */
+            .closebtn:hover {
+            color: lightgrey;
+            }
+        </style>
+<!-- <html>
+<div class="callout">
+    <div class="callout-header">**Please note**</div>
+    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+    <div class="callout-container">
+        <p style="color: black;">For AniML beta testing, please use the following dataset for model 1 filtering, model 2 labeling/training, 
+        and model 2 classifications. 
+        <br><br>Click the download button to save them locally.
+        </p>
+    <center>
+        <a href="static/images/beta testing dataset.zip" download="beta_testing_files">
+        <button type="button">Download beta testing files</button>
+        </a>
+    </center>
+    </div>
+</div>
+</html> -->
