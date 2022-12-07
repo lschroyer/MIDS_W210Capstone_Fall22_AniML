@@ -1,0 +1,18 @@
+celery==5.2.3
+flower==1.0.0
+fastapi==0.73.0
+matplotlib
+opencv-python
+aiofiles
+python-multipart
+pyyaml
+seaborn
+uvicorn[standard]==0.17.4
+redis
+httpx ==0.21.1
+
+
+
+
+
+
