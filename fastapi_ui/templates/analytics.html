@@ -11,21 +11,470 @@
 
 {% block page_content %}
 <h1 class="cap">Analytics</h1>
-{% if yournum %}
-<h2>Your number is {{yournum}} and the result is {{result}}.</h2>
+<p> Here we have our predictions of what animals (i.e. "model classes" or "classes" for short) were 
+    identified based on the model built from the custom labels you provided. On this webpage, we show
+    some charts around what and when different classes were identified as well as allow you to change
+    how sensitive the model predictions are before saving your final outputs. 
+</p>
+
+<html>
+<head>
+    <title>Classified Images Analytics and Review</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="../static/css/styles.css">
+    <link rel="stylesheet" href="../static/css/mystyle.css">
+    <link rel="stylesheet" href="../static/css/style3.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+        crossorigin="anonymous">
+</head>
+<h2>AniML - Classified Images Analytics and Review</h2>
+<br>
+
+<hr>
+<h3>Histograms of Model Class Predictions</h3>
+<p>
+    Here are two histograms displaying the number of different classes identified (left) 
+    as well as the distribution of how confident the model was when classifying each image per 
+    class (i.e. the confidence scores per class). If a class has a low confidence score, more images 
+    during the training phase may be needed so that the model is better at recognizing the different
+    angles, lighting exposures, etc. of that animal when trying to classify it. Changes to the model class
+    cutoff scores in the next section will update these graphics. Click the three elipses '...' at the top right of each graphic
+    if you wish to save them.
+</p>
+<center>
+    <div id="vis1" class="vis">
+        <div id="hist" class="vis-inner"/>
+    </div>
+    <hr>
+</center>
+
+<br><br>
+{% if time_series_total %}
+<p>
+    Next are two timeline charts that show how many animals were observed over time. Again, changes to the model class
+    cutoff scores in the next section will update these graphics.
+</p>
+<style type="text/css">
+    #slide {
+    width: auto;
+    height: 700px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    white-space: nowrap;
+}
+</style>
+
+
+<div id="slide">
+    <center>
+        <div id="vis2" class="vis">
+            <div id="timeseries-total" class="vis-inner", style="margin-left: 58px"/>
+        </div>
+        <hr size="10"/>
+        <div id="vis3" class="vis">
+            <div id="timeseries-class" class="vis-inner"/>
+        </div>
+        
+        <div id="space" class="space">
+        <!--     this is just for some spacing so the image doesn't show up in a weird place -->
+        </div>
+    </center>
+</div>
+<hr>
+
 {% endif %}
-<h3>Form 1: Add 2</h3>
-<form action="/form1" method="post">
-    <input type="number" name="number" value="" required />
-    <input type="submit">
-</form>
 
-<h3>Form 2: Add 100</h3>
-<form action="/form2" method="post">
-    <input type="number" name="number" value="" required />
-    <input type="submit">
-</form>
+<body>
+    <br><br>
+    <h3>Image Classification Results</h3>
+    <style type="text/css">
+        table {
+        border-spacing: 0;
+        border: 5px solid black;
+        /* border-collapse: collapse; */
+        }
+        tr, th, td {  
+            border: 1px solid white;
+            border-right: 1px solid white;  
+        }
+        #blue_color tr, #blue_color th, #blue_color td {
+            border: 1px solid #1eaaba;
+            background-color: #1eaaba;
+        }
+        #side_border tr, #side_border th, #side_border td {
+            border-right: 1px solid black;
+        }
+        #top_border tr, #top_border th, #top_border td {
+            border-top: 3px solid black;
+    }
+    </style>
+    
+    <p>
+        This table shows a random sample of images that the filtering model predicted as containing and not containing animals.
+        To view more images in each class to get a sense of how the filterin model is performing, click the 'randomize images by class'
+        button. You can adjust the sensitivity of how a model classifies an image as containing an animal or not in the next section below.
+        When you are ready, you can save a zip file of your filtered results by clicking the 'Download zip' button at the top 
+        of either column. 
+    </p>
+    
+    <table border="5" align="center"> 
+        <tr id="blue_color">
+            <th colspan="3">
+                <h3>
+                    <center><font color="white">Random Sample Images</font></center>
+                </h3>
+            </th> 
+        </tr>
+        <tr>
+            <th colspan="3">
+                <center>
+                    <p>Enter the animal type you wish to view and save the model classification results for. 
+                        <br>To see a random sample of all the images, enter 'all_classes'.</p>
+                    <form action="/analytics_randomize_images" method="post">
+                        <input type="text" name="random_class_name" id="random_class_name" placeholder="e.g. fox or 'all_classes'" required>
+                        <input type="submit" value="Randomize class images">
+                    </form>
+                    <br>
+                    {% if show_model_table_reclassified %}
+                        <img src="static/images/analytics/data_frame/class_counts_reclassified.png" alt="Class Counts" width=”200″ height=”200″>
+                    {% else %}
+                        <img src="static/images/analytics/data_frame/class_counts_initial.png" alt="Class Counts" width=”200″ height=”200″>
+                    {% endif %}
+                </center>
+            </th>
+        </tr>
+        {% if class_name == "all_classes" %}
+        <tr>
+            <th><center><font color="white">------</font></center></th>
+            <th><font color="white">------</font></th>
+            <th><center><font color="white">------</font></center></th>
+        </tr>
+        <tr id="top_border">
+            <td id="top_border">
+                <center><figure>
+                    <img src="{{'static/images/analytics/inference_images/' + random_files_names[class_name][0]}}" alt="Any Class - Random Image 1" style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][0]}}</figcaption>
+                </figure></center>
+            </td>
+            <td id="top_border">
+                <center><figure>
+                    <img src="{{'static/images/analytics/inference_images/' + random_files_names[class_name][1]}}" alt="Any Class - Random Image 2" style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][1]}}</figcaption>
+                </figure></center>
+            </td>
+            <td id="top_border">
+                <center><figure>
+                    <img src="{{'static/images/analytics/inference_images/' + random_files_names[class_name][2]}}" alt="Any Class - Random Image 3" style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][2]}}</figcaption>
+                </figure></center>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <center><figure>
+                    <img src="{{'static/images/analytics/inference_images/' + random_files_names[class_name][3]}}" alt="Any Class - Random Image 4" style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][3]}}</figcaption>
+                </figure></center>
+            </td>
+            <td>
+                <center><figure>
+                    <img src="{{'static/images/analytics/inference_images/' + random_files_names[class_name][4]}}" alt="Any Class - Random Image 5" style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][4]}}</figcaption>
+                </figure></center>
+            </td>
+            <td>
+                <center><figure>
+                    <img src="{{'static/images/analytics/inference_images/' + random_files_names[class_name][5]}}" alt="Any Class - Random Image 6" style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][5]}}</figcaption>
+                </figure></center>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <center><figure>
+                    <img src="{{'static/images/analytics/inference_images/' + random_files_names[class_name][6]}}" alt="Any Class - Random Image 7" style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][6]}}</figcaption>
+                </figure></center>
+            </td>
+            <td>
+                <center><figure>
+                    <img src="{{'static/images/analytics/inference_images/' + random_files_names[class_name][7]}}" alt="Any Class - Random Image 8" style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][7]}}</figcaption>
+                </figure></center>
+            </td>
+            <td>
+                <center><figure>
+                    <img src="{{'static/images/analytics/inference_images/' + random_files_names[class_name][8]}}" alt="Any Class - Random Image 9" style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][8]}}</figcaption>
+                </figure></center>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <th><center><font color="black"><h3>Model Predictions</h3></font></center></th>
+            <th><font color="white">------</font></th>
+            <th><center><font color="black"><h3>Model Predictions</h3></font></center></th>
+        </tr>
+        <tr >
+            <th><center><font color="black">Low confidence that image contains: {{class_name}}</font></center></th>
+            <th><font color="white">------</font></th>
+            <th><center><font color="black">High confidence that image contains: {{class_name}}</font></center></th>
+        </tr>
+        <tr id="top_border">
+            <th>
+                <center>
+                    <a href={{"static/images/analytics/outputs/not_" + class_name + ".zip"}} download={{"class_not_" + class_name}}>
+                    <button type="button">Download zip of prediction of not_{{class_name}} images</button>
+                    </a>
+                </center>
+            </th>
+            <th></th>
+            <th>
+                <center>
+                    <a href={{"static/images/analytics/outputs/" + class_name + ".zip"}} download={{"class_" + class_name}}>
+                    <button type="button">Download zip of prediction of {{class_name}} images</button>
+                    </a>
+                </center>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_not_" + class_name + "/" + random_files_names["not_"+class_name][0]}} alt={{"Class_not_" + class_name + " - Random Image 1"}} style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names["not_"+class_name][0]}}</figcaption>
+                </figure></center>
+            </th>
+            <th></th>
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_" + class_name + "/" + random_files_names[class_name][0]}} alt={{"Class_" + class_name + " - Random Image 1"}} style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][0]}}</figcaption>
+                </figure></center>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_not_" + class_name + "/" + random_files_names["not_"+class_name][1]}} alt={{"Class_not_" + class_name + " - Random Image 2"}} style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names["not_"+class_name][1]}}</figcaption>
+                </figure></center>
+            </th>
+            <th></th>
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_" + class_name + "/" + random_files_names[class_name][1]}} alt={{"Class_" + class_name + " - Random Image 2"}} style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][1]}}</figcaption>
+                </figure></center>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_not_" + class_name + "/" + random_files_names["not_"+class_name][2]}} alt={{"Class_not_" + class_name + " - Random Image 3"}} style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names["not_"+class_name][2]}}</figcaption>
+                </figure></center>
+            </th>
+            <th></th>
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_" + class_name + "/" + random_files_names[class_name][2]}} alt={{"Class_" + class_name + " - Random Image 3"}} style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][2]}}</figcaption>
+                </figure></center>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_not_" + class_name + "/" + random_files_names["not_"+class_name][3]}} alt={{"Class_not_" + class_name + " - Random Image 4"}} style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names["not_"+class_name][3]}}</figcaption>
+                </figure></center>
+            </th>
+            <th></th>
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_" + class_name + "/" + random_files_names[class_name][3]}} alt={{"Class_" + class_name + " - Random Image 4"}} style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][3]}}</figcaption>
+                </figure></center>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_not_" + class_name + "/" + random_files_names["not_"+class_name][4]}} alt={{"Class_not_" + class_name + " - Random Image 5"}} style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names["not_"+class_name][4]}}</figcaption>
+                </figure></center>
+            </th>
+            <th></th>
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_" + class_name + "/" + random_files_names[class_name][4]}} alt={{"Class_" + class_name + " - Random Image 5"}} style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][4]}}</figcaption>
+                </figure></center>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_not_" + class_name + "/" + random_files_names["not_"+class_name][5]}} alt={{"Class_not_" + class_name + " - Random Image 6"}} style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names["not_"+class_name][5]}}</figcaption>
+                </figure></center>
+            </th>
+            <th></th>
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_" + class_name + "/" + random_files_names[class_name][5]}} alt={{"Class_" + class_name + " - Random Image 6"}} style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][5]}}</figcaption>
+                </figure></center>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_not_" + class_name + "/" + random_files_names["not_"+class_name][6]}} alt={{"Class_not_" + class_name + " - Random Image 7"}} style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names["not_"+class_name][6]}}</figcaption>
+                </figure></center>
+            </th>
+            <th></th>
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_" + class_name + "/" + random_files_names[class_name][6]}} alt={{"Class_" + class_name + " - Random Image 7"}} style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][6]}}</figcaption>
+                </figure></center>
+            </th>
+        </tr>
+        <tr>
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_not_" + class_name + "/" + random_files_names["not_"+class_name][7]}} alt={{"Class_not_" + class_name + " - Random Image 8"}} style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names["not_"+class_name][7]}}</figcaption>
+                </figure></center>
+            </th>
+            <th></th>
+            <th>
+                <center><figure>
+                    <img src={{"static/images/analytics/predicted_classes/predicted_" + class_name + "/" + random_files_names[class_name][7]}} alt={{"Class_" + class_name + " - Random Image 8"}} style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[class_name][7]}}</figcaption>
+                </figure></center>
+            </th>
+        </tr>
+        {% endif %}
+    </table>
+</body>
 
+<body>
+
+<hr>
+<br><br>
+<h3>Adjust Image Classification Results</h3>
+<p>Like the filtering model, this classification model identifies a specific animal type as detected or not detected
+    based on the confidence level that the image belongs to that class. 
+    <br><br>
+    You may adjust the confidence thresholds for each class and see in the image results above how different 
+    confidence level thresholds affect the sensitivity of the model predictions above. You can then download 
+    the files associated with each animal class after any final adjustments to the confidence level cutoff.
+    <br><br>
+    The analytics histograms and timelines above also are updated along with any adjustments to the confidence level 
+    cutoffs in this section.
+    <br><br>
+    If you wish to view the inital model predictions, you can reset the table below.
+</p>
+<table border="5" align="center" style="width:1600px;height:auto;">
+    <tr id="side_border">
+        <td id="side_border" colspan="2" style="width: 259px; vertical-align:top">
+            <h3>Reclassify class with new confidence level</h3>
+            <p>Keep class if confidence score greater than:</p>
+            <center>
+            <form action="/analytics_reclassify_predictions" method="post" style="text-align: left;">
+                <input type="text" name="pred_class" id="pred_class" 
+                placeholder="e.g. fox"  required style="width: 100px;">
+                <br>
+                <input type="number" name="conf_lev" id="conf_lev"
+                max="1.000000000000000" min="0.000000000000000" 
+                placeholder="e.g. 0.50" step="0.01" style="width: 100px;"
+                value="" required />
+                <br>
+                <input type="submit">
+            </form>
+            </center>
+            
+            <br><br>
+            <p>Confidence Score Cutoffs</p>
+            <center>
+            {% if show_model_table_reclassified %}
+                <img src="static/images/analytics/data_frame/cutoff_levels_table_reclassified.png" alt="Cutoff Table" width=”200″ height=”200″>
+            {% else %}
+                <img src="static/images/analytics/data_frame/cutoff_levels_table_initial.png" alt="Cutoff Table" width=”200″ height=”200″>
+
+            {% endif %}
+            </center>
+            <br><br>
+            <p>Any changes to predicted classes from new cutoff scores does not override any manual classifications below: </p>
+
+            
+            <h3>Manually reclassify individual images</h3>
+            <p>If you see image(s) above that you want to manually reclassify without changing model confidence cutoff scores,
+                you can manually reclassify them here.
+                <br><br>
+                Example format for single input:<br>img name = [image_name_1], new class = fox
+                <br><br>
+                Example format for multi input:<br>img name = [image_name_1, image_name_2], new class = fox
+                
+            </p>
+            <form action="/analytics_reclassify_image" method="post" style="text-align: left;">
+                <input type="text" name="img_name" id="img_name" size="42"
+                placeholder="{{'img name(s), e.g.: [image_name_1] or [img1, img2]'}}"
+                  required>
+                <br>
+                <input type="text" name="new_class" id="new_class" size="42"
+                placeholder="new class, e.g.: fox" required>
+                <br>
+                <input type="submit" size="10">
+            </form>
+
+            <br><br>
+            <h3>Reset classification</h3>
+            <p>Reset the 'new' classifications to the default model outputs</p>
+            <center>
+                <form action="/analytics" method="get">
+                    <input type="submit" value="Reset classifications">
+                </form>
+            </center>
+            
+
+
+        </td>
+
+        <td>
+            <center>
+                {% if show_model_table_reclassified %}
+                <h3>Adjusted Model Results</h3>
+                <br>
+                <!-- <img src="static/images/analytics/data_frame/conf_table_reclassified.png" alt="Model Classification Table" width=”500″ height=”600″> -->
+                <iframe src="static/images/analytics/data_frame/conf_table_reclassified.html" width="1200" height="600"></iframe>
+                {% else %}
+                <h3>Initial Model Results</h3>
+                <br>
+                <!-- <img src="static/images/analytics/data_frame/conf_table_initial.png" alt="Model Classification Table" width=”500″ height=”600″> -->
+                <iframe src="static/images/analytics/data_frame/conf_table_initial.html" width="900" height="600"></iframe>
+                <!-- <input type = "button" onclick = "load_home()" value = "Display">   -->
+            
+                {% endif %}
+            </center>
+        </td>
+    </tr>
+</table>
+</body>
+
+<!-- scripts to fill histogram/analytics viz divs -->
+<script>
+    var concat_chart = JSON.parse({{concat_chart|tojson|safe}});
+    var time_series_total = JSON.parse({{time_series_total|tojson|safe}});
+    var time_series_class = JSON.parse({{time_series_class|tojson|safe}});
+    vegaEmbed("#hist", concat_chart, {mode: "vega-lite"}).then(console.log).catch(console.warn);
+    vegaEmbed("#timeseries-total", time_series_total, {mode: "vega-lite"}).then(console.log).catch(console.warn);
+    vegaEmbed("#timeseries-class", time_series_class, {mode: "vega-lite"}).then(console.log).catch(console.warn);
+</script>
 
 
 {% endblock %}

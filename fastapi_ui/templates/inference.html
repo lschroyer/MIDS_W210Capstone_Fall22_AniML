@@ -11,64 +11,125 @@
 
 
 {% block page_content %}
-<h1 class="cap">Auotmatic Image Detection</h1>
-
-    <p>No more combing through thousands of false triggers! <br>
-    Simply add all your images below or a zip file of your images and we’ll cluster them into similar groups based on likeness.
-    <br>
+<h1 class="cap">Automatic Object Detection</h1>
+    <p>Congratulations! You’ve trained a ML vision system that will greatly reduce the amount of manual work 
+        required to find insightful information about objects in your images.
     <br>
 </p>
 
-<script type="text/javascript">
-    function previewFile() {
-        console.log("document:")
-        console.log(document)
-        var inputs = document.querySelectorAll('input[type=file]');
-        console.log("inputs:")
-        console.log(inputs)
-        var inputs_array = [...inputs];
-        var file_list = inputs[0].files
-        console.log(file_list)
-        console.log(inputs_array)
-        for(let i=0; i<file_list.length; i++){
-            // let file = inputs[i].files[0];
-            let file = file_list[i];
-            console.log("filename:")
-            console.log(file)
-            //use file
-            const reader = new FileReader();
-            reader.addEventListener("load", function() {
-                uploadFile(file)
-            }, false);
-            if (file) {
-                reader.readAsDataURL(file);
-            }
-        }
-    }
+<html>
 
-    function uploadFile(file) {
-        var formData = new FormData();
-        formData.append('file', file);
-        fetch('/upload', {
-                method: 'POST',
-                body: formData,
-            })
-            .then(response => {
-                console.log(response);
-            })
-            .catch(error => {
-                console.error(error);
-            });
-    }
+<head>
+    <title>AniML - Model 2. Customized Object Detection and Classification </title>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="../static/js/app.js"></script>
+    <link rel="stylesheet" href="../static/css/styles.css">
+    <link rel="stylesheet" href="../static/css/mystyle.css">
+    <link rel="stylesheet" href="../static/css/style3.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+        crossorigin="anonymous">
+    <h2> AniML - Model 2. Customized Object Detection and Classification </h2>
+</head>
+
+<body>
+    <br>
+    <h3>Object Detection</h3>
+    <p> 
+        Time to put your custom ML Vision system to work - add new images with your object of interest here and your model will 
+        automatically run inference and find the objects you’ve trained it to detect. You can review the prediction results by 
+        selecting “View” and scrolling to the bottom to see the image, the location and the confidence of the prediction.
+        Check out the predictions - if things look good, proceed to 3.2 (review, analytics, and download) or, if predictions are poor, 
+        try labeling more images and re-training your model on step 2.2.
+    </p>
+    <div class="container">
+        <div class="col-sm-12">
+            <div class="form-row">
+                <div class="form-group col-md-8">
+                    <label for="file" id="label_file">&nbsp;</label>
+                    <input class="form-control" type="file" id="input_file" multiple />
+                </div>
+                <div class="form-group col-md-4">
+                    <label>&nbsp;</label>
+                    <button type="button" class="btn btn-primary btn-block" id="btn-process">Upload and Process</button>
+                </div>
+            </div>
+
+            <div class="form-row" id="row_results">
+                <div class="form-row" id="row_detail">
+                    <div class="col-md-3"><textarea id="result_txt" style="height: 800px; font-size: 12px;"></textarea></div>
+                    <div class="col-md-9"><a id="result_link"><img id="result_img" width="600px" /></a></div>
+                </div>
+
+                <div class="col-md-12">
+                    <p>
+                        Click any of the view buttons below to view individual filtering model results here. 
+                    </p>
+                    <div class="form-row" style="margin-top: 10px;">
+                        <div class="col-md-12">
+                            <table border="1px solid" id="table_result">
+                                <thead>
+                                    <th>Task Id</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                
+
+            </div>
+        </div>
+<br><br>
+<p>Save files once you have viewed that they have an animal (do not save null images, denoted by '[]')</p>
+<button onclick="tableloopfx()">Save animal files</button>
+
+<script>
+    function tableloopfx() {
+    var table = document.getElementById("result_txt").value;
+    var df = {"dataframe": table}
+    console.log("---------------")
+    console.log(df)
+    
+    $.ajax(
+            {
+                type:'GET',
+                contentType:'application/json;charset-utf-08',
+                url:'http://127.0.0.1:8080/inference_post/' + table,
+                // async: true,
+                // url:'http://127.0.0.1:8080/inference_post' , table
+                dataType:'json',
+                // data: JSON.stringify(df),
+                // data: '{"test_key": "test_value"}',
+                success: function (result) {
+                    console.log(result)
+                    // var reply=data.reply;
+                    // if (reply=="success")
+                    // {
+                    //     return;
+                    // }
+                    // else
+                        // {
+                        // alert("some error ocured in session agent")
+                        // }
+                },
+                error: function (xhr, resp, text){
+                    console.log(xhr, resp, text)
+                }
+
+                }
+            
+        );
+}
+    
 </script>
-<form action="/action_page.php">
-  <input type="file" id="files"
-         name="files[]" multiple
-         onchange="previewFile()"
-         accept="image/*, zip,application/octet-stream,application/zip,application/x-zip,application/x-zip-compressed"><br><br>
-  <label id="files-upload-label" for="files"><i previewFile()></i></label>
 
-</form>
+</body>
+
+</html>
+
 
 {% endblock %}
 

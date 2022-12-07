@@ -6,6 +6,12 @@ __pycache__/
 # C extensions
 *.so
 
+# Custom filepaths
+venv/
+venv/*
+.venv
+.venv/
+
 # Distribution / packaging
 .Python
 build/
@@ -25,6 +31,10 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+
+# custom
+fastapi_ui/google-chrome-stable_current_amd64.deb
+google-chrome-stable_current_amd64.deb
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -127,6 +137,19 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+.Python
+[Bb]in
+[Ii]nclude
+[Ll]ib
+[Ll]ib64
+[Ll]ocal
+[Ss]cripts
+pyvenv.cfg
+fastapi_ui/.venv
+fastapi_ui/venv
+fastapi_ui/.venv/
+fastapi_ui/venv/
+pip-selfcheck.json
 
 # Spyder project settings
 .spyderproject

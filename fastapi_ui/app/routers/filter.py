@@ -16,37 +16,37 @@ logging.root.setLevel(logging.NOTSET)
 logging.basicConfig(level=logging.NOTSET)
 logging.info("end of logging configs")
 
-@router.post("/filter")
-def upload(file: UploadFile = File(...)):
-    file_name = file.filename
-    destination_file_path = "images_uploads/" + file_name #output file path
-    logging.debug("Logging Test")
-    try:
-        contents = file.file.read()
-        with open(destination_file_path, "wb") as f:
-            f.write(contents)
-    except Exception:
-        raise HTTPException(status_code=404, detail="There was an error uploading the file")
-    finally:
-        file.file.close()
+# @router.post("/filter")
+# def upload(file: UploadFile = File(...)):
+#     file_name = file.filename
+#     destination_file_path = "images_uploads/" + file_name #output file path
+#     logging.debug("Logging Test")
+#     try:
+#         contents = file.file.read()
+#         with open(destination_file_path, "wb") as f:
+#             f.write(contents)
+#     except Exception:
+#         raise HTTPException(status_code=404, detail="There was an error uploading the file")
+#     finally:
+#         file.file.close()
 
-    try:
-        s3 = boto3.client("s3")
-        bucket_name = "famlive"
-        bucket_folder = "training_upload"
-        object_name = file_name 
-        local_file_path = os.path.join(pathlib.Path(__file__).parent.resolve(), "../../" + destination_file_path)
+#     try:
+#         s3 = boto3.client("s3")
+#         bucket_name = "famlive"
+#         bucket_folder = "training_upload"
+#         object_name = file_name 
+#         local_file_path = os.path.join(pathlib.Path(__file__).parent.resolve(), "../../" + destination_file_path)
 
-        response = s3.upload_file(local_file_path, bucket_name, '%s/%s' % (bucket_folder,object_name ))
+#         response = s3.upload_file(local_file_path, bucket_name, '%s/%s' % (bucket_folder,object_name ))
 
 
-    except Exception:
-        raise HTTPException(status_code=400, detail="There was an error uploading the file to S3")
+#     except Exception:
+#         raise HTTPException(status_code=400, detail="There was an error uploading the file to S3")
         
 
-    return {"message": f"Successfuly uploaded {file.filename}"}
+#     return {"message": f"Successfuly uploaded {file.filename}"}
 
 
 @router.get("/filter")
 def main(request: Request):
-    return templates.TemplateResponse("filter.html", {"request": request})
+    return templates.TemplateResponse("filter_new.html", {"request": request})

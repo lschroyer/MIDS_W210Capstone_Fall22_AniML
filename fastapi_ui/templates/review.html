@@ -10,91 +10,269 @@
 {% endblock %}
 
 {% block page_content %}
-<h1 class="cap">Review Images</h1>
+<h1 class="cap">Review Image Classifications</h1>
+<p> Here we can see the results from our filtering model's prediction of which images are false triggers.
+    Adjust the sensitivity and randomly view a sample of the images. 
+</p>
 
-<p>Click into each cluster to review it’s contents.<br>
-    If it contains an object of interest you’d like to automatically detect, select it for labeling.<br>
-    <br>
+<html>
+<head>
+    <title>AniML Filtering Empty Images</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="../static/css/styles.css">
+    <link rel="stylesheet" href="../static/css/mystyle.css">
+    <link rel="stylesheet" href="../static/css/style3.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+        crossorigin="anonymous">
+</head>
+<h2>AniML - Filtering Empty Images</h2>
+<br>
 
-{% if tag %}
-<h2>You selected {{tag}}</h2>
-{% endif %}
+<h3>Image Classification Results</h3>
+<p>
+    This table shows a random sample of images that the filtering model predicted as containing and not containing animals.
+    To view more images in each class to get a sense of how the filterin model is performing, click the 'randomize images by class'
+    button. You can adjust the sensitivity of how a model classifies an image as containing an animal or not in the next section below.
+    When you are ready, you can save a zip file of your filtered results by clicking the 'Download zip' button at the top 
+    of either column.
+</p>
 
-{% set Choice_1 = ['1','2','3','4', ''] %}
-{% set Choice_2 = [ 'A', 'B', 'C', 'D', ''] %}
+<style type="text/css">
+    table {
+        border-spacing: 0;
+        border: 5px solid black;
+        /* border-collapse: collapse; */
+    }
+    tr, th, td {  
+        border: 1px solid white;
+        border-right: 1px solid white;  
+    }
+    #blue_color tr, #blue_color th, #blue_color td {
+        border: 1px solid #1eaaba;
+        background-color: #1eaaba;
+    }
+    #side_border tr, #side_border th, #side_border td {
+        border-right: 1px solid black;
+    }
+    #top_border tr, #top_border th, #top_border td {
+        border-top: 3px solid black;
+    }
 
-<form method="post" id="category">
-    <div class="upload" id="uploadExample">
-        <div class="card">
-            <div class="card-header" id="headingOne">
-                <h2 class="mb-0">
-                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#collapseOne"
-                        aria-controls="collapseOne">
-                        Choice_1
-                    </button>
+    #slide {
+    width: auto;
+    height: 1000px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    white-space: nowrap;
+}
+</style>
 
-                </h2>
-            </div>
-
-            <div id="collapseOne" class="collapse
-            {% for  name in Choice_1 %}
-            {% if name==tag %}
-            show
+<body>
+<div id="slide">
+    <table border="5" align="center" style="width:1300px;height:auto;"> 
+        <tr id="blue_color">
+            <th id="blue_color" colspan="3">
+                    <center>
+                        <font color=white><h3>Randomly Sampled Images by Predicted Class</h3></font>
+                        <form action="/review_randomize" method="get">
+                            <input type="submit" value="randomize images by class">
+                        </form>
+                    </center>
+            </th> 
+        </tr>
+        <tr id="blue_color">
+            {% if model_predictions %}
+                <th><center><h3>Adjusted Model Predictions</h3></center></th>
+                <th><font color="#1eaaba">------</font></th>
+                <th><center><h3>Adjusted Model Predictions</h3></center></th>
+            {% else %}
+                <th><center><font color=white><h3>Initial Model Predictions</h3></font></center></th>
+                <th><font color="#1eaaba">------</font></th>
+                <th><center><font color=white><h3>Initial Model Predictions</h3></font></center></th>
             {% endif %}
-            {% endfor %}
-            " aria-labelledby="headingOne" data-parent="#uploadExample">
-                <div class="card-body">
-                    {% for name in Choice_1 %}
-                    {% if tag == name %}
-                    {% set checked="checked" %}
-                    {% endif %}
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="tag" id="radio-{{name}}" value="{{name}}"
-                            {{ checked }}>
-                        <label class="form-check-label" for="radio-{{name}}">
-                            {{ name | capitalize}}
-                        </label>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
+        </tr>
+        <tr id="blue_color">
+            <th><center><font color="black">Low likelihood image contains animal</font></center></th>
+            <th><font color="#1eaaba">------</font></th>
+            <th><center><font color="black">High likelihood image contains animal</font></center></th>
+        </tr>
+        <tr id="blue_color">
+            <th>
+                <center>
+                    <a href="static/images/review/outputs/predicted_not_animal_detected.zip" download="class_0">
+                    <button type="button">download zip of prediction of no animal images</button>
+                    </a>
+                </center>
+            </th>
+            <th></th>
+            <th>
+                <center>
+                    <a href="static/images/review/outputs/predicted_animal_detected.zip" download="class_1">
+                    <button type="button">download zip of prediction of animal images</button>
+                    </a>
+                </center>
+            </th>
+        </tr>
+        <tr id="top_border">
+            <td id="top_border">
+                <center><figure>
+                    <img src="{{'static/images/review/predicted_not_animal_detected/' + random_files_names[0][0]}}" alt="Class No Animal - Random Image 1" style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[0][0]}}</figcaption>
+                </figure></center>
+            </td>
+            <td id="top_border"></td>
+            <td id="top_border">
+                <center><figure>
+                    <img src="{{'static/images/review/predicted_animal_detected/' + random_files_names[1][0]}}" alt="Class Animal - Random Image 1" style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[1][0]}}</figcaption>
+                </figure></center>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <center><figure>
+                    <img src="{{'static/images/review/predicted_not_animal_detected/' + random_files_names[0][1]}}" alt="Class No Animal - Random Image 2" style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[0][1]}}</figcaption>
+                </figure></center>
+            </td>
+            <td></td>
+            <td>
+                <center><figure>
+                    <img src="{{'static/images/review/predicted_animal_detected/' + random_files_names[1][1]}}" alt="Class Animal - Random Image 2" style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[1][1]}}</figcaption>
+                </figure></center>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <center><figure>
+                    <img src="{{'static/images/review/predicted_not_animal_detected/' + random_files_names[0][2]}}" alt="Class No Animal - Random Image 3" style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[0][2]}}</figcaption>
+                </figure></center>
+            </td>        
+            <td></td>
+            <td>
+                <center><figure>
+                    <img src="{{'static/images/review/predicted_animal_detected/' + random_files_names[1][2]}}" alt="Class Animal - Random Image 3" style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[1][2]}}</figcaption>
+                </figure></center>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <center><figure>
+                    <img src="{{'static/images/review/predicted_not_animal_detected/' + random_files_names[0][3]}}" alt="Class No Animal - Random Image 4" style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[0][3]}}</figcaption>
+                </figure></center>
+            </td>        
+            <td></td>
+            <td>
+                <center><figure>
+                    <img src="{{'static/images/review/predicted_animal_detected/' + random_files_names[1][3]}}" alt="Class Animal - Random Image 4" style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[1][3]}}</figcaption>
+                </figure></center>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <center><figure>
+                    <img src="{{'static/images/review/predicted_not_animal_detected/' + random_files_names[0][4]}}" alt="Class No Animal - Random Image 5" style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[0][4]}}</figcaption>
+                </figure></center>
+            </td>        
+            <td></td>
+            <td>
+                <center><figure>
+                    <img src="{{'static/images/review/predicted_animal_detected/' + random_files_names[1][4]}}" alt="Class Animal - Random Image 5" style="width:200px;height:auto;">
+                    <figcaption>{{random_files_names[1][4]}}</figcaption>
+                </figure></center>
+            </td>
+        </tr>
+    </table>
+</div>
+<hr>
 
-        <div class="card">
-            <div class="card-header" id="analytics">
-                <h2 class="mb-0">
-                    <button class="btn btn-link collapsed" type="button" data-toggle="collapse"
-                        data-target="#collapseTwo" aria-controls="collapseTwo">
-                        Choice_2
-                    </button>
-                </h2>
-            </div>
-            <div id="collapseTwo" class="collapse
-            {% for  name in Choice_1 %}
-            {% if name==tag %}
-            show
+<br><br>
+
+<h3>Adjust Image Classification Results</h3>
+<p>The model classifies an animal as detected (i.e. "animal_detected") or not detected (i.e. "not_animal_detected")
+    based on the confidence level that the image belongs to that class. For "animal_detected", a higher "confidence_score"
+    in the table means the model is more confident that it contains an animal, while for "not_animal_detected", a lower "confidence_score"
+    means that the model is less confident that an animal isn't in the image.
+    <br><br>
+    You may adjust the confidence thresholds for each class and see in the image results above how different 
+    confidence level thresholds affect the sensitivity of the model predictions above. You may save model results iteratively 
+    for different confidence scenarios, such as only saving results where the model has a high confidence that an animal isn't present
+    (i.e. a high confidence cutoff for "not_animal_detected"), a low confidence that an animal is present (i.e. a low confidence 
+    cutoff for "animal_detected"), a combination of the two levers, or some other scenario.
+    <br><br>
+    If you wish to view the inital
+    model predictions, you can reset the table below.
+</p>
+
+<table border="5" align="center" style="width:1300px;height:auto;">
+    <tr id="side_border">
+        <td id="side_border" colspan="2" style="width: 259px; vertical-align:top">
+            <h3>Reclassify with new confidence level</h3>
+            <p>Keep class if confidence score greater than:</p>
+            <form action="/review_reclassify_predictions" method="post">
+                <!-- <input type="text" name="random_class_name" id="random_class_name" placeholder="e.g. fox or 'all_classes'" required> -->
+                <label>Select Class (i.e. 'animal_detected' or 'not_animal_detected') and New Confidence Cutoff Level:<br>
+                    <input list="reclassify_class_name" id="reclassify_class_name_label"
+                     name="reclassify_class_name_label" placeholder="select from dropdown "
+                     style="width: 200px;"/>
+                </label>
+                <datalist id="reclassify_class_name">
+                    <option value="animal_detected">
+                    <option value="not_animal_detected">
+                </datalist>
+                <br>
+                <input type="number" name="conf_lev" id="conf_lev"
+                max="1.0000000000000000" min="0.0000000000000000" 
+                placeholder="e.g. 0.50" step="0.01" 
+                value="" style="width: 200px;" required />
+                <br>
+                <input type="submit">
+            </form>
+            <br><br>
+            <p>Confidence Score Cutoffs</p>
+            {% if model_predictions %}
+                <img src="static/images/review/data_frame/cutoff_levels_table_reclassified.png" alt="Cutoff Table" width=”200″ height=”200″>
+            {% else %}
+                <img src="static/images/review/data_frame/cutoff_levels_table_initial.png" alt="Cutoff Table" width=”200″ height=”200″>
             {% endif %}
-            {% endfor %}
-            " aria-labelledby="headingTwo" data-parent="#uploadExample">
-                <div class="card-body">
-                    {% for name in Choice_2 %}
-                    {% if tag == name %}
-                    {% set checked="checked" %}
-                    {% endif %}
-                    <div class="form-check form-check-inline">
-                        <input class="form-check-input" type="radio" name="tag" id="radio-{{name}}" value="{{name}}"
-                            {{ checked }}>
-                        <label class="form-check-label" for="radio-{{name}}">
-                            {{ name | capitalize}}
-                        </label>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-    </div>
-    <button type="submit" class="submit btn btn-primary btn-xl">Submit</button>
-</form>
+
+            <br><br><br>
+            <h3>Reset classification</h3>
+            <p>Reset the 'new' classifications to the default model outputs</p>
+            <form action="/review" method="get">
+                <input type="submit" value="Reset classifications">
+            </form>
+        </td> 
+        <td>
+            <center>
+                {% if model_predictions %}
+                <h3>Adjusted Model Results</h3>
+                <iframe src="static/images/review/data_frame/conf_table_reclassified.html" alt="Model Classification Table" width="1000" height="500"></iframe>
+                <!-- <img src="static/images/review/data_frame/conf_table_reclassified.png" alt="Model Classification Table" width=”500″ height=”600″> -->
+                {% else %}
+                <h3>Initial Model Results</h3>
+                <!-- <img src="static/images/review/data_frame/conf_table_initial.png" alt="Model Classification Table" width=”500″ height=”600″> -->
+                <iframe src="static/images/review/data_frame/conf_table_initial.html" alt="Model Classification Table" width="900" height="500"></iframe>
+                {% endif %}
+            </center>
+        </td>
+    </tr>
+    
+    
+    <br><br>
+    
+    
+</table>
+</body>
+</html>
+
 
 {% endblock %}
 

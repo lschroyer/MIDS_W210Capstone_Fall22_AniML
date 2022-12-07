@@ -13,23 +13,26 @@
 
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="nav navbar-nav ml-auto">
+                <li class="nav-item {{'active' if active_page == 'home' }}">
+                    <a class="nav-link" href="/">Home</a>
+                </li>
                 <li class="nav-item {{'active' if active_page == 'filter' }}">
-                    <a class="nav-link" href="/filter">Filter Images</a>
+                    <a class="nav-link" href="/filter">(1.1) Filter Images</a>
                 </li>
                 <li class="nav-item {{'active' if active_page == 'review' }}">
-                    <a class="nav-link" href="/review">Review Filtered Images</a>
+                    <a class="nav-link" href="/review">(1.2) Review and Download Filtered Images</a>
                 </li>
                 <li class="nav-item {{'active' if active_page == 'label' }}">
-                    <a class="nav-link" href="/label">Label Images</a>
+                    <a class="nav-link" href="/label">(2.1) Label Images</a>
                 </li>
                 <li class="nav-item {{'active' if active_page == 'upload' }}">
-                    <a class="nav-link" href="/upload">Model Training</a>
+                    <a class="nav-link" href="/training">(2.2) Model Training</a>
                 </li>
                 <li class="nav-item {{'active' if active_page == 'inference' }}">
-                    <a class="nav-link" href="/inference">Automatic Image Detection</a>
+                    <a class="nav-link" href="/inference">(3.1) Classify Objects in Images</a>
                 </li>
                 <li class="nav-item {{'active' if active_page == 'analytics' }}">
-                    <a class="nav-link" href="/analytics">Analytics</a>
+                    <a class="nav-link" href="/analytics">(3.2) Review and Download Classified Images</a>
                 </li>
                 
             </ul>

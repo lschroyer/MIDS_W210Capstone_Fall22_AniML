@@ -6,10 +6,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="description" content="FastAPI Starter">
-    <meta name="author" content="Shinichi Okada">
+    <meta name="description" content="AniML Website - W210 Fall 2022, UC Berkeley School of Information">
+    <meta name="author" content="Lucas Harvey-Schroyer, Ivan Wong, Lana Elauria, Whit Blodgett">
 
-    <title>{% block title %}{% endblock %} FastAPI Starter</title>
+    <title>{% block title %}{% endblock %} AniML Website</title>
     <link rel="icon" href="{{ url_for('static', path='/images/favicon.png') }}" sizes="32x32" />
 
     <!-- Bootstrap CSS CDN -->
@@ -20,7 +20,10 @@
     <link href="{{ url_for('static', path='/css/mystyle.css') }}" rel="stylesheet">
     <!-- Your Font Awesome kit -->
     <script src="https://kit.fontawesome.com/543c4560e5.js" crossorigin="anonymous"></script>
-
+    
+    <script src="https://cdn.jsdelivr.net/npm/vega@5.22.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.2.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.20.8"></script>
     {% endblock %}
 </head>
 
@@ -34,6 +37,8 @@
             {% endblock %}
         </div>
     </div>
+
+    
     <div class="overlay"></div>
 
     {% block scripts %}

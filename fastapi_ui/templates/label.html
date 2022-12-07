@@ -11,17 +11,47 @@
 
 {% block page_content %}
 <h1 class="cap">Label Images</h1>
+<p>If you'd like to go beyond just filtering your model results, 
+    use the resources in this page to label your images for custom model training.</p>
 
-Please navigate to <a href="https://roboflow.com/annotate" 
-target="_blank">Roboflow.com/annotate
-</a> to annotate ~20 of your images.
-<br>
+<head>
+    <title>AniML - Labeling</title>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="../static/css/styles.css">
+    <link rel="stylesheet" href="../static/css/mystyle.css">
+    <link rel="stylesheet" href="../static/css/style3.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+        crossorigin="anonymous">
 
+    <h2 class="cap">AniML - Labeling</h2>
+</head>
 
-<br><br>
-<h2 class="cap">ROBOFLOW ANNOTATE</h2>
-<div style="width: 500px; height: 300px; position: relative; "><iframe src="https://streamable.com/e/218nmu" frameborder="0" width="100%" height="100%" allowfullscreen style="width: 100%; height: 100%; position: absolute;"></iframe></div>
-<!-- padding-bottom: 56.250%; -->
+<body>
+
+    <br>
+    <h3>Roboflow Introduction</h3>
+    <p>
+
+        Next you’ll need to label your images of interest with bounding boxes - squares which tell the model what you are looking for. 
+        We’ll use these images to train a custom model that is great at detecting your objects of interest. 
+        Simply use the downloaded dataset from (2.2) with the files that contains your animals, go to:
+    </p>
+    <p style="color: blue;">
+        <a href="https://roboflow.com/" target="_blank">Roboflow.com</a> 
+    </p>
+    <p> 
+        Please annotate at least 20 images.Once you’ve labeled, export the image/label zip file and upload it in step 3.1.
+    </p>
+    <br>
+
+    <h3>Robowflow Annotate</h3>
+    <p>Create an account and follow our custom walkthrough here:</p>
+    <p style="color: blue;">
+        <a href="https://www.loom.com/share/256040fb5d8c4c67890b56136df60c99" target="_blank">Roboflow labeling link</a> 
+    </p>
+</body>
+
 
 {% endblock %}
 
