@@ -1,0 +1,13 @@
+train: ./train/images
+val: ./valid/images
+test: ./test/images
+
+nc: 4
+names: ['Coyote', 'Fox', 'Rabbit', 'Wildcat']
+
+roboflow:
+  workspace: farmlife
+  project: animl-sample-dataset
+  version: 1
+  license: CC BY 4.0
+  url: https://universe.roboflow.com/farmlife/animl-sample-dataset/dataset/1
