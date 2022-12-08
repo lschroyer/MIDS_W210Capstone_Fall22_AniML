@@ -108,7 +108,7 @@ UC Berkeley, School of Information 2022 - Masters of Information and Data Scienc
             color: lightgrey;
             }
         </style>
-<!-- <html>
+<html>
 <div class="callout">
     <div class="callout-header">**Please note**</div>
     <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
@@ -124,4 +124,4 @@ UC Berkeley, School of Information 2022 - Masters of Information and Data Scienc
     </center>
     </div>
 </div>
-</html> -->
+</html>
